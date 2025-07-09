@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SaaS Real Estate</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">SaaS Inmobiliario</div>
+
+    <div class="login-section" id="loginSection">
+      <h2>Iniciar sesión</h2>
+      <form id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Email" required />
+        <input type="password" id="loginPassword" placeholder="Contraseña" required />
+        <button type="submit">Entrar</button>
+      </form>
+    </div>
+
+    <div id="mainApp" class="hidden">
+      <h2>Registrar Cliente</h2>
+      <form id="clienteForm">
+        <input type="text" id="nombreCliente" placeholder="Nombre" required />
+        <input type="number" id="zonaCliente" placeholder="Zona" required />
+        <input type="number" id="entrada" placeholder="Entrada (€)" required />
+        <input type="number" id="habitacionesCliente" placeholder="Habitaciones" required />
+        <input type="number" id="banosCliente" placeholder="Baños" required />
+        <button type="submit">Registrar Cliente</button>
+      </form>
+
+      <h2>Registrar Piso</h2>
+      <form id="pisoForm">
+        <input type="number" id="zona" placeholder="Zona" required />
+        <input type="number" id="precio" placeholder="Precio (€)" required />
+        <input type="number" id="habitaciones" placeholder="Habitaciones" required />
+        <input type="number" id="banos" placeholder="Baños" required />
+        <button type="submit">Registrar Piso</button>
+      </form>
+    </div>
+
+    <div id="resultArea"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
