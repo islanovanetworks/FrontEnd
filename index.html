@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SaaS Real Estate</title>
+  <title>MatchingProps | Plataforma Inmobiliaria de IA</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <div class="header">SaaS Inmobiliario</div>
+    <div class="header">🏠 MatchingProps</div>
 
     <div class="login-section" id="loginSection">
       <h2>Iniciar sesión</h2>
@@ -20,27 +20,189 @@
     </div>
 
     <div id="mainApp" class="hidden">
-      <h2>Registrar Cliente</h2>
-      <form id="clienteForm">
-        <input type="text" id="nombreCliente" placeholder="Nombre" required />
-        <input type="number" id="zonaCliente" placeholder="Zona" required />
-        <input type="number" id="entrada" placeholder="Entrada (€)" required />
-        <input type="number" id="habitacionesCliente" placeholder="Habitaciones" required />
-        <input type="number" id="banosCliente" placeholder="Baños" required />
-        <button type="submit">Registrar Cliente</button>
-      </form>
+      <div class="actions">
+        <h2>🔎 Acciones disponibles</h2>
+        <ul>
+          <li><a href="#clientes">🧍 Registrar Cliente</a></li>
+          <li><a href="#pisos">🏡 Registrar Piso</a></li>
+          <li><a href="#buscar-clientes">🔍 Buscar Clientes</a></li>
+          <li><a href="#buscar-pisos">🏡 Buscar Pisos</a></li>
+        </ul>
+      </div>
 
-      <h2>Registrar Piso</h2>
-      <form id="pisoForm">
-        <input type="number" id="zona" placeholder="Zona" required />
-        <input type="number" id="precio" placeholder="Precio (€)" required />
-        <input type="number" id="habitaciones" placeholder="Habitaciones" required />
-        <input type="number" id="banos" placeholder="Baños" required />
-        <button type="submit">Registrar Piso</button>
-      </form>
+      <div id="clientes" class="section">
+        <h2>🧍 Registro de nuevo cliente</h2>
+        <form id="clienteForm">
+          <div class="form-grid">
+            <div>
+              <label>Nombre</label>
+              <input type="text" id="nombreCliente" placeholder="Nombre" required />
+            </div>
+            <div>
+              <label>Teléfono</label>
+              <input type="text" id="telefonoCliente" placeholder="Teléfono" />
+            </div>
+            <div>
+              <label>Zona Preferida</label>
+              <select id="zonaCliente" required>
+                <option value="">Seleccionar zona</option>
+                <option value="Zona 0">Zona 0</option>
+                <option value="Zona 1">Zona 1</option>
+                <option value="Zona 2">Zona 2</option>
+                <option value="Zona 3">Zona 3</option>
+                <option value="Zona 4">Zona 4</option>
+                <option value="Zona 5">Zona 5</option>
+                <option value="Zona 6">Zona 6</option>
+                <option value="Zona 7">Zona 7</option>
+                <option value="Zona 8">Zona 8</option>
+                <option value="Zona 9">Zona 9</option>
+              </select>
+            </div>
+            <div>
+              <label>Subzonas</label>
+              <input type="text" id="subzonasCliente" placeholder="Subzonas" />
+            </div>
+            <div>
+              <label>Entrada (%)</label>
+              <input type="number" id="entrada" placeholder="Entrada (%)" required />
+            </div>
+            <div>
+              <label>Precio (€)</label>
+              <input type="number" id="precioCliente" placeholder="Precio (€)" />
+            </div>
+            <div>
+              <label>Tipo de Vivienda</label>
+              <select id="tipoViviendaCliente">
+                <option value="">Seleccionar</option>
+                <option value="Piso">Piso</option>
+                <option value="Casa">Casa</option>
+                <option value="Chalet">Chalet</option>
+                <option value="Adosado">Adosado</option>
+                <option value="Dúplex">Dúplex</option>
+                <option value="Ático">Ático</option>
+                <option value="Estudio">Estudio</option>
+              </select>
+            </div>
+            <div>
+              <label>Finalidad</label>
+              <input type="text" id="finalidadCliente" placeholder="Finalidad" />
+            </div>
+            <div>
+              <label>Habitaciones deseadas</label>
+              <input type="number" id="habitacionesCliente" placeholder="Habitaciones" required />
+            </div>
+            <div>
+              <label>Baños deseados</label>
+              <input type="text" id="banosCliente" placeholder="Baños (ej. 1+1)" required />
+            </div>
+            <!-- Add remaining fields similarly -->
+            <div>
+              <label>Estado</label>
+              <select id="estadoCliente">
+                <option value="">Seleccionar</option>
+                <option value="Obra Nueva">Obra Nueva</option>
+                <option value="Buen Estado">Buen Estado</option>
+                <option value="A Reformar">A Reformar</option>
+              </select>
+            </div>
+            <div>
+              <label>Ascensor</label>
+              <select id="ascensorCliente">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <!-- Add fields for bajos, entreplanta, m2, altura, cercania_metro, orientacion, etc. -->
+            <div>
+              <label>Características Adicionales</label>
+              <input type="text" id="caracteristicasCliente" placeholder="Características Adicionales" />
+            </div>
+            <div>
+              <label>Banco</label>
+              <input type="text" id="bancoCliente" placeholder="Banco" />
+            </div>
+            <div>
+              <label>Ahorro (€)</label>
+              <input type="number" id="ahorroCliente" placeholder="Ahorro (€)" />
+            </div>
+          </div>
+          <button type="submit">✅ Registrar Cliente</button>
+        </form>
+      </div>
+
+      <div id="pisos" class="section">
+        <h2>🏡 Registro de nuevo piso</h2>
+        <form id="pisoForm">
+          <div class="form-grid">
+            <div>
+              <label>Zona</label>
+              <select id="zona" required>
+                <option value="">Seleccionar zona</option>
+                <option value="Zona 0">Zona 0</option>
+                <option value="Zona 1">Zona 1</option>
+                <option value="Zona 2">Zona 2</option>
+                <option value="Zona 3">Zona 3</option>
+                <option value="Zona 4">Zona 4</option>
+                <option value="Zona 5">Zona 5</option>
+                <option value="Zona 6">Zona 6</option>
+                <option value="Zona 7">Zona 7</option>
+                <option value="Zona 8">Zona 8</option>
+                <option value="Zona 9">Zona 9</option>
+              </select>
+            </div>
+            <div>
+              <label>Precio (€)</label>
+              <input type="number" id="precio" placeholder="Precio (€)" required />
+            </div>
+            <div>
+              <label>Tipo de Vivienda</label>
+              <select id="tipoVivienda">
+                <option value="">Seleccionar</option>
+                <option value="Piso">Piso</option>
+                <option value="Casa">Casa</option>
+                <option value="Chalet">Chalet</option>
+                <option value="Adosado">Adosado</option>
+                <option value="Dúplex">Dúplex</option>
+                <option value="Ático">Ático</option>
+                <option value="Estudio">Estudio</option>
+              </select>
+            </div>
+            <div>
+              <label>Habitaciones</label>
+              <input type="number" id="habitaciones" placeholder="Habitaciones" required />
+            </div>
+            <div>
+              <label>Baños</label>
+              <input type="text" id="banos" placeholder="Baños (ej. 1+1)" required />
+            </div>
+            <!-- Add remaining fields similarly -->
+            <div>
+              <label>Características Adicionales</label>
+              <input type="text" id="caracteristicasPiso" placeholder="Características Adicionales" />
+            </div>
+          </div>
+          <button type="submit">✅ Registrar Piso</button>
+        </form>
+      </div>
+
+      <div id="buscar-clientes" class="section">
+        <h2>🔍 Buscar Clientes para un Piso</h2>
+        <select id="selectPiso">
+          <option value="">Seleccionar un piso...</option>
+        </select>
+        <button onclick="buscarClientes()">Buscar</button>
+        <div id="clientesResult"></div>
+      </div>
+
+      <div id="buscar-pisos" class="section">
+        <h2>🏡 Buscar Pisos para un Cliente</h2>
+        <select id="selectCliente">
+          <option value="">Seleccionar un cliente...</option>
+        </select>
+        <button onclick="buscarPisos()">Buscar</button>
+        <div id="pisosResult"></div>
+      </div>
     </div>
-
-    <div id="resultArea"></div>
   </div>
   <script src="script.js"></script>
 </body>
