@@ -72,3 +72,21 @@ document.getElementById("pisoForm").addEventListener("submit", async function(e)
   const result = await response.json();
   document.getElementById("resultArea").innerText = "Piso registrado: " + JSON.stringify(result);
 });
+
+<button onclick="obtenerMatches()">Ver Matches</button>
+<div id="matchResults"></div>
+
+async function obtenerMatches() {
+  const res = await fetch("https://matchingprops.onrender.com/match", {
+    headers: {
+      Authorization: "Bearer " + token
+    }
+  });
+  const data = await res.json();
+  let html = "<h3>Matches encontrados</h3><ul>";
+  data.forEach(match => {
+    html += `<li>Cliente ID: ${match.cliente_id} ↔ Piso ID: ${match.piso_id} (score: ${match.score})</li>`;
+  });
+  html += "</ul>";
+  document.getElementById("matchResults").innerHTML = html;
+}
