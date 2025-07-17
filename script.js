@@ -22,6 +22,8 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
     document.getElementById("loginSection").classList.add("hidden");
     document.getElementById("mainApp").classList.remove("hidden");
     alert("Login correcto");
+    loadPisos();
+    loadClientes();
   } else {
     alert("Login incorrecto");
   }
@@ -30,10 +32,21 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
 document.getElementById("clienteForm").addEventListener("submit", async function(e) {
   e.preventDefault();
   const cliente = {
-    zona: parseInt(document.getElementById("zonaCliente").value),
-    entrada: parseInt(document.getElementById("entrada").value),
+    nombre: document.getElementById("nombreCliente").value,
+    telefono: document.getElementById("telefonoCliente").value,
+    zona: document.getElementById("zonaCliente").value,
+    subzonas: document.getElementById("subzonasCliente").value,
+    precio: parseFloat(document.getElementById("precioCliente").value) || 0,
+    tipo_vivienda: document.getElementById("tipoViviendaCliente").value,
+    finalidad: document.getElementById("finalidadCliente").value,
     habitaciones: parseInt(document.getElementById("habitacionesCliente").value),
-    banos: parseInt(document.getElementById("banosCliente").value),
+    banos: document.getElementById("banosCliente").value,
+    estado: document.getElementById("estadoCliente").value,
+    ascensor: document.getElementById("ascensorCliente").value,
+    // Add other fields
+    caracteristicas_adicionales: document.getElementById("caracteristicasCliente").value,
+    banco: document.getElementById("bancoCliente").value,
+    ahorro: parseFloat(document.getElementById("ahorroCliente").value) || 0,
     compania_id: compania_id
   };
 
@@ -47,16 +60,19 @@ document.getElementById("clienteForm").addEventListener("submit", async function
   });
 
   const result = await response.json();
-  document.getElementById("resultArea").innerText = "Cliente registrado: " + JSON.stringify(result);
+  document.getElementById("clientesResult").innerText = "Cliente registrado: " + JSON.stringify(result);
+  loadClientes();
 });
 
 document.getElementById("pisoForm").addEventListener("submit", async function(e) {
   e.preventDefault();
   const piso = {
-    zona: parseInt(document.getElementById("zona").value),
-    precio: parseInt(document.getElementById("precio").value),
+    precio: parseFloat(document.getElementById("precio").value),
+    tipo_vivienda: document.getElementById("tipoVivienda").value,
     habitaciones: parseInt(document.getElementById("habitaciones").value),
-    banos: parseInt(document.getElementById("banos").value),
+    banos: document.getElementById("banos").value,
+    // Add other fields
+    caracteristicas_adicionales: document.getElementById("caracteristicasPiso").value,
     compania_id: compania_id
   };
 
@@ -70,23 +86,66 @@ document.getElementById("pisoForm").addEventListener("submit", async function(e)
   });
 
   const result = await response.json();
-  document.getElementById("resultArea").innerText = "Piso registrado: " + JSON.stringify(result);
+  document.getElementById("pisosResult").innerText = "Piso registrado: " + JSON.stringify(result);
+  loadPisos();
 });
 
-<button onclick="obtenerMatches()">Ver Matches</button>
-<div id="matchResults"></div>
-
-async function obtenerMatches() {
-  const res = await fetch("https://matchingprops.onrender.com/match", {
-    headers: {
-      Authorization: "Bearer " + token
-    }
+async function loadPisos() {
+  const response = await fetch(`${API_BASE}/pisos`, {
+    headers: { "Authorization": "Bearer " + token }
   });
-  const data = await res.json();
-  let html = "<h3>Matches encontrados</h3><ul>";
-  data.forEach(match => {
-    html += `<li>Cliente ID: ${match.cliente_id} ↔ Piso ID: ${match.piso_id} (score: ${match.score})</li>`;
+  const pisos = await response.json();
+  const select = document.getElementById("selectPiso");
+  select.innerHTML = '<option value="">Seleccionar un piso...</option>';
+  pisos.forEach(piso => {
+    select.innerHTML += `<option value="${piso.id}">Piso ${piso.id} - ${piso.zona} (${piso.precio}€)</option>`;
+  });
+}
+
+async function loadClientes() {
+  const response = await fetch(`${API_BASE}/clientes`, {
+    headers: { "Authorization": "Bearer " + token }
+  });
+  const clientes = await response.json();
+  const select = document.getElementById("selectCliente");
+  select.innerHTML = '<option value="">Seleccionar un cliente...</option>';
+  clientes.forEach(cliente => {
+    select.innerHTML += `<option value="${cliente.id}">${cliente.nombre} - ${cliente.zona}</option>`;
+  });
+}
+
+async function buscarClientes() {
+  const pisoId = document.getElementById("selectPiso").value;
+  if (!pisoId) {
+    alert("Selecciona un piso");
+    return;
+  }
+  const response = await fetch(`${API_BASE}/match?piso_id=${pisoId}`, {
+    headers: { "Authorization": "Bearer " + token }
+  });
+  const matches = await response.json();
+  let html = "<h3>Clientes compatibles</h3><ul>";
+  matches.forEach(match => {
+    html += `<li>Cliente ID: ${match.cliente_id} (Score: ${match.score})</li>`;
   });
   html += "</ul>";
-  document.getElementById("matchResults").innerHTML = html;
+  document.getElementById("clientesResult").innerHTML = html;
+}
+
+async function buscarPisos() {
+  const clienteId = document.getElementById("selectCliente").value;
+  if (!clienteId) {
+    alert("Selecciona un cliente");
+    return;
+  }
+  const response = await fetch(`${API_BASE}/match?cliente_id=${clienteId}`, {
+    headers: { "Authorization": "Bearer " + token }
+  });
+  const matches = await response.json();
+  let html = "<h3>Pisos compatibles</h3><ul>";
+  matches.forEach(match => {
+    html += `<li>Piso ID: ${match.piso_id} (Score: ${match.score})</li>`;
+  });
+  html += "</ul>";
+  document.getElementById("pisosResult").innerHTML = html;
 }
