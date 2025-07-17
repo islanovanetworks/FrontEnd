@@ -85,7 +85,11 @@
             </div>
             <div>
               <label>Finalidad</label>
-              <input type="text" id="finalidadCliente" placeholder="Finalidad" />
+              <select id="finalidadCliente">
+                <option value="">Seleccionar</option>
+                <option value="Primera Vivienda">Primera Vivienda</option>
+                <option value="Inversión">Inversión</option>
+              </select>
             </div>
             <div>
               <label>Habitaciones deseadas</label>
@@ -95,7 +99,6 @@
               <label>Baños deseados</label>
               <input type="text" id="banosCliente" placeholder="Baños (ej. 1+1)" required />
             </div>
-            <!-- Add remaining fields similarly -->
             <div>
               <label>Estado</label>
               <select id="estadoCliente">
@@ -112,7 +115,128 @@
                 <option value="No">No</option>
               </select>
             </div>
-            <!-- Add fields for bajos, entreplanta, m2, altura, cercania_metro, orientacion, etc. -->
+            <div>
+              <label>Bajos</label>
+              <select id="bajosCliente">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Entreplanta</label>
+              <select id="entreplantaCliente">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Metros Cuadrados</label>
+              <input type="number" id="m2Cliente" placeholder="Metros Cuadrados" />
+            </div>
+            <div>
+              <label>Altura</label>
+              <select id="alturaCliente">
+                <option value="">Seleccionar</option>
+                <option value="Primeras Plantas">Primeras Plantas</option>
+                <option value="Plantas Intermedias">Plantas Intermedias</option>
+                <option value="Últimas Plantas">Últimas Plantas</option>
+              </select>
+            </div>
+            <div>
+              <label>Cercanía Metro</label>
+              <select id="cercaniaMetroCliente">
+                <option value="">Seleccionar</option>
+                <option value="<5 Minutos"><5 Minutos</option>
+                <option value="<10 Minutos"><10 Minutos</option>
+                <option value="<15 Minutos"><15 Minutos</option>
+                <option value="Indiferente">Indiferente</option>
+              </select>
+            </div>
+            <div>
+              <label>Orientación</label>
+              <select id="orientacionCliente">
+                <option value="">Seleccionar</option>
+                <option value="Norte">Norte</option>
+                <option value="Sur">Sur</option>
+                <option value="Este">Este</option>
+                <option value="Oeste">Oeste</option>
+                <option value="Indiferente">Indiferente</option>
+              </select>
+            </div>
+            <div>
+              <label>Edificio Semi-Nuevo</label>
+              <select id="edificioSemiNuevoCliente">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Adaptado Movilidad</label>
+              <select id="adaptadoMovilidadCliente">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Balcón</label>
+              <select id="balconCliente">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Patio</label>
+              <select id="patioCliente">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Terraza</label>
+              <select id="terrazaCliente">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Garaje</label>
+              <select id="garajeCliente">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Trastero</label>
+              <select id="trasteroCliente">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Interior</label>
+              <select id="interiorCliente">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Piscina</label>
+              <select id="piscinaCliente">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Urbanización</label>
+              <select id="urbanizacionCliente">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Vistas</label>
+              <input type="text" id="vistasCliente" placeholder="Vistas" />
+            </div>
             <div>
               <label>Características Adicionales</label>
               <input type="text" id="caracteristicasCliente" placeholder="Características Adicionales" />
@@ -175,7 +299,144 @@
               <label>Baños</label>
               <input type="text" id="banos" placeholder="Baños (ej. 1+1)" required />
             </div>
-            <!-- Add remaining fields similarly -->
+            <div>
+              <label>Estado</label>
+              <select id="estado">
+                <option value="">Seleccionar</option>
+                <option value="Obra Nueva">Obra Nueva</option>
+                <option value="Buen Estado">Buen Estado</option>
+                <option value="A Reformar">A Reformar</option>
+              </select>
+            </div>
+            <div>
+              <label>Ascensor</label>
+              <select id="ascensor">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Bajos</label>
+              <select id="bajos">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Entreplanta</label>
+              <select id="entreplanta">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Metros Cuadrados</label>
+              <input type="number" id="m2" placeholder="Metros Cuadrados" />
+            </div>
+            <div>
+              <label>Altura</label>
+              <select id="altura">
+                <option value="">Seleccionar</option>
+                <option value="Primeras Plantas">Primeras Plantas</option>
+                <option value="Plantas Intermedias">Plantas Intermedias</option>
+                <option value="Últimas Plantas">Últimas Plantas</option>
+              </select>
+            </div>
+            <div>
+              <label>Cercanía Metro</label>
+              <select id="cercaniaMetro">
+                <option value="">Seleccionar</option>
+                <option value="<5 Minutos"><5 Minutos</option>
+                <option value="<10 Minutos"><10 Minutos</option>
+                <option value="<15 Minutos"><15 Minutos</option>
+                <option value="Indiferente">Indiferente</option>
+              </select>
+            </div>
+            <div>
+              <label>Orientación</label>
+              <select id="orientacion">
+                <option value="">Seleccionar</option>
+                <option value="Norte">Norte</option>
+                <option value="Sur">Sur</option>
+                <option value="Este">Este</option>
+                <option value="Oeste">Oeste</option>
+                <option value="Indiferente">Indiferente</option>
+              </select>
+            </div>
+            <div>
+              <label>Edificio Semi-Nuevo</label>
+              <select id="edificioSemiNuevo">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Adaptado Movilidad</label>
+              <select id="adaptadoMovilidad">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Balcón</label>
+              <select id="balcon">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Patio</label>
+              <select id="patio">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Terraza</label>
+              <select id="terraza">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Garaje</label>
+              <select id="garaje">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Trastero</label>
+              <select id="trastero">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Interior</label>
+              <select id="interior">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Piscina</label>
+              <select id="piscina">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Urbanización</label>
+              <select id="urbanizacion">
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label>Vistas</label>
+              <input type="text" id="vistas" placeholder="Vistas" />
+            </div>
             <div>
               <label>Características Adicionales</label>
               <input type="text" id="caracteristicasPiso" placeholder="Características Adicionales" />
