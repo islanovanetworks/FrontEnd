@@ -10,7 +10,7 @@ body {
   margin: auto;
 }
 .header {
-  font-size: 2rem;
+  font-size: 2.5rem;
   text-align: center;
   margin-bottom: 2rem;
 }
@@ -20,6 +20,8 @@ input, select {
   margin: 0.5rem 0;
   border-radius: 5px;
   border: none;
+  background-color: #ffffff;
+  color: #000000;
 }
 button {
   padding: 0.6rem 1.2rem;
@@ -28,9 +30,19 @@ button {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-weight: bold;
+}
+button:hover {
+  background-color: #e0b620;
 }
 .hidden {
   display: none;
+}
+.actions {
+  background-color: #1a1f21;
+  padding: 1rem;
+  border-radius: 5px;
+  margin-bottom: 2rem;
 }
 .actions ul {
   list-style: none;
@@ -39,6 +51,13 @@ button {
 .actions li {
   margin: 0.5rem 0;
 }
+.actions a {
+  color: #f9ca24;
+  text-decoration: none;
+}
+.actions a:hover {
+  text-decoration: underline;
+}
 .form-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -46,4 +65,13 @@ button {
 }
 .section {
   margin-top: 2rem;
+  background-color: #1a1f21;
+  padding: 1.5rem;
+  border-radius: 5px;
+}
+.section h2 {
+  margin-top: 0;
+}
+#clientesResult, #pisosResult {
+  margin-top: 1rem;
 }
