@@ -7,6 +7,7 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
   const email = document.getElementById("loginEmail").value;
   const password = document.getElementById("loginPassword").value;
 
+  console.log("Attempting login with email:", email);
   try {
     const response = await fetch(`${API_BASE}/auth/login`, {
       method: "POST",
@@ -14,12 +15,14 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
       body: new URLSearchParams({ username: email, password: password })
     });
 
+    console.log("Login response status:", response.status);
     const data = await response.json();
+    console.log("Login response data:", data);
+
     if (response.ok) {
       token = data.access_token;
       const payload = JSON.parse(atob(token.split(".")[1]));
       compania_id = payload.compania_id;
-
       document.getElementById("loginSection").classList.add("hidden");
       document.getElementById("mainApp").classList.remove("hidden");
       alert("Login correcto");
@@ -28,6 +31,7 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
       alert("Login incorrecto: " + data.detail);
     }
   } catch (error) {
+    console.error("Login error:", error);
     alert("Error en el login: " + error.message);
   }
 });
