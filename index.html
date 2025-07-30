@@ -8,37 +8,97 @@
   <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@heroicons/react@2.0.18/20/solid/esm/index.js"></script>
   <style>
-    /* Custom Tailwind overrides for dark theme consistency */
     @layer base {
       body {
-        @apply bg-gray-900 text-white;
+        @apply bg-gray-950 text-white font-inter antialiased;
       }
-      .accent-yellow {
-        @apply bg-yellow-400 text-black hover:bg-yellow-300;
+      .intro-bg {
+        background: linear-gradient(135deg, #0F1F1A 0%, #1F4033 100%);
+        background-size: cover;
+        animation: fadeIn 2s ease-in-out;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      .particle {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 15s infinite;
+      }
+      @keyframes float {
+        0% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-20px) scale(1.2); }
+        100% { transform: translateY(0) scale(1); }
       }
     }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
   </style>
 </head>
-<body>
+<body class="overflow-hidden">
   <div id="root"></div>
 
   <script type="text/babel">
     const { useState, useEffect } = React;
+    const { ArrowRightIcon } = window.HeroIconsReact;
 
     const API_BASE = "https://matchingprops.onrender.com";
     let token = localStorage.getItem("token");
     let companiaId = localStorage.getItem("companiaId");
 
+    const Intro = ({ onStart }) => (
+      <div className="intro-bg relative h-screen flex items-center justify-center overflow-hidden">
+        {[...Array(20)].map((_, i) => (
+          <div key={i} className="particle" style={{
+            width: `${Math.random() * 5 + 2}px`,
+            height: `${Math.random() * 5 + 2}px`,
+            top: `${Math.random() * 100}vh`,
+            left: `${Math.random() * 100}vw`,
+            animationDelay: `${Math.random() * 10}s`
+          }} />
+        ))}
+        <div className="text-center z-10">
+          <h1 className="text-5xl font-bold text-white mb-4">MatchingProps</h1>
+          <p className="text-lg text-gray-300 mb-6">Plataforma premium para asesores inmobiliarios</p>
+          <button onClick={onStart} className="bg-yellow-400 text-gray-950 px-6 py-3 rounded-lg font-semibold hover:bg-yellow-300 transition">
+            <ArrowRightIcon className="h-5 w-5 inline-block mr-2" /> Comenzar
+          </button>
+        </div>
+      </div>
+    );
+
     const Sidebar = () => (
-      <div className="fixed w-64 h-screen p-4 bg-gray-800">
-        <h2 className="text-2xl font-bold mb-6">🔎 Acciones</h2>
-        <ul className="space-y-4">
-          <li><a href="#clientes" className="block accent-yellow p-2 rounded">🧍 Registrar Cliente</a></li>
-          <li><a href="#pisos" className="block accent-yellow p-2 rounded">🏡 Registrar Piso</a></li>
-          <li><a href="#searchClientes" className="block accent-yellow p-2 rounded">🔍 Buscar Clientes</a></li>
-          <li><a href="#searchPisos" className="block accent-yellow p-2 rounded">🏡 Buscar Pisos</a></li>
-        </ul>
+      <div className="fixed w-64 h-screen bg-gray-900 p-6 border-r border-gray-800">
+        <h2 className="text-xl font-semibold mb-6 border-b border-gray-700 pb-2">Menú</h2>
+        <nav className="space-y-2">
+          <a href="#clientes" className="flex items-center text-gray-300 hover:text-white hover:bg-gray-800 p-2 rounded">
+            <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 114 0 2 2 0 01-4 0z" />
+            </svg>
+            Registrar Cliente
+          </a>
+          <a href="#pisos" className="flex items-center text-gray-300 hover:text-white hover:bg-gray-800 p-2 rounded">
+            <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            Registrar Piso
+          </a>
+          <a href="#searchClientes" className="flex items-center text-gray-300 hover:text-white hover:bg-gray-800 p-2 rounded">
+            <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            Buscar Clientes
+          </a>
+          <a href="#searchPisos" className="flex items-center text-gray-300 hover:text-white hover:bg-gray-800 p-2 rounded">
+            <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+            </svg>
+            Buscar Pisos
+          </a>
+        </nav>
       </div>
     );
 
@@ -63,23 +123,23 @@
             localStorage.setItem("companiaId", companiaId);
             onLogin();
           } else {
-            alert("Login incorrecto: " + data.detail);
+            alert("Error de inicio de sesión: " + data.detail);
           }
         } catch (error) {
-          alert("Error en el login: " + error.message);
+          alert("Error: " + error.message);
         }
       };
 
       return (
-        <div className="max-w-md mx-auto mt-10 p-6 bg-gray-800 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold mb-4 text-center">Iniciar Sesión</h2>
+        <div className="max-w-md mx-auto mt-20 p-8 bg-gray-800 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-semibold mb-6">Iniciar Sesión</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
-              className="w-full p-2 rounded bg-white text-black"
+              placeholder="Correo electrónico"
+              className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
               required
             />
             <input
@@ -87,10 +147,12 @@
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Contraseña"
-              className="w-full p-2 rounded bg-white text-black"
+              className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
               required
             />
-            <button type="submit" className="w-full accent-yellow p-2 rounded">Entrar</button>
+            <button type="submit" className="w-full bg-yellow-400 text-gray-900 p-3 rounded font-medium hover:bg-yellow-300 transition">
+              Iniciar Sesión
+            </button>
           </form>
         </div>
       );
@@ -105,14 +167,15 @@
 
       const handleChange = (e) => {
         const { name, value, selectedOptions } = e.target;
-        if (name === "zona" || name === "tipo_vivienda" || name === "finalidad" || name === "habitaciones" || name === "banos" || name === "orientacion") {
+        if (["zona", "tipo_vivienda", "finalidad", "habitaciones", "banos", "orientacion"].includes(name)) {
           setFormData({ ...formData, [name]: Array.from(selectedOptions, opt => opt.value) });
         } else {
           setFormData({ ...formData, [name]: value });
         }
       };
 
-      const handleSubmit = async () => {
+      const handleSubmit = async (e) => {
+        e.preventDefault();
         const cliente = { ...formData, compania_id: companiaId, entrada: parseFloat(formData.entrada), precio: parseFloat(formData.precio), m2: parseInt(formData.m2), habitaciones: formData.habitaciones.map(Number) };
         try {
           const response = await fetch(`${API_BASE}/clientes`, {
@@ -120,68 +183,68 @@
             headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
             body: JSON.stringify(cliente),
           });
-          const result = await response.json();
           if (response.ok) {
-            alert(`Cliente registrado: ${result.nombre}`);
+            alert("Cliente registrado con éxito");
             onRegister();
           } else {
-            alert("Error al registrar cliente: " + result.detail);
+            const data = await response.json();
+            alert("Error: " + data.detail);
           }
         } catch (error) {
-          alert("Error al registrar cliente: " + error.message);
+          alert("Error: " + error.message);
         }
       };
 
       return (
         <div className="max-w-4xl mx-auto mt-10 p-6 bg-gray-800 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold mb-4">🧍 Registro de Cliente</h2>
-          <div className="grid grid-cols-3 gap-4">
-            <input name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre" className="p-2 rounded bg-white text-black" required />
-            <input name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono" className="p-2 rounded bg-white text-black" required />
-            <select name="zona" multiple value={formData.zona} onChange={handleChange} className="p-2 rounded bg-white text-black" required>
+          <h2 className="text-2xl font-semibold mb-6">Registrar Cliente</h2>
+          <form onSubmit={handleSubmit} className="grid grid-cols-3 gap-4">
+            <input name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre" className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" required />
+            <input name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono" className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" required />
+            <select name="zona" multiple value={formData.zona} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" required>
               <option value="ALTO">ALTO</option><option value="OLIVOS">OLIVOS</option><option value="LAGUNA">LAGUNA</option>
               <option value="BATÁN">BATÁN</option><option value="SEPÚLVEDA">SEPÚLVEDA</option><option value="MANZANARES">MANZANARES</option>
               <option value="PÍO">PÍO</option><option value="PUERTA">PUERTA</option><option value="JESUITAS">JESUITAS</option>
             </select>
-            <input name="subzonas" value={formData.subzonas} onChange={handleChange} placeholder="Subzonas" className="p-2 rounded bg-white text-black" />
-            <select name="entrada" value={formData.entrada} onChange={handleChange} className="p-2 rounded bg-white text-black" required>
+            <input name="subzonas" value={formData.subzonas} onChange={handleChange} placeholder="Subzonas" className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" />
+            <select name="entrada" value={formData.entrada} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" required>
               <option value="">Entrada</option>{[...Array(50).keys()].map(i => <option key={i * 10000 + 10000} value={i * 10000 + 10000}>{(i * 10000 + 10000).toLocaleString()}€</option>)}
             </select>
-            <select name="precio" value={formData.precio} onChange={handleChange} className="p-2 rounded bg-white text-black" required>
+            <select name="precio" value={formData.precio} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" required>
               <option value="">Precio</option>{[...Array(20).keys()].map(i => <option key={i * 10000 + 10000} value={i * 10000 + 10000}>{(i * 10000 + 10000).toLocaleString()}€</option>)}
               {[...Array(15).keys()].map(i => <option key={(i + 20) * 20000} value={(i + 20) * 20000}>{(i + 20) * 20000}€</option>)}
             </select>
-            <select name="tipo_vivienda" multiple value={formData.tipo_vivienda} onChange={handleChange} className="p-2 rounded bg-white text-black">
+            <select name="tipo_vivienda" multiple value={formData.tipo_vivienda} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
               <option value="Piso">Piso</option><option value="Casa">Casa</option><option value="Chalet">Chalet</option>
               <option value="Adosado">Adosado</option><option value="Dúplex">Dúplex</option><option value="Ático">Ático</option><option value="Estudio">Estudio</option>
             </select>
-            <select name="finalidad" multiple value={formData.finalidad} onChange={handleChange} className="p-2 rounded bg-white text-black">
+            <select name="finalidad" multiple value={formData.finalidad} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
               <option value="Primera Vivienda">Primera Vivienda</option><option value="Inversión">Inversión</option>
             </select>
-            <select name="habitaciones" multiple value={formData.habitaciones} onChange={handleChange} className="p-2 rounded bg-white text-black">
+            <select name="habitaciones" multiple value={formData.habitaciones} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
               {[0,1,2,3,4,5].map(h => <option key={h} value={h}>{h}</option>)}
             </select>
-            <select name="banos" multiple value={formData.banos} onChange={handleChange} className="p-2 rounded bg-white text-black">
+            <select name="banos" multiple value={formData.banos} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
               <option value="1">1</option><option value="1+1">1+1</option><option value="2">2</option>
             </select>
-            <select name="estado" value={formData.estado} onChange={handleChange} className="p-2 rounded bg-white text-black">
+            <select name="estado" value={formData.estado} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
               <option value="">Estado</option><option value="Entrar a Vivir">Entrar a Vivir</option><option value="Actualizar">Actualizar</option><option value="A Reformar">A Reformar</option>
             </select>
-            <select name="ascensor" value={formData.ascensor} onChange={handleChange} className="p-2 rounded bg-white text-black">
+            <select name="ascensor" value={formData.ascensor} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
               <option value="">Ascensor</option><option value="SÍ">SÍ</option><option value="HASTA 1º">HASTA 1º</option><option value="HASTA 2º">HASTA 2º</option>
               <option value="HASTA 3º">HASTA 3º</option><option value="HASTA 4º">HASTA 4º</option><option value="HASTA 5º">HASTA 5º</option>
             </select>
-            <select name="m2" value={formData.m2} onChange={handleChange} className="p-2 rounded bg-white text-black" required>
+            <select name="m2" value={formData.m2} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" required>
               <option value="">m²</option>{[30,40,50,60,70,80,90,100,110,120,130,150].map(m => <option key={m} value={m}>{m}</option>)}
             </select>
-            <select name="orientacion" multiple value={formData.orientacion} onChange={handleChange} className="p-2 rounded bg-white text-black">
+            <select name="orientacion" multiple value={formData.orientacion} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
               <option value="Norte">Norte</option><option value="Sur">Sur</option><option value="Este">Este</option><option value="Oeste">Oeste</option><option value="Indiferente">Indiferente</option>
             </select>
-            <select name="permuta" value={formData.permuta} onChange={handleChange} className="p-2 rounded bg-white text-black">
+            <select name="permuta" value={formData.permuta} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
               <option value="">Permuta</option><option value="SÍ">SÍ</option><option value="NO">NO</option>
             </select>
-            <button type="button" onClick={handleSubmit} className="col-span-3 accent-yellow p-2 rounded">Registrar Cliente</button>
-          </div>
+            <button type="submit" className="col-span-3 bg-yellow-400 text-gray-900 p-3 rounded font-medium hover:bg-yellow-300 transition">Registrar</button>
+          </form>
         </div>
       );
     };
@@ -194,14 +257,15 @@
 
       const handleChange = (e) => {
         const { name, value, selectedOptions } = e.target;
-        if (name === "zona" || name === "tipo_vivienda" || name === "habitaciones" || name === "banos" || name === "orientacion") {
+        if (["zona", "tipo_vivienda", "habitaciones", "banos", "orientacion"].includes(name)) {
           setFormData({ ...formData, [name]: Array.from(selectedOptions, opt => opt.value) });
         } else {
           setFormData({ ...formData, [name]: value });
         }
       };
 
-      const handleSubmit = async () => {
+      const handleSubmit = async (e) => {
+        e.preventDefault();
         const piso = { ...formData, compania_id: companiaId, precio: parseFloat(formData.precio), m2: parseInt(formData.m2), habitaciones: formData.habitaciones.map(Number) };
         try {
           const response = await fetch(`${API_BASE}/pisos`, {
@@ -209,55 +273,55 @@
             headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
             body: JSON.stringify(piso),
           });
-          const result = await response.json();
           if (response.ok) {
-            alert(`Piso registrado: ${result.id}`);
+            alert("Piso registrado con éxito");
             onRegister();
           } else {
-            alert("Error al registrar piso: " + result.detail);
+            const data = await response.json();
+            alert("Error: " + data.detail);
           }
         } catch (error) {
-          alert("Error al registrar piso: " + error.message);
+          alert("Error: " + error.message);
         }
       };
 
       return (
         <div className="max-w-4xl mx-auto mt-10 p-6 bg-gray-800 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold mb-4">🏡 Registro de Piso</h2>
-          <div className="grid grid-cols-3 gap-4">
-            <select name="zona" multiple value={formData.zona} onChange={handleChange} className="p-2 rounded bg-white text-black" required>
+          <h2 className="text-2xl font-semibold mb-6">Registrar Piso</h2>
+          <form onSubmit={handleSubmit} className="grid grid-cols-3 gap-4">
+            <select name="zona" multiple value={formData.zona} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" required>
               <option value="ALTO">ALTO</option><option value="OLIVOS">OLIVOS</option><option value="LAGUNA">LAGUNA</option>
               <option value="BATÁN">BATÁN</option><option value="SEPÚLVEDA">SEPÚLVEDA</option><option value="MANZANARES">MANZANARES</option>
               <option value="PÍO">PÍO</option><option value="PUERTA">PUERTA</option><option value="JESUITAS">JESUITAS</option>
             </select>
-            <input name="precio" value={formData.precio} onChange={handleChange} placeholder="Precio (€)" className="p-2 rounded bg-white text-black" required />
-            <select name="tipo_vivienda" multiple value={formData.tipo_vivienda} onChange={handleChange} className="p-2 rounded bg-white text-black">
+            <input name="precio" value={formData.precio} onChange={handleChange} placeholder="Precio (€)" className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" required />
+            <select name="tipo_vivienda" multiple value={formData.tipo_vivienda} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
               <option value="Piso">Piso</option><option value="Casa">Casa</option><option value="Chalet">Chalet</option>
               <option value="Adosado">Adosado</option><option value="Dúplex">Dúplex</option><option value="Ático">Ático</option><option value="Estudio">Estudio</option>
             </select>
-            <select name="habitaciones" multiple value={formData.habitaciones} onChange={handleChange} className="p-2 rounded bg-white text-black">
+            <select name="habitaciones" multiple value={formData.habitaciones} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
               {[0,1,2,3,4,5].map(h => <option key={h} value={h}>{h}</option>)}
             </select>
-            <select name="banos" multiple value={formData.banos} onChange={handleChange} className="p-2 rounded bg-white text-black">
+            <select name="banos" multiple value={formData.banos} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
               <option value="1">1</option><option value="1+1">1+1</option><option value="2">2</option>
             </select>
-            <select name="estado" value={formData.estado} onChange={handleChange} className="p-2 rounded bg-white text-black">
+            <select name="estado" value={formData.estado} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
               <option value="">Estado</option><option value="Entrar a Vivir">Entrar a Vivir</option><option value="Actualizar">Actualizar</option><option value="A Reformar">A Reformar</option>
             </select>
-            <select name="ascensor" value={formData.ascensor} onChange={handleChange} className="p-2 rounded bg-white text-black">
+            <select name="ascensor" value={formData.ascensor} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
               <option value="">Ascensor</option><option value="SÍ">SÍ</option><option value="HASTA 1º">HASTA 1º</option><option value="HASTA 2º">HASTA 2º</option>
               <option value="HASTA 3º">HASTA 3º</option><option value="HASTA 4º">HASTA 4º</option><option value="HASTA 5º">HASTA 5º</option>
             </select>
-            <select name="m2" value={formData.m2} onChange={handleChange} className="p-2 rounded bg-white text-black" required>
+            <select name="m2" value={formData.m2} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" required>
               <option value="">m²</option>{[30,40,50,60,70,80,90,100,110,120,130,150].map(m => <option key={m} value={m}>{m}</option>)}
             </select>
-            <button type="button" onClick={handleSubmit} className="col-span-3 accent-yellow p-2 rounded">Registrar Piso</button>
-          </div>
+            <button type="submit" className="col-span-3 bg-yellow-400 text-gray-900 p-3 rounded font-medium hover:bg-yellow-300 transition">Registrar</button>
+          </form>
         </div>
       );
     };
 
-    const SearchClientes = ({ onLoad }) => {
+    const SearchClientes = () => {
       const [pisos, setPisos] = useState([]);
       const [results, setResults] = useState([]);
 
@@ -277,7 +341,7 @@
       const handleSearch = async () => {
         const pisoId = document.getElementById("pisoSelect").value;
         if (!pisoId) {
-          alert("Selecciona un piso");
+          alert("Seleccione un piso");
           return;
         }
         try {
@@ -290,23 +354,31 @@
 
       return (
         <div className="max-w-4xl mx-auto mt-10 p-6 bg-gray-800 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold mb-4">🔍 Buscar Clientes para un Piso</h2>
-          <select id="pisoSelect" className="w-full p-2 mb-4 rounded bg-white text-black">
-            <option value="">Seleccionar un piso...</option>
-            {pisos.map(piso => <option key={piso.id} value={piso.id}>Piso {piso.id} - {piso.zona} ({piso.precio}€)</option>)}
-          </select>
-          <button onClick={handleSearch} className="accent-yellow p-2 rounded">Buscar</button>
-          <div className="mt-4">
-            <h3 className="text-xl">Clientes Compatibles</h3>
-            <ul className="list-disc pl-5">
-              {results.map(match => <li key={match.cliente_id}>Cliente ID: {match.cliente_id} (Score: {match.score}%)</li>)}
-            </ul>
+          <h2 className="text-2xl font-semibold mb-6">Buscar Clientes</h2>
+          <div className="space-y-4">
+            <select id="pisoSelect" className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
+              <option value="">Seleccionar un piso...</option>
+              {pisos.map(piso => <option key={piso.id} value={piso.id}>{piso.id} - {piso.zona} ({piso.precio}€)</option>)}
+            </select>
+            <button onClick={handleSearch} className="bg-yellow-400 text-gray-900 p-3 rounded font-medium hover:bg-yellow-300 transition">Buscar</button>
+            <div className="mt-6">
+              <h3 className="text-xl font-medium mb-4">Resultados</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {results.map(match => (
+                  <div key={match.cliente_id} className="bg-gray-700 p-4 rounded-lg shadow">
+                    <p>Cliente ID: {match.cliente_id}</p>
+                    <p>Match: {match.score}%</p>
+                    <a href={`#cliente/${match.cliente_id}`} className="text-yellow-400 hover:underline">Detalles</a>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       );
     };
 
-    const SearchPisos = ({ onLoad }) => {
+    const SearchPisos = () => {
       const [clientes, setClientes] = useState([]);
       const [results, setResults] = useState([]);
 
@@ -326,7 +398,7 @@
       const handleSearch = async () => {
         const clienteId = document.getElementById("clienteSelect").value;
         if (!clienteId) {
-          alert("Selecciona un cliente");
+          alert("Seleccione un cliente");
           return;
         }
         try {
@@ -339,52 +411,54 @@
 
       return (
         <div className="max-w-4xl mx-auto mt-10 p-6 bg-gray-800 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold mb-4">🏡 Buscar Pisos para un Cliente</h2>
-          <select id="clienteSelect" className="w-full p-2 mb-4 rounded bg-white text-black">
-            <option value="">Seleccionar un cliente...</option>
-            {clientes.map(cliente => <option key={cliente.id} value={cliente.id}>{cliente.nombre || "Cliente " + cliente.id} - {cliente.zona}</option>)}
-          </select>
-          <button onClick={handleSearch} className="accent-yellow p-2 rounded">Buscar</button>
-          <div className="mt-4">
-            <h3 className="text-xl">Pisos Compatibles</h3>
-            <ul className="list-disc pl-5">
-              {results.map(match => <li key={match.piso_id}>Piso ID: {match.piso_id} (Score: {match.score}%)</li>)}
-            </ul>
+          <h2 className="text-2xl font-semibold mb-6">Buscar Pisos</h2>
+          <div className="space-y-4">
+            <select id="clienteSelect" className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
+              <option value="">Seleccionar un cliente...</option>
+              {clientes.map(cliente => <option key={cliente.id} value={cliente.id}>{cliente.nombre || `Cliente ${cliente.id}`} - {cliente.zona}</option>)}
+            </select>
+            <button onClick={handleSearch} className="bg-yellow-400 text-gray-900 p-3 rounded font-medium hover:bg-yellow-300 transition">Buscar</button>
+            <div className="mt-6">
+              <h3 className="text-xl font-medium mb-4">Resultados</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {results.map(match => (
+                  <div key={match.piso_id} className="bg-gray-700 p-4 rounded-lg shadow">
+                    <p>Piso ID: {match.piso_id}</p>
+                    <p>Match: {match.score}%</p>
+                    <a href={`#piso/${match.piso_id}`} className="text-yellow-400 hover:underline">Detalles</a>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       );
     };
 
     const App = () => {
+      const [isIntro, setIsIntro] = useState(!token);
       const [isLoggedIn, setIsLoggedIn] = useState(!!token);
 
-      const handleLogin = () => {
-        setIsLoggedIn(true);
-      };
-
-      const handleRegister = () => {
-        // Refresh data after registration
-        document.querySelectorAll("select[id$='Select']").forEach(select => {
-          select.dispatchEvent(new Event("change"));
-        });
-      };
+      const handleStart = () => setIsIntro(false);
+      const handleLogin = () => setIsLoggedIn(true);
 
       return (
-        <div className="flex">
-          <Sidebar />
-          <div className="ml-64 w-full p-6">
-            {!isLoggedIn ? (
-              <LoginForm onLogin={handleLogin} />
-            ) : (
-              <>
-                <h1 className="text-4xl font-bold mb-6 text-center">🏠 MatchingProps</h1>
-                <ClientForm onRegister={handleRegister} />
-                <PisoForm onRegister={handleRegister} />
-                <SearchClientes onLoad={handleRegister} />
-                <SearchPisos onLoad={handleRegister} />
-              </>
-            )}
-          </div>
+        <div className="min-h-screen">
+          {isIntro && <Intro onStart={handleStart} />}
+          {isLoggedIn ? (
+            <div className="flex">
+              <Sidebar />
+              <main className="ml-64 w-full p-6">
+                <h1 className="text-4xl font-bold mb-8">MatchingProps</h1>
+                <ClientForm onRegister={() => {}} />
+                <PisoForm onRegister={() => {}} />
+                <SearchClientes />
+                <SearchPisos />
+              </main>
+            </div>
+          ) : !isIntro && (
+            <LoginForm onLogin={handleLogin} />
+          )}
         </div>
       );
     };
