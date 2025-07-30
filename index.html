@@ -4,11 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MatchingProps</title>
-  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/@heroicons/react@2.0.18/20/solid/esm/index.js"></script>
+  <script src="https://unpkg.com/@heroicons/react@2.0.18/20/solid/index.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     @layer base {
       body {
@@ -16,12 +17,8 @@
       }
       .intro-bg {
         background: linear-gradient(135deg, #0F1F1A 0%, #1F4033 100%);
-        background-size: cover;
-        animation: fadeIn 2s ease-in-out;
-      }
-      @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+        height: 100vh;
+        overflow: hidden;
       }
       .particle {
         position: absolute;
@@ -35,10 +32,9 @@
         100% { transform: translateY(0) scale(1); }
       }
     }
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
   </style>
 </head>
-<body class="overflow-hidden">
+<body class="overflow-x-hidden">
   <div id="root"></div>
 
   <script type="text/babel">
@@ -50,20 +46,27 @@
     let companiaId = localStorage.getItem("companiaId");
 
     const Intro = ({ onStart }) => (
-      <div className="intro-bg relative h-screen flex items-center justify-center overflow-hidden">
+      <div className="intro-bg relative flex items-center justify-center">
         {[...Array(20)].map((_, i) => (
-          <div key={i} className="particle" style={{
-            width: `${Math.random() * 5 + 2}px`,
-            height: `${Math.random() * 5 + 2}px`,
-            top: `${Math.random() * 100}vh`,
-            left: `${Math.random() * 100}vw`,
-            animationDelay: `${Math.random() * 10}s`
-          }} />
+          <div
+            key={i}
+            className="particle"
+            style={{
+              width: `${Math.random() * 5 + 2}px`,
+              height: `${Math.random() * 5 + 2}px`,
+              top: `${Math.random() * 100}vh`,
+              left: `${Math.random() * 100}vw`,
+              animationDelay: `${Math.random() * 10}s`
+            }}
+          />
         ))}
         <div className="text-center z-10">
-          <h1 className="text-5xl font-bold text-white mb-4">MatchingProps</h1>
+          <h1 className="text-5xl font-bold mb-4">MatchingProps</h1>
           <p className="text-lg text-gray-300 mb-6">Plataforma premium para asesores inmobiliarios</p>
-          <button onClick={onStart} className="bg-yellow-400 text-gray-950 px-6 py-3 rounded-lg font-semibold hover:bg-yellow-300 transition">
+          <button
+            onClick={onStart}
+            className="bg-yellow-400 text-gray-950 px-6 py-3 rounded-lg font-semibold hover:bg-yellow-300 transition"
+          >
             <ArrowRightIcon className="h-5 w-5 inline-block mr-2" /> Comenzar
           </button>
         </div>
@@ -150,7 +153,7 @@
               className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
               required
             />
-            <button type="submit" className="w-full bg-yellow-400 text-gray-900 p-3 rounded font-medium hover:bg-yellow-300 transition">
+            <button type="submit" className="w-full bg-yellow-400 text-gray-950 p-3 rounded font-medium hover:bg-yellow-300 transition">
               Iniciar Sesión
             </button>
           </form>
@@ -199,51 +202,53 @@
         <div className="max-w-4xl mx-auto mt-10 p-6 bg-gray-800 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold mb-6">Registrar Cliente</h2>
           <form onSubmit={handleSubmit} className="grid grid-cols-3 gap-4">
-            <input name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre" className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" required />
-            <input name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono" className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" required />
-            <select name="zona" multiple value={formData.zona} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" required>
+            <input name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre" className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400" required />
+            <input name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono" className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400" required />
+            <select name="zona" multiple value={formData.zona} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
               <option value="ALTO">ALTO</option><option value="OLIVOS">OLIVOS</option><option value="LAGUNA">LAGUNA</option>
               <option value="BATÁN">BATÁN</option><option value="SEPÚLVEDA">SEPÚLVEDA</option><option value="MANZANARES">MANZANARES</option>
               <option value="PÍO">PÍO</option><option value="PUERTA">PUERTA</option><option value="JESUITAS">JESUITAS</option>
             </select>
-            <input name="subzonas" value={formData.subzonas} onChange={handleChange} placeholder="Subzonas" className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" />
-            <select name="entrada" value={formData.entrada} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" required>
+            <input name="subzonas" value={formData.subzonas} onChange={handleChange} placeholder="Subzonas" className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+            <select name="entrada" value={formData.entrada} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
               <option value="">Entrada</option>{[...Array(50).keys()].map(i => <option key={i * 10000 + 10000} value={i * 10000 + 10000}>{(i * 10000 + 10000).toLocaleString()}€</option>)}
             </select>
-            <select name="precio" value={formData.precio} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" required>
+            <select name="precio" value={formData.precio} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
               <option value="">Precio</option>{[...Array(20).keys()].map(i => <option key={i * 10000 + 10000} value={i * 10000 + 10000}>{(i * 10000 + 10000).toLocaleString()}€</option>)}
               {[...Array(15).keys()].map(i => <option key={(i + 20) * 20000} value={(i + 20) * 20000}>{(i + 20) * 20000}€</option>)}
             </select>
-            <select name="tipo_vivienda" multiple value={formData.tipo_vivienda} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
+            <select name="tipo_vivienda" multiple value={formData.tipo_vivienda} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
               <option value="Piso">Piso</option><option value="Casa">Casa</option><option value="Chalet">Chalet</option>
               <option value="Adosado">Adosado</option><option value="Dúplex">Dúplex</option><option value="Ático">Ático</option><option value="Estudio">Estudio</option>
             </select>
-            <select name="finalidad" multiple value={formData.finalidad} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
+            <select name="finalidad" multiple value={formData.finalidad} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
               <option value="Primera Vivienda">Primera Vivienda</option><option value="Inversión">Inversión</option>
             </select>
-            <select name="habitaciones" multiple value={formData.habitaciones} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
+            <select name="habitaciones" multiple value={formData.habitaciones} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
               {[0,1,2,3,4,5].map(h => <option key={h} value={h}>{h}</option>)}
             </select>
-            <select name="banos" multiple value={formData.banos} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
+            <select name="banos" multiple value={formData.banos} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
               <option value="1">1</option><option value="1+1">1+1</option><option value="2">2</option>
             </select>
-            <select name="estado" value={formData.estado} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
+            <select name="estado" value={formData.estado} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
               <option value="">Estado</option><option value="Entrar a Vivir">Entrar a Vivir</option><option value="Actualizar">Actualizar</option><option value="A Reformar">A Reformar</option>
             </select>
-            <select name="ascensor" value={formData.ascensor} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
+            <select name="ascensor" value={formData.ascensor} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
               <option value="">Ascensor</option><option value="SÍ">SÍ</option><option value="HASTA 1º">HASTA 1º</option><option value="HASTA 2º">HASTA 2º</option>
               <option value="HASTA 3º">HASTA 3º</option><option value="HASTA 4º">HASTA 4º</option><option value="HASTA 5º">HASTA 5º</option>
             </select>
-            <select name="m2" value={formData.m2} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" required>
+            <select name="m2" value={formData.m2} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
               <option value="">m²</option>{[30,40,50,60,70,80,90,100,110,120,130,150].map(m => <option key={m} value={m}>{m}</option>)}
             </select>
-            <select name="orientacion" multiple value={formData.orientacion} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
+            <select name="orientacion" multiple value={formData.orientacion} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
               <option value="Norte">Norte</option><option value="Sur">Sur</option><option value="Este">Este</option><option value="Oeste">Oeste</option><option value="Indiferente">Indiferente</option>
             </select>
-            <select name="permuta" value={formData.permuta} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
+            <select name="permuta" value={formData.permuta} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
               <option value="">Permuta</option><option value="SÍ">SÍ</option><option value="NO">NO</option>
             </select>
-            <button type="submit" className="col-span-3 bg-yellow-400 text-gray-900 p-3 rounded font-medium hover:bg-yellow-300 transition">Registrar</button>
+            <button type="submit" className="col-span-3 bg-yellow-400 text-gray-950 p-3 rounded font-medium hover:bg-yellow-300 transition">
+              Registrar
+            </button>
           </form>
         </div>
       );
@@ -289,33 +294,35 @@
         <div className="max-w-4xl mx-auto mt-10 p-6 bg-gray-800 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold mb-6">Registrar Piso</h2>
           <form onSubmit={handleSubmit} className="grid grid-cols-3 gap-4">
-            <select name="zona" multiple value={formData.zona} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" required>
+            <select name="zona" multiple value={formData.zona} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
               <option value="ALTO">ALTO</option><option value="OLIVOS">OLIVOS</option><option value="LAGUNA">LAGUNA</option>
               <option value="BATÁN">BATÁN</option><option value="SEPÚLVEDA">SEPÚLVEDA</option><option value="MANZANARES">MANZANARES</option>
               <option value="PÍO">PÍO</option><option value="PUERTA">PUERTA</option><option value="JESUITAS">JESUITAS</option>
             </select>
-            <input name="precio" value={formData.precio} onChange={handleChange} placeholder="Precio (€)" className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" required />
-            <select name="tipo_vivienda" multiple value={formData.tipo_vivienda} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
+            <input name="precio" value={formData.precio} onChange={handleChange} placeholder="Precio (€)" className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400" required />
+            <select name="tipo_vivienda" multiple value={formData.tipo_vivienda} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
               <option value="Piso">Piso</option><option value="Casa">Casa</option><option value="Chalet">Chalet</option>
               <option value="Adosado">Adosado</option><option value="Dúplex">Dúplex</option><option value="Ático">Ático</option><option value="Estudio">Estudio</option>
             </select>
-            <select name="habitaciones" multiple value={formData.habitaciones} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
+            <select name="habitaciones" multiple value={formData.habitaciones} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
               {[0,1,2,3,4,5].map(h => <option key={h} value={h}>{h}</option>)}
             </select>
-            <select name="banos" multiple value={formData.banos} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
+            <select name="banos" multiple value={formData.banos} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
               <option value="1">1</option><option value="1+1">1+1</option><option value="2">2</option>
             </select>
-            <select name="estado" value={formData.estado} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
+            <select name="estado" value={formData.estado} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
               <option value="">Estado</option><option value="Entrar a Vivir">Entrar a Vivir</option><option value="Actualizar">Actualizar</option><option value="A Reformar">A Reformar</option>
             </select>
-            <select name="ascensor" value={formData.ascensor} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
+            <select name="ascensor" value={formData.ascensor} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
               <option value="">Ascensor</option><option value="SÍ">SÍ</option><option value="HASTA 1º">HASTA 1º</option><option value="HASTA 2º">HASTA 2º</option>
               <option value="HASTA 3º">HASTA 3º</option><option value="HASTA 4º">HASTA 4º</option><option value="HASTA 5º">HASTA 5º</option>
             </select>
-            <select name="m2" value={formData.m2} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400" required>
+            <select name="m2" value={formData.m2} onChange={handleChange} className="p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
               <option value="">m²</option>{[30,40,50,60,70,80,90,100,110,120,130,150].map(m => <option key={m} value={m}>{m}</option>)}
             </select>
-            <button type="submit" className="col-span-3 bg-yellow-400 text-gray-900 p-3 rounded font-medium hover:bg-yellow-300 transition">Registrar</button>
+            <button type="submit" className="col-span-3 bg-yellow-400 text-gray-950 p-3 rounded font-medium hover:bg-yellow-300 transition">
+              Registrar
+            </button>
           </form>
         </div>
       );
@@ -356,11 +363,13 @@
         <div className="max-w-4xl mx-auto mt-10 p-6 bg-gray-800 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold mb-6">Buscar Clientes</h2>
           <div className="space-y-4">
-            <select id="pisoSelect" className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
+            <select id="pisoSelect" className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
               <option value="">Seleccionar un piso...</option>
               {pisos.map(piso => <option key={piso.id} value={piso.id}>{piso.id} - {piso.zona} ({piso.precio}€)</option>)}
             </select>
-            <button onClick={handleSearch} className="bg-yellow-400 text-gray-900 p-3 rounded font-medium hover:bg-yellow-300 transition">Buscar</button>
+            <button onClick={handleSearch} className="bg-yellow-400 text-gray-950 p-3 rounded font-medium hover:bg-yellow-300 transition">
+              Buscar
+            </button>
             <div className="mt-6">
               <h3 className="text-xl font-medium mb-4">Resultados</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -413,11 +422,13 @@
         <div className="max-w-4xl mx-auto mt-10 p-6 bg-gray-800 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold mb-6">Buscar Pisos</h2>
           <div className="space-y-4">
-            <select id="clienteSelect" className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-yellow-400">
+            <select id="clienteSelect" className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400">
               <option value="">Seleccionar un cliente...</option>
               {clientes.map(cliente => <option key={cliente.id} value={cliente.id}>{cliente.nombre || `Cliente ${cliente.id}`} - {cliente.zona}</option>)}
             </select>
-            <button onClick={handleSearch} className="bg-yellow-400 text-gray-900 p-3 rounded font-medium hover:bg-yellow-300 transition">Buscar</button>
+            <button onClick={handleSearch} className="bg-yellow-400 text-gray-950 p-3 rounded font-medium hover:bg-yellow-300 transition">
+              Buscar
+            </button>
             <div className="mt-6">
               <h3 className="text-xl font-medium mb-4">Resultados</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
