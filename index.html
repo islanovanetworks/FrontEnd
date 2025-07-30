@@ -104,7 +104,7 @@
         orientacion: [], edificio_semi_nuevo: "", adaptado_movilidad: "", balcon: "",
         patio: "", terraza: "", garaje: "", trastero: "", interior: "", piscina: "",
         urbanizacion: "", vistas: "", caracteristicas_adicionales: "", banco: "",
-        permuta: "", ahorro: ""
+        permuta: ""
       });
 
       const handleChange = (e) => {
@@ -123,7 +123,6 @@
           entrada: parseFloat(formData.entrada) || 0,
           precio: parseFloat(formData.precio) || 0,
           m2: parseInt(formData.m2) || 0,
-          ahorro: parseFloat(formData.ahorro) || 0,
           habitaciones: formData.habitaciones.map(Number)
         };
         try {
@@ -169,7 +168,8 @@
               </select>
               <select name="precio" value={formData.precio} onChange={handleChange} className="input" required>
                 <option value="">Precio</option>
-                {[...Array(60).keys()].map(i => <option key={i * 10000 + 10000} value={i * 10000 + 10000}>{(i * 10000 + 10000).toLocaleString()}€</option>)}
+                {[...Array(20).keys()].map(i => <option key={i * 10000 + 10000} value={i * 10000 + 10000}>{(i * 10000 + 10000).toLocaleString()}€</option>)}
+                {[...Array(20).keys()].map(i => <option key={(i + 20) * 20000 + 10000} value={(i + 20) * 20000 + 10000}>{((i + 20) * 20000 + 10000).toLocaleString()}€</option>)}
               </select>
               <select name="tipo_vivienda" multiple value={formData.tipo_vivienda} onChange={handleChange} className="input">
                 <option value="Piso">Piso</option>
@@ -199,14 +199,13 @@
               </select>
               <select name="estado" value={formData.estado} onChange={handleChange} className="input">
                 <option value="">Estado</option>
-                <option value="Obra Nueva">Obra Nueva</option>
-                <option value="Buen Estado">Buen Estado</option>
+                <option value="Entrar a Vivir">Entrar a Vivir</option>
+                <option value="Actualizar">Actualizar</option>
                 <option value="A Reformar">A Reformar</option>
               </select>
               <select name="ascensor" value={formData.ascensor} onChange={handleChange} className="input">
                 <option value="">Ascensor</option>
-                <option value="Sí">Sí</option>
-                <option value="No">No</option>
+                <option value="SÍ">SÍ</option>
                 <option value="HASTA 1º">HASTA 1º</option>
                 <option value="HASTA 2º">HASTA 2º</option>
                 <option value="HASTA 3º">HASTA 3º</option>
@@ -313,10 +312,9 @@
               <input name="banco" value={formData.banco} onChange={handleChange} placeholder="Banco" className="input" />
               <select name="permuta" value={formData.permuta} onChange={handleChange} className="input">
                 <option value="">Permuta</option>
-                <option value="Sí">Sí</option>
-                <option value="No">No</option>
+                <option value="SÍ">SÍ</option>
+                <option value="NO">NO</option>
               </select>
-              <input name="ahorro" value={formData.ahorro} onChange={handleChange} placeholder="Ahorro (€)" className="input" />
               <button type="submit" className="button mt-4">Registrar Cliente</button>
             </form>
           </div>
@@ -409,14 +407,13 @@
               </select>
               <select name="estado" value={formData.estado} onChange={handleChange} className="input">
                 <option value="">Estado</option>
-                <option value="Obra Nueva">Obra Nueva</option>
-                <option value="Buen Estado">Buen Estado</option>
+                <option value="Entrar a Vivir">Entrar a Vivir</option>
+                <option value="Actualizar">Actualizar</option>
                 <option value="A Reformar">A Reformar</option>
               </select>
               <select name="ascensor" value={formData.ascensor} onChange={handleChange} className="input">
                 <option value="">Ascensor</option>
-                <option value="Sí">Sí</option>
-                <option value="No">No</option>
+                <option value="SÍ">SÍ</option>
                 <option value="HASTA 1º">HASTA 1º</option>
                 <option value="HASTA 2º">HASTA 2º</option>
                 <option value="HASTA 3º">HASTA 3º</option>
