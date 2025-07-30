@@ -76,6 +76,29 @@
       padding-bottom: 8px;
       border-bottom: 2px solid #e5e7eb;
     }
+    .multi-select-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .multi-select-item {
+      background: #f3f4f6;
+      border: 2px solid #d1d5db;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+    }
+    .multi-select-item.selected {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+    .multi-select-item:hover {
+      border-color: #667eea;
+    }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -87,6 +110,42 @@
     const API_BASE = "https://matchingprops.onrender.com";
     let token = null;
     let companiaId = null;
+
+    // Multi-Select Component
+    const MultiSelect = ({ label, name, options, value, onChange, required = false }) => {
+      const handleItemClick = (option) => {
+        const currentValues = Array.isArray(value) ? value : [];
+        const isSelected = currentValues.includes(option);
+        
+        let newValues;
+        if (isSelected) {
+          newValues = currentValues.filter(v => v !== option);
+        } else {
+          newValues = [...currentValues, option];
+        }
+        
+        onChange({ target: { name, value: newValues } });
+      };
+
+      return (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {label} {required && '*'}
+          </label>
+          <div className="multi-select-container">
+            {options.map(option => (
+              <div
+                key={option}
+                className={`multi-select-item ${Array.isArray(value) && value.includes(option) ? 'selected' : ''}`}
+                onClick={() => handleItemClick(option)}
+              >
+                {option}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    };
 
     // Sidebar Component
     const Sidebar = ({ activeSection, setActiveSection }) => (
@@ -209,12 +268,8 @@
       });
 
       const handleChange = (e) => {
-        const { name, value, selectedOptions } = e.target;
-        if (name === "zona" || name === "tipo_vivienda" || name === "finalidad" || name === "habitaciones" || name === "banos" || name === "orientacion") {
-          setFormData({ ...formData, [name]: Array.from(selectedOptions, opt => opt.value) });
-        } else {
-          setFormData({ ...formData, [name]: value });
-        }
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
       };
 
       const handleSubmit = async (e) => {
@@ -308,27 +363,14 @@
             <div className="form-section">
               <h3>Ubicación</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Zona *</label>
-                  <select
-                    name="zona"
-                    multiple
-                    value={formData.zona}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                    required
-                  >
-                    <option value="ALTO">ALTO</option>
-                    <option value="OLIVOS">OLIVOS</option>
-                    <option value="LAGUNA">LAGUNA</option>
-                    <option value="BATÁN">BATÁN</option>
-                    <option value="SEPÚLVEDA">SEPÚLVEDA</option>
-                    <option value="MANZANARES">MANZANARES</option>
-                    <option value="PÍO">PÍO</option>
-                    <option value="PUERTA">PUERTA</option>
-                    <option value="JESUITAS">JESUITAS</option>
-                  </select>
-                </div>
+                <MultiSelect
+                  label="Zona"
+                  name="zona"
+                  options={["ALTO", "OLIVOS", "LAGUNA", "BATÁN", "SEPÚLVEDA", "MANZANARES", "PÍO", "PUERTA", "JESUITAS"]}
+                  value={formData.zona}
+                  onChange={handleChange}
+                  required={true}
+                />
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Subzonas</label>
@@ -408,68 +450,37 @@
             <div className="form-section">
               <h3>Características de la Vivienda</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Vivienda</label>
-                  <select
-                    name="tipo_vivienda"
-                    multiple
-                    value={formData.tipo_vivienda}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="Piso">Piso</option>
-                    <option value="Casa">Casa</option>
-                    <option value="Chalet">Chalet</option>
-                    <option value="Adosado">Adosado</option>
-                    <option value="Dúplex">Dúplex</option>
-                    <option value="Ático">Ático</option>
-                    <option value="Estudio">Estudio</option>
-                  </select>
-                </div>
+                <MultiSelect
+                  label="Tipo de Vivienda"
+                  name="tipo_vivienda"
+                  options={["Piso", "Casa", "Chalet", "Adosado", "Dúplex", "Ático", "Estudio"]}
+                  value={formData.tipo_vivienda}
+                  onChange={handleChange}
+                />
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Finalidad</label>
-                  <select
-                    name="finalidad"
-                    multiple
-                    value={formData.finalidad}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="Primera Vivienda">Primera Vivienda</option>
-                    <option value="Inversión">Inversión</option>
-                  </select>
-                </div>
+                <MultiSelect
+                  label="Finalidad"
+                  name="finalidad"
+                  options={["Primera Vivienda", "Inversión"]}
+                  value={formData.finalidad}
+                  onChange={handleChange}
+                />
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Habitaciones</label>
-                  <select
-                    name="habitaciones"
-                    multiple
-                    value={formData.habitaciones}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    {[0,1,2,3,4,5].map(h => (
-                      <option key={h} value={h}>{h}</option>
-                    ))}
-                  </select>
-                </div>
+                <MultiSelect
+                  label="Habitaciones"
+                  name="habitaciones"
+                  options={["0", "1", "2", "3", "4", "5"]}
+                  value={formData.habitaciones}
+                  onChange={handleChange}
+                />
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Baños</label>
-                  <select
-                    name="banos"
-                    multiple
-                    value={formData.banos}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="1">1</option>
-                    <option value="1+1">1+1</option>
-                    <option value="2">2</option>
-                  </select>
-                </div>
+                <MultiSelect
+                  label="Baños"
+                  name="banos"
+                  options={["1", "1+1", "2"]}
+                  value={formData.banos}
+                  onChange={handleChange}
+                />
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
@@ -528,35 +539,52 @@
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Bajos</label>
-                  <input
+                  <select
                     name="bajos"
                     value={formData.bajos}
                     onChange={handleChange}
-                    placeholder="Información de bajos"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="COMERCIAL">COMERCIAL</option>
+                    <option value="GARAJE">GARAJE</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Entreplanta</label>
-                  <input
+                  <select
                     name="entreplanta"
                     value={formData.entreplanta}
                     onChange={handleChange}
-                    placeholder="Información de entreplanta"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Altura</label>
-                  <input
+                  <select
                     name="altura"
                     value={formData.altura}
                     onChange={handleChange}
-                    placeholder="Altura del inmueble"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="BAJO">BAJO</option>
+                    <option value="1º">1º</option>
+                    <option value="2º">2º</option>
+                    <option value="3º">3º</option>
+                    <option value="4º">4º</option>
+                    <option value="5º">5º</option>
+                    <option value="6º">6º</option>
+                    <option value="ÁTICO">ÁTICO</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -565,32 +593,30 @@
             <div className="form-section">
               <h3>Orientación y Transporte</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Orientación</label>
-                  <select
-                    name="orientacion"
-                    multiple
-                    value={formData.orientacion}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="Norte">Norte</option>
-                    <option value="Sur">Sur</option>
-                    <option value="Este">Este</option>
-                    <option value="Oeste">Oeste</option>
-                    <option value="Indiferente">Indiferente</option>
-                  </select>
-                </div>
+                <MultiSelect
+                  label="Orientación"
+                  name="orientacion"
+                  options={["Norte", "Sur", "Este", "Oeste", "Indiferente"]}
+                  value={formData.orientacion}
+                  onChange={handleChange}
+                />
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Cercanía Metro</label>
-                  <input
+                  <select
                     name="cercania_metro"
                     value={formData.cercania_metro}
                     onChange={handleChange}
-                    placeholder="Distancia al metro"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="0-5 MIN">0-5 MIN</option>
+                    <option value="5-10 MIN">5-10 MIN</option>
+                    <option value="10-15 MIN">10-15 MIN</option>
+                    <option value="15-20 MIN">15-20 MIN</option>
+                    <option value="+20 MIN">+20 MIN</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -601,35 +627,48 @@
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Edificio Semi-nuevo</label>
-                  <input
+                  <select
                     name="edificio_semi_nuevo"
                     value={formData.edificio_semi_nuevo}
                     onChange={handleChange}
-                    placeholder="Información del edificio"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Adaptado Movilidad</label>
-                  <input
+                  <select
                     name="adaptado_movilidad"
                     value={formData.adaptado_movilidad}
                     onChange={handleChange}
-                    placeholder="Adaptación para movilidad"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Interior</label>
-                  <input
+                  <select
                     name="interior"
                     value={formData.interior}
                     onChange={handleChange}
-                    placeholder="Características interiores"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="EXTERIOR">EXTERIOR</option>
+                    <option value="INTERIOR">INTERIOR</option>
+                    <option value="AMBOS">AMBOS</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -640,46 +679,65 @@
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Balcón</label>
-                  <input
+                  <select
                     name="balcon"
                     value={formData.balcon}
                     onChange={handleChange}
-                    placeholder="Información del balcón"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Patio</label>
-                  <input
+                  <select
                     name="patio"
                     value={formData.patio}
                     onChange={handleChange}
-                    placeholder="Información del patio"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Terraza</label>
-                  <input
+                  <select
                     name="terraza"
                     value={formData.terraza}
                     onChange={handleChange}
-                    placeholder="Información de la terraza"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Vistas</label>
-                  <input
+                  <select
                     name="vistas"
                     value={formData.vistas}
                     onChange={handleChange}
-                    placeholder="Descripción de las vistas"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="DESPEJADAS">DESPEJADAS</option>
+                    <option value="MONTAÑA">MONTAÑA</option>
+                    <option value="MAR">MAR</option>
+                    <option value="CIUDAD">CIUDAD</option>
+                    <option value="PATIO">PATIO</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -690,46 +748,66 @@
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Garaje</label>
-                  <input
+                  <select
                     name="garaje"
                     value={formData.garaje}
                     onChange={handleChange}
-                    placeholder="Información del garaje"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="OPCIONAL">OPCIONAL</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Trastero</label>
-                  <input
+                  <select
                     name="trastero"
                     value={formData.trastero}
                     onChange={handleChange}
-                    placeholder="Información del trastero"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="OPCIONAL">OPCIONAL</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Piscina</label>
-                  <input
+                  <select
                     name="piscina"
                     value={formData.piscina}
                     onChange={handleChange}
-                    placeholder="Información de la piscina"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="COMUNITARIA">COMUNITARIA</option>
+                    <option value="PRIVADA">PRIVADA</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Urbanización</label>
-                  <input
+                  <select
                     name="urbanizacion"
                     value={formData.urbanizacion}
                     onChange={handleChange}
-                    placeholder="Información de la urbanización"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -769,12 +847,8 @@
       });
 
       const handleChange = (e) => {
-        const { name, value, selectedOptions } = e.target;
-        if (name === "zona" || name === "tipo_vivienda" || name === "habitaciones" || name === "banos" || name === "orientacion") {
-          setFormData({ ...formData, [name]: Array.from(selectedOptions, opt => opt.value) });
-        } else {
-          setFormData({ ...formData, [name]: value });
-        }
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
       };
 
       const handleSubmit = async (e) => {
@@ -825,27 +899,14 @@
             <div className="form-section">
               <h3>Información Básica</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Zona *</label>
-                  <select
-                    name="zona"
-                    multiple
-                    value={formData.zona}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                    required
-                  >
-                    <option value="ALTO">ALTO</option>
-                    <option value="OLIVOS">OLIVOS</option>
-                    <option value="LAGUNA">LAGUNA</option>
-                    <option value="BATÁN">BATÁN</option>
-                    <option value="SEPÚLVEDA">SEPÚLVEDA</option>
-                    <option value="MANZANARES">MANZANARES</option>
-                    <option value="PÍO">PÍO</option>
-                    <option value="PUERTA">PUERTA</option>
-                    <option value="JESUITAS">JESUITAS</option>
-                  </select>
-                </div>
+                <MultiSelect
+                  label="Zona"
+                  name="zona"
+                  options={["ALTO", "OLIVOS", "LAGUNA", "BATÁN", "SEPÚLVEDA", "MANZANARES", "PÍO", "PUERTA", "JESUITAS"]}
+                  value={formData.zona}
+                  onChange={handleChange}
+                  required={true}
+                />
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Precio (€) *</label>
@@ -882,54 +943,29 @@
             <div className="form-section">
               <h3>Características de la Vivienda</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Vivienda</label>
-                  <select
-                    name="tipo_vivienda"
-                    multiple
-                    value={formData.tipo_vivienda}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="Piso">Piso</option>
-                    <option value="Casa">Casa</option>
-                    <option value="Chalet">Chalet</option>
-                    <option value="Adosado">Adosado</option>
-                    <option value="Dúplex">Dúplex</option>
-                    <option value="Ático">Ático</option>
-                    <option value="Estudio">Estudio</option>
-                  </select>
-                </div>
+                <MultiSelect
+                  label="Tipo de Vivienda"
+                  name="tipo_vivienda"
+                  options={["Piso", "Casa", "Chalet", "Adosado", "Dúplex", "Ático", "Estudio"]}
+                  value={formData.tipo_vivienda}
+                  onChange={handleChange}
+                />
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Habitaciones</label>
-                  <select
-                    name="habitaciones"
-                    multiple
-                    value={formData.habitaciones}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    {[0,1,2,3,4,5].map(h => (
-                      <option key={h} value={h}>{h}</option>
-                    ))}
-                  </select>
-                </div>
+                <MultiSelect
+                  label="Habitaciones"
+                  name="habitaciones"
+                  options={["0", "1", "2", "3", "4", "5"]}
+                  value={formData.habitaciones}
+                  onChange={handleChange}
+                />
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Baños</label>
-                  <select
-                    name="banos"
-                    multiple
-                    value={formData.banos}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="1">1</option>
-                    <option value="1+1">1+1</option>
-                    <option value="2">2</option>
-                  </select>
-                </div>
+                <MultiSelect
+                  label="Baños"
+                  name="banos"
+                  options={["1", "1+1", "2"]}
+                  value={formData.banos}
+                  onChange={handleChange}
+                />
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
@@ -972,35 +1008,52 @@
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Bajos</label>
-                  <input
+                  <select
                     name="bajos"
                     value={formData.bajos}
                     onChange={handleChange}
-                    placeholder="Información de bajos"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="COMERCIAL">COMERCIAL</option>
+                    <option value="GARAJE">GARAJE</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Entreplanta</label>
-                  <input
+                  <select
                     name="entreplanta"
                     value={formData.entreplanta}
                     onChange={handleChange}
-                    placeholder="Información de entreplanta"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Altura</label>
-                  <input
+                  <select
                     name="altura"
                     value={formData.altura}
                     onChange={handleChange}
-                    placeholder="Altura del inmueble"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="BAJO">BAJO</option>
+                    <option value="1º">1º</option>
+                    <option value="2º">2º</option>
+                    <option value="3º">3º</option>
+                    <option value="4º">4º</option>
+                    <option value="5º">5º</option>
+                    <option value="6º">6º</option>
+                    <option value="ÁTICO">ÁTICO</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -1009,32 +1062,30 @@
             <div className="form-section">
               <h3>Orientación y Transporte</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Orientación</label>
-                  <select
-                    name="orientacion"
-                    multiple
-                    value={formData.orientacion}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="Norte">Norte</option>
-                    <option value="Sur">Sur</option>
-                    <option value="Este">Este</option>
-                    <option value="Oeste">Oeste</option>
-                    <option value="Indiferente">Indiferente</option>
-                  </select>
-                </div>
+                <MultiSelect
+                  label="Orientación"
+                  name="orientacion"
+                  options={["Norte", "Sur", "Este", "Oeste", "Indiferente"]}
+                  value={formData.orientacion}
+                  onChange={handleChange}
+                />
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Cercanía Metro</label>
-                  <input
+                  <select
                     name="cercania_metro"
                     value={formData.cercania_metro}
                     onChange={handleChange}
-                    placeholder="Distancia al metro"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="0-5 MIN">0-5 MIN</option>
+                    <option value="5-10 MIN">5-10 MIN</option>
+                    <option value="10-15 MIN">10-15 MIN</option>
+                    <option value="15-20 MIN">15-20 MIN</option>
+                    <option value="+20 MIN">+20 MIN</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -1045,35 +1096,48 @@
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Edificio Semi-nuevo</label>
-                  <input
+                  <select
                     name="edificio_semi_nuevo"
                     value={formData.edificio_semi_nuevo}
                     onChange={handleChange}
-                    placeholder="Información del edificio"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Adaptado Movilidad</label>
-                  <input
+                  <select
                     name="adaptado_movilidad"
                     value={formData.adaptado_movilidad}
                     onChange={handleChange}
-                    placeholder="Adaptación para movilidad"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Interior</label>
-                  <input
+                  <select
                     name="interior"
                     value={formData.interior}
                     onChange={handleChange}
-                    placeholder="Características interiores"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="EXTERIOR">EXTERIOR</option>
+                    <option value="INTERIOR">INTERIOR</option>
+                    <option value="AMBOS">AMBOS</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -1084,46 +1148,65 @@
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Balcón</label>
-                  <input
+                  <select
                     name="balcon"
                     value={formData.balcon}
                     onChange={handleChange}
-                    placeholder="Información del balcón"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Patio</label>
-                  <input
+                  <select
                     name="patio"
                     value={formData.patio}
                     onChange={handleChange}
-                    placeholder="Información del patio"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Terraza</label>
-                  <input
+                  <select
                     name="terraza"
                     value={formData.terraza}
                     onChange={handleChange}
-                    placeholder="Información de la terraza"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Vistas</label>
-                  <input
+                  <select
                     name="vistas"
                     value={formData.vistas}
                     onChange={handleChange}
-                    placeholder="Descripción de las vistas"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="DESPEJADAS">DESPEJADAS</option>
+                    <option value="MONTAÑA">MONTAÑA</option>
+                    <option value="MAR">MAR</option>
+                    <option value="CIUDAD">CIUDAD</option>
+                    <option value="PATIO">PATIO</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -1134,46 +1217,66 @@
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Garaje</label>
-                  <input
+                  <select
                     name="garaje"
                     value={formData.garaje}
                     onChange={handleChange}
-                    placeholder="Información del garaje"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="OPCIONAL">OPCIONAL</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Trastero</label>
-                  <input
+                  <select
                     name="trastero"
                     value={formData.trastero}
                     onChange={handleChange}
-                    placeholder="Información del trastero"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="OPCIONAL">OPCIONAL</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Piscina</label>
-                  <input
+                  <select
                     name="piscina"
                     value={formData.piscina}
                     onChange={handleChange}
-                    placeholder="Información de la piscina"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="COMUNITARIA">COMUNITARIA</option>
+                    <option value="PRIVADA">PRIVADA</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Urbanización</label>
-                  <input
+                  <select
                     name="urbanizacion"
                     value={formData.urbanizacion}
                     onChange={handleChange}
-                    placeholder="Información de la urbanización"
                     className="w-full form-input"
-                  />
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
                 </div>
               </div>
             </div>
