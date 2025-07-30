@@ -4,519 +4,392 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MatchingProps</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { background-color: #2d3436; color: white; font-family: 'Segoe UI', sans-serif; }
-    .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    input, select { background-color: white; color: black; padding: 5px; border-radius: 5px; }
-    button { background-color: #f9ca24; color: black; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; }
-    button:hover { background-color: #f1c40f; }
-    #actions a { color: #f9ca24; text-decoration: none; }
-    #actions a:hover { text-decoration: underline; }
+    /* Custom Tailwind overrides for dark theme consistency */
+    @layer base {
+      body {
+        @apply bg-gray-900 text-white;
+      }
+      .accent-yellow {
+        @apply bg-yellow-400 text-black hover:bg-yellow-300;
+      }
+    }
   </style>
 </head>
 <body>
-  <div id="container" class="max-w-6xl mx-auto p-8">
-    <h1 style="text-align: center; font-size: 2.5rem;">🏠 MatchingProps</h1>
-    <div id="loginForm" style="display: block;">
-      <h2>Iniciar sesión</h2>
-      <form id="login">
-        <input type="email" id="email" placeholder="Email" required><br>
-        <input type="password" id="password" placeholder="Contraseña" required><br>
-        <button type="submit">Entrar</button>
-      </form>
-    </div>
-    <div id="mainApp" style="display: none;">
-      <div id="actions">
-        <h2>🔎 Acciones disponibles</h2>
-        <ul>
-          <li><a href="#clienteForm">🧍 Registrar Cliente</a></li>
-          <li><a href="#pisoForm">🏡 Registrar Piso</a></li>
-          <li><a href="#searchClientes">🔍 Buscar Clientes</a></li>
-          <li><a href="#searchPisos">🏡 Buscar Pisos</a></li>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const API_BASE = "https://matchingprops.onrender.com";
+    let token = localStorage.getItem("token");
+    let companiaId = localStorage.getItem("companiaId");
+
+    const Sidebar = () => (
+      <div className="fixed w-64 h-screen p-4 bg-gray-800">
+        <h2 className="text-2xl font-bold mb-6">🔎 Acciones</h2>
+        <ul className="space-y-4">
+          <li><a href="#clientes" className="block accent-yellow p-2 rounded">🧍 Registrar Cliente</a></li>
+          <li><a href="#pisos" className="block accent-yellow p-2 rounded">🏡 Registrar Piso</a></li>
+          <li><a href="#searchClientes" className="block accent-yellow p-2 rounded">🔍 Buscar Clientes</a></li>
+          <li><a href="#searchPisos" className="block accent-yellow p-2 rounded">🏡 Buscar Pisos</a></li>
         </ul>
       </div>
-      <div id="clienteForm" class="form-grid">
-        <h2>🧍 Registro de nuevo cliente</h2>
-        <input type="text" id="nombre" placeholder="Nombre" required><br>
-        <input type="tel" id="telefono" placeholder="Teléfono" required><br>
-        <select id="zona" multiple required>
-          <option value="ALTO">ALTO</option>
-          <option value="OLIVOS">OLIVOS</option>
-          <option value="LAGUNA">LAGUNA</option>
-          <option value="BATÁN">BATÁN</option>
-          <option value="SEPÚLVEDA">SEPÚLVEDA</option>
-          <option value="MANZANARES">MANZANARES</option>
-          <option value="PÍO">PÍO</option>
-          <option value="PUERTA">PUERTA</option>
-          <option value="JESUITAS">JESUITAS</option>
-        </select><br>
-        <input type="text" id="subzonas" placeholder="Subzonas"><br>
-        <select id="entrada" required>
-          <option value="">Seleccionar Entrada</option>
-          <!-- €10,000 to €500,000 in €10,000 increments -->
-          <option value="10000">10,000€</option>
-          <option value="20000">20,000€</option>
-          <option value="30000">30,000€</option>
-          <option value="40000">40,000€</option>
-          <option value="50000">50,000€</option>
-          <option value="60000">60,000€</option>
-          <option value="70000">70,000€</option>
-          <option value="80000">80,000€</option>
-          <option value="90000">90,000€</option>
-          <option value="100000">100,000€</option>
-          <option value="110000">110,000€</option>
-          <option value="120000">120,000€</option>
-          <option value="130000">130,000€</option>
-          <option value="140000">140,000€</option>
-          <option value="150000">150,000€</option>
-          <option value="160000">160,000€</option>
-          <option value="170000">170,000€</option>
-          <option value="180000">180,000€</option>
-          <option value="190000">190,000€</option>
-          <option value="200000">200,000€</option>
-          <option value="210000">210,000€</option>
-          <option value="220000">220,000€</option>
-          <option value="230000">230,000€</option>
-          <option value="240000">240,000€</option>
-          <option value="250000">250,000€</option>
-          <option value="260000">260,000€</option>
-          <option value="270000">270,000€</option>
-          <option value="280000">280,000€</option>
-          <option value="290000">290,000€</option>
-          <option value="300000">300,000€</option>
-          <option value="310000">310,000€</option>
-          <option value="320000">320,000€</option>
-          <option value="330000">330,000€</option>
-          <option value="340000">340,000€</option>
-          <option value="350000">350,000€</option>
-          <option value="360000">360,000€</option>
-          <option value="370000">370,000€</option>
-          <option value="380000">380,000€</option>
-          <option value="390000">390,000€</option>
-          <option value="400000">400,000€</option>
-          <option value="410000">410,000€</option>
-          <option value="420000">420,000€</option>
-          <option value="430000">430,000€</option>
-          <option value="440000">440,000€</option>
-          <option value="450000">450,000€</option>
-          <option value="460000">460,000€</option>
-          <option value="470000">470,000€</option>
-          <option value="480000">480,000€</option>
-          <option value="490000">490,000€</option>
-          <option value="500000">500,000€</option>
-        </select><br>
-        <select id="precio" required>
-          <option value="">Seleccionar Precio</option>
-          <!-- €10,000 to €200,000 in €10,000 increments, then €20,000 -->
-          <option value="10000">10,000€</option>
-          <option value="20000">20,000€</option>
-          <option value="30000">30,000€</option>
-          <option value="40000">40,000€</option>
-          <option value="50000">50,000€</option>
-          <option value="60000">60,000€</option>
-          <option value="70000">70,000€</option>
-          <option value="80000">80,000€</option>
-          <option value="90000">90,000€</option>
-          <option value="100000">100,000€</option>
-          <option value="110000">110,000€</option>
-          <option value="120000">120,000€</option>
-          <option value="130000">130,000€</option>
-          <option value="140000">140,000€</option>
-          <option value="150000">150,000€</option>
-          <option value="160000">160,000€</option>
-          <option value="170000">170,000€</option>
-          <option value="180000">180,000€</option>
-          <option value="190000">190,000€</option>
-          <option value="200000">200,000€</option>
-          <option value="220000">220,000€</option>
-          <option value="240000">240,000€</option>
-          <option value="260000">260,000€</option>
-          <option value="280000">280,000€</option>
-          <option value="300000">300,000€</option>
-          <option value="320000">320,000€</option>
-          <option value="340000">340,000€</option>
-          <option value="360000">360,000€</option>
-          <option value="380000">380,000€</option>
-          <option value="400000">400,000€</option>
-          <option value="420000">420,000€</option>
-          <option value="440000">440,000€</option>
-          <option value="460000">460,000€</option>
-          <option value="480000">480,000€</option>
-          <option value="500000">500,000€</option>
-        </select><br>
-        <select id="tipo_vivienda" multiple>
-          <option value="Piso">Piso</option>
-          <option value="Casa">Casa</option>
-          <option value="Chalet">Chalet</option>
-          <option value="Adosado">Adosado</option>
-          <option value="Dúplex">Dúplex</option>
-          <option value="Ático">Ático</option>
-          <option value="Estudio">Estudio</option>
-        </select><br>
-        <select id="finalidad" multiple>
-          <option value="Primera Vivienda">Primera Vivienda</option>
-          <option value="Inversión">Inversión</option>
-        </select><br>
-        <select id="habitaciones" multiple>
-          <option value="0">0</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-        </select><br>
-        <select id="banos" multiple>
-          <option value="1">1</option>
-          <option value="1+1">1+1</option>
-          <option value="2">2</option>
-        </select><br>
-        <select id="estado">
-          <option value="">Seleccionar</option>
-          <option value="Entrar a Vivir">Entrar a Vivir</option>
-          <option value="Actualizar">Actualizar</option>
-          <option value="A Reformar">A Reformar</option>
-        </select><br>
-        <select id="ascensor">
-          <option value="">Seleccionar</option>
-          <option value="SÍ">SÍ</option>
-          <option value="HASTA 1º">HASTA 1º</option>
-          <option value="HASTA 2º">HASTA 2º</option>
-          <option value="HASTA 3º">HASTA 3º</option>
-          <option value="HASTA 4º">HASTA 4º</option>
-          <option value="HASTA 5º">HASTA 5º</option>
-        </select><br>
-        <select id="m2">
-          <option value="">Seleccionar</option>
-          <option value="30">30</option>
-          <option value="40">40</option>
-          <option value="50">50</option>
-          <option value="60">60</option>
-          <option value="70">70</option>
-          <option value="80">80</option>
-          <option value="90">90</option>
-          <option value="100">100</option>
-          <option value="110">110</option>
-          <option value="120">120</option>
-          <option value="130">130</option>
-          <option value="150">150</option>
-        </select><br>
-        <select id="orientacion" multiple>
-          <option value="Norte">Norte</option>
-          <option value="Sur">Sur</option>
-          <option value="Este">Este</option>
-          <option value="Oeste">Oeste</option>
-          <option value="Indiferente">Indiferente</option>
-        </select><br>
-        <select id="permuta">
-          <option value="">Seleccionar</option>
-          <option value="SÍ">SÍ</option>
-          <option value="NO">NO</option>
-        </select><br>
-        <button type="button" onclick="registerCliente()">✅ Registrar Cliente</button>
-      </div>
-      <div id="pisoForm" class="form-grid">
-        <h2>🏡 Registro de nuevo piso</h2>
-        <select id="zonaPiso" multiple required>
-          <option value="ALTO">ALTO</option>
-          <option value="OLIVOS">OLIVOS</option>
-          <option value="LAGUNA">LAGUNA</option>
-          <option value="BATÁN">BATÁN</option>
-          <option value="SEPÚLVEDA">SEPÚLVEDA</option>
-          <option value="MANZANARES">MANZANARES</option>
-          <option value="PÍO">PÍO</option>
-          <option value="PUERTA">PUERTA</option>
-          <option value="JESUITAS">JESUITAS</option>
-        </select><br>
-        <input type="number" id="precioPiso" placeholder="Precio (€)" required><br>
-        <select id="tipo_viviendaPiso" multiple>
-          <option value="Piso">Piso</option>
-          <option value="Casa">Casa</option>
-          <option value="Chalet">Chalet</option>
-          <option value="Adosado">Adosado</option>
-          <option value="Dúplex">Dúplex</option>
-          <option value="Ático">Ático</option>
-          <option value="Estudio">Estudio</option>
-        </select><br>
-        <select id="habitacionesPiso" multiple>
-          <option value="0">0</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-        </select><br>
-        <select id="banosPiso" multiple>
-          <option value="1">1</option>
-          <option value="1+1">1+1</option>
-          <option value="2">2</option>
-        </select><br>
-        <select id="estadoPiso">
-          <option value="">Seleccionar</option>
-          <option value="Entrar a Vivir">Entrar a Vivir</option>
-          <option value="Actualizar">Actualizar</option>
-          <option value="A Reformar">A Reformar</option>
-        </select><br>
-        <select id="ascensorPiso">
-          <option value="">Seleccionar</option>
-          <option value="SÍ">SÍ</option>
-          <option value="HASTA 1º">HASTA 1º</option>
-          <option value="HASTA 2º">HASTA 2º</option>
-          <option value="HASTA 3º">HASTA 3º</option>
-          <option value="HASTA 4º">HASTA 4º</option>
-          <option value="HASTA 5º">HASTA 5º</option>
-        </select><br>
-        <select id="m2Piso">
-          <option value="">Seleccionar</option>
-          <option value="30">30</option>
-          <option value="40">40</option>
-          <option value="50">50</option>
-          <option value="60">60</option>
-          <option value="70">70</option>
-          <option value="80">80</option>
-          <option value="90">90</option>
-          <option value="100">100</option>
-          <option value="110">110</option>
-          <option value="120">120</option>
-          <option value="130">130</option>
-          <option value="150">150</option>
-        </select><br>
-        <button type="button" onclick="registerPiso()">✅ Registrar Piso</button>
-      </div>
-      <div id="searchClientes" class="form-grid">
-        <h2>🔍 Buscar Clientes para un Piso</h2>
-        <select id="pisoSelect">
-          <option value="">Seleccionar un piso...</option>
-        </select><br>
-        <button type="button" onclick="searchClientes()">Buscar</button>
-        <div id="clientesResult"></div>
-      </div>
-      <div id="searchPisos" class="form-grid">
-        <h2>🏡 Buscar Pisos para un Cliente</h2>
-        <select id="clienteSelect">
-          <option value="">Seleccionar un cliente...</option>
-        </select><br>
-        <button type="button" onclick="searchPisos()">Buscar</button>
-        <div id="pisosResult"></div>
-      </div>
-    </div>
-  </div>
+    );
 
-  <script>
-    const API_BASE = "https://matchingprops.onrender.com";
-    let token = null;
-    let companiaId = null;
+    const LoginForm = ({ onLogin }) => {
+      const [email, setEmail] = useState("");
+      const [password, setPassword] = useState("");
 
-    document.getElementById("login").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      try {
-        const response = await fetch(`${API_BASE}/auth/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams({ username: email, password }),
-        });
-        const data = await response.json();
-        if (response.ok) {
-          token = data.access_token;
-          const payload = JSON.parse(atob(data.access_token.split(".")[1]));
-          companiaId = payload.compania_id;
-          document.getElementById("loginForm").style.display = "none";
-          document.getElementById("mainApp").style.display = "block";
-          loadPisos();
-          loadClientes();
-        } else {
-          alert("Login incorrecto: " + data.detail);
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+          const response = await fetch(`${API_BASE}/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ username: email, password }),
+          });
+          const data = await response.json();
+          if (response.ok) {
+            token = data.access_token;
+            const payload = JSON.parse(atob(data.access_token.split(".")[1]));
+            companiaId = payload.compania_id;
+            localStorage.setItem("token", token);
+            localStorage.setItem("companiaId", companiaId);
+            onLogin();
+          } else {
+            alert("Login incorrecto: " + data.detail);
+          }
+        } catch (error) {
+          alert("Error en el login: " + error.message);
         }
-      } catch (error) {
-        alert("Error en el login: " + error.message);
-      }
-    });
-
-    async function loadPisos() {
-      try {
-        const response = await fetch(`${API_BASE}/pisos`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const pisos = await response.json();
-        const select = document.getElementById("pisoSelect");
-        select.innerHTML = '<option value="">Seleccionar un piso...</option>';
-        pisos.forEach(piso => {
-          select.innerHTML += `<option value="${piso.id}">Piso ${piso.id} - ${piso.zona} (${piso.precio}€)</option>`;
-        });
-      } catch (error) {
-        alert("Error al cargar pisos: " + error.message);
-      }
-    }
-
-    async function loadClientes() {
-      try {
-        const response = await fetch(`${API_BASE}/clientes`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const clientes = await response.json();
-        const select = document.getElementById("clienteSelect");
-        select.innerHTML = '<option value="">Seleccionar un cliente...</option>';
-        clientes.forEach(cliente => {
-          select.innerHTML += `<option value="${cliente.id}">${cliente.nombre || "Cliente " + cliente.id} - ${cliente.zona}</option>`;
-        });
-      } catch (error) {
-        alert("Error al cargar clientes: " + error.message);
-      }
-    }
-
-    async function registerCliente() {
-      const cliente = {
-        nombre: document.getElementById("nombre").value,
-        telefono: document.getElementById("telefono").value,
-        zona: Array.from(document.getElementById("zona").selectedOptions).map(opt => opt.value),
-        subzonas: document.getElementById("subzonas").value,
-        entrada: parseFloat(document.getElementById("entrada").value),
-        precio: parseFloat(document.getElementById("precio").value),
-        tipo_vivienda: Array.from(document.getElementById("tipo_vivienda").selectedOptions).map(opt => opt.value),
-        finalidad: Array.from(document.getElementById("finalidad").selectedOptions).map(opt => opt.value),
-        habitaciones: Array.from(document.getElementById("habitaciones").selectedOptions).map(opt => parseInt(opt.value)),
-        banos: Array.from(document.getElementById("banos").selectedOptions).map(opt => opt.value),
-        estado: document.getElementById("estado").value,
-        ascensor: document.getElementById("ascensor").value,
-        bajos: document.getElementById("bajos").value,
-        entreplanta: document.getElementById("entreplanta").value,
-        m2: parseInt(document.getElementById("m2").value),
-        altura: document.getElementById("altura").value,
-        cercania_metro: document.getElementById("cercania_metro").value,
-        orientacion: Array.from(document.getElementById("orientacion").selectedOptions).map(opt => opt.value),
-        edificio_semi_nuevo: document.getElementById("edificio_semi_nuevo").value,
-        adaptado_movilidad: document.getElementById("adaptado_movilidad").value,
-        balcon: document.getElementById("balcon").value,
-        patio: document.getElementById("patio").value,
-        terraza: document.getElementById("terraza").value,
-        garaje: document.getElementById("garaje").value,
-        trastero: document.getElementById("trastero").value,
-        interior: document.getElementById("interior").value,
-        piscina: document.getElementById("piscina").value,
-        urbanizacion: document.getElementById("urbanizacion").value,
-        vistas: document.getElementById("vistas").value,
-        caracteristicas_adicionales: document.getElementById("caracteristicas_adicionales").value,
-        banco: document.getElementById("banco").value,
-        permuta: document.getElementById("permuta").value,
-        compania_id: companiaId
       };
-      try {
-        const response = await fetch(`${API_BASE}/clientes`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(cliente),
-        });
-        const result = await response.json();
-        if (response.ok) {
-          document.getElementById("clientesResult").innerHTML = `<p>Cliente registrado: ${result.nombre}</p>`;
-          loadClientes();
-          document.getElementById("clienteForm").reset();
-        } else {
-          alert("Error al registrar cliente: " + result.detail);
-        }
-      } catch (error) {
-        alert("Error al registrar cliente: " + error.message);
-      }
-    }
 
-    async function registerPiso() {
-      const piso = {
-        zona: Array.from(document.getElementById("zonaPiso").selectedOptions).map(opt => opt.value),
-        precio: parseFloat(document.getElementById("precioPiso").value),
-        tipo_vivienda: Array.from(document.getElementById("tipo_viviendaPiso").selectedOptions).map(opt => opt.value),
-        habitaciones: Array.from(document.getElementById("habitacionesPiso").selectedOptions).map(opt => parseInt(opt.value)),
-        banos: Array.from(document.getElementById("banosPiso").selectedOptions).map(opt => opt.value),
-        estado: document.getElementById("estadoPiso").value,
-        ascensor: document.getElementById("ascensorPiso").value,
-        bajos: document.getElementById("bajos").value,
-        entreplanta: document.getElementById("entreplanta").value,
-        m2: parseInt(document.getElementById("m2Piso").value),
-        altura: document.getElementById("altura").value,
-        cercania_metro: document.getElementById("cercania_metro").value,
-        orientacion: Array.from(document.getElementById("orientacion").selectedOptions).map(opt => opt.value),
-        edificio_semi_nuevo: document.getElementById("edificio_semi_nuevo").value,
-        adaptado_movilidad: document.getElementById("adaptado_movilidad").value,
-        balcon: document.getElementById("balcon").value,
-        patio: document.getElementById("patio").value,
-        terraza: document.getElementById("terraza").value,
-        garaje: document.getElementById("garaje").value,
-        trastero: document.getElementById("trastero").value,
-        interior: document.getElementById("interior").value,
-        piscina: document.getElementById("piscina").value,
-        urbanizacion: document.getElementById("urbanizacion").value,
-        vistas: document.getElementById("vistas").value,
-        caracteristicas_adicionales: document.getElementById("caracteristicas_adicionales").value,
-        compania_id: companiaId
+      return (
+        <div className="max-w-md mx-auto mt-10 p-6 bg-gray-800 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold mb-4 text-center">Iniciar Sesión</h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              className="w-full p-2 rounded bg-white text-black"
+              required
+            />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Contraseña"
+              className="w-full p-2 rounded bg-white text-black"
+              required
+            />
+            <button type="submit" className="w-full accent-yellow p-2 rounded">Entrar</button>
+          </form>
+        </div>
+      );
+    };
+
+    const ClientForm = ({ onRegister }) => {
+      const [formData, setFormData] = useState({
+        nombre: "", telefono: "", zona: [], subzonas: "", entrada: "", precio: "",
+        tipo_vivienda: [], finalidad: [], habitaciones: [], banos: [], estado: "",
+        ascensor: "", m2: "", orientacion: [], permuta: ""
+      });
+
+      const handleChange = (e) => {
+        const { name, value, selectedOptions } = e.target;
+        if (name === "zona" || name === "tipo_vivienda" || name === "finalidad" || name === "habitaciones" || name === "banos" || name === "orientacion") {
+          setFormData({ ...formData, [name]: Array.from(selectedOptions, opt => opt.value) });
+        } else {
+          setFormData({ ...formData, [name]: value });
+        }
       };
-      try {
-        const response = await fetch(`${API_BASE}/pisos`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(piso),
-        });
-        const result = await response.json();
-        if (response.ok) {
-          document.getElementById("pisosResult").innerHTML = `<p>Piso registrado: ${result.id}</p>`;
-          loadPisos();
-          document.getElementById("pisoForm").reset();
-        } else {
-          alert("Error al registrar piso: " + result.detail);
+
+      const handleSubmit = async () => {
+        const cliente = { ...formData, compania_id: companiaId, entrada: parseFloat(formData.entrada), precio: parseFloat(formData.precio), m2: parseInt(formData.m2), habitaciones: formData.habitaciones.map(Number) };
+        try {
+          const response = await fetch(`${API_BASE}/clientes`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify(cliente),
+          });
+          const result = await response.json();
+          if (response.ok) {
+            alert(`Cliente registrado: ${result.nombre}`);
+            onRegister();
+          } else {
+            alert("Error al registrar cliente: " + result.detail);
+          }
+        } catch (error) {
+          alert("Error al registrar cliente: " + error.message);
         }
-      } catch (error) {
-        alert("Error al registrar piso: " + error.message);
-      }
-    }
+      };
 
-    async function searchClientes() {
-      const pisoId = document.getElementById("pisoSelect").value;
-      if (!pisoId) {
-        alert("Selecciona un piso");
-        return;
-      }
-      try {
-        const response = await fetch(`${API_BASE}/match?piso_id=${pisoId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const matches = await response.json();
-        let html = "<h3>Clientes compatibles</h3><ul>";
-        matches.forEach(match => {
-          html += `<li>Cliente ID: ${match.cliente_id} (Score: ${match.score}%)</li>`;
-        });
-        html += "</ul>";
-        document.getElementById("clientesResult").innerHTML = html;
-      } catch (error) {
-        alert("Error al buscar clientes: " + error.message);
-      }
-    }
+      return (
+        <div className="max-w-4xl mx-auto mt-10 p-6 bg-gray-800 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold mb-4">🧍 Registro de Cliente</h2>
+          <div className="grid grid-cols-3 gap-4">
+            <input name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre" className="p-2 rounded bg-white text-black" required />
+            <input name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono" className="p-2 rounded bg-white text-black" required />
+            <select name="zona" multiple value={formData.zona} onChange={handleChange} className="p-2 rounded bg-white text-black" required>
+              <option value="ALTO">ALTO</option><option value="OLIVOS">OLIVOS</option><option value="LAGUNA">LAGUNA</option>
+              <option value="BATÁN">BATÁN</option><option value="SEPÚLVEDA">SEPÚLVEDA</option><option value="MANZANARES">MANZANARES</option>
+              <option value="PÍO">PÍO</option><option value="PUERTA">PUERTA</option><option value="JESUITAS">JESUITAS</option>
+            </select>
+            <input name="subzonas" value={formData.subzonas} onChange={handleChange} placeholder="Subzonas" className="p-2 rounded bg-white text-black" />
+            <select name="entrada" value={formData.entrada} onChange={handleChange} className="p-2 rounded bg-white text-black" required>
+              <option value="">Entrada</option>{[...Array(50).keys()].map(i => <option key={i * 10000 + 10000} value={i * 10000 + 10000}>{(i * 10000 + 10000).toLocaleString()}€</option>)}
+            </select>
+            <select name="precio" value={formData.precio} onChange={handleChange} className="p-2 rounded bg-white text-black" required>
+              <option value="">Precio</option>{[...Array(20).keys()].map(i => <option key={i * 10000 + 10000} value={i * 10000 + 10000}>{(i * 10000 + 10000).toLocaleString()}€</option>)}
+              {[...Array(15).keys()].map(i => <option key={(i + 20) * 20000} value={(i + 20) * 20000}>{(i + 20) * 20000}€</option>)}
+            </select>
+            <select name="tipo_vivienda" multiple value={formData.tipo_vivienda} onChange={handleChange} className="p-2 rounded bg-white text-black">
+              <option value="Piso">Piso</option><option value="Casa">Casa</option><option value="Chalet">Chalet</option>
+              <option value="Adosado">Adosado</option><option value="Dúplex">Dúplex</option><option value="Ático">Ático</option><option value="Estudio">Estudio</option>
+            </select>
+            <select name="finalidad" multiple value={formData.finalidad} onChange={handleChange} className="p-2 rounded bg-white text-black">
+              <option value="Primera Vivienda">Primera Vivienda</option><option value="Inversión">Inversión</option>
+            </select>
+            <select name="habitaciones" multiple value={formData.habitaciones} onChange={handleChange} className="p-2 rounded bg-white text-black">
+              {[0,1,2,3,4,5].map(h => <option key={h} value={h}>{h}</option>)}
+            </select>
+            <select name="banos" multiple value={formData.banos} onChange={handleChange} className="p-2 rounded bg-white text-black">
+              <option value="1">1</option><option value="1+1">1+1</option><option value="2">2</option>
+            </select>
+            <select name="estado" value={formData.estado} onChange={handleChange} className="p-2 rounded bg-white text-black">
+              <option value="">Estado</option><option value="Entrar a Vivir">Entrar a Vivir</option><option value="Actualizar">Actualizar</option><option value="A Reformar">A Reformar</option>
+            </select>
+            <select name="ascensor" value={formData.ascensor} onChange={handleChange} className="p-2 rounded bg-white text-black">
+              <option value="">Ascensor</option><option value="SÍ">SÍ</option><option value="HASTA 1º">HASTA 1º</option><option value="HASTA 2º">HASTA 2º</option>
+              <option value="HASTA 3º">HASTA 3º</option><option value="HASTA 4º">HASTA 4º</option><option value="HASTA 5º">HASTA 5º</option>
+            </select>
+            <select name="m2" value={formData.m2} onChange={handleChange} className="p-2 rounded bg-white text-black" required>
+              <option value="">m²</option>{[30,40,50,60,70,80,90,100,110,120,130,150].map(m => <option key={m} value={m}>{m}</option>)}
+            </select>
+            <select name="orientacion" multiple value={formData.orientacion} onChange={handleChange} className="p-2 rounded bg-white text-black">
+              <option value="Norte">Norte</option><option value="Sur">Sur</option><option value="Este">Este</option><option value="Oeste">Oeste</option><option value="Indiferente">Indiferente</option>
+            </select>
+            <select name="permuta" value={formData.permuta} onChange={handleChange} className="p-2 rounded bg-white text-black">
+              <option value="">Permuta</option><option value="SÍ">SÍ</option><option value="NO">NO</option>
+            </select>
+            <button type="button" onClick={handleSubmit} className="col-span-3 accent-yellow p-2 rounded">Registrar Cliente</button>
+          </div>
+        </div>
+      );
+    };
 
-    async function searchPisos() {
-      const clienteId = document.getElementById("clienteSelect").value;
-      if (!clienteId) {
-        alert("Selecciona un cliente");
-        return;
-      }
-      try {
-        const response = await fetch(`${API_BASE}/match?cliente_id=${clienteId}`, {
-          headers: { Authorization: `Bearer ${token}` },
+    const PisoForm = ({ onRegister }) => {
+      const [formData, setFormData] = useState({
+        zona: [], precio: "", tipo_vivienda: [], habitaciones: [], banos: [], estado: "",
+        ascensor: "", m2: "", orientacion: []
+      });
+
+      const handleChange = (e) => {
+        const { name, value, selectedOptions } = e.target;
+        if (name === "zona" || name === "tipo_vivienda" || name === "habitaciones" || name === "banos" || name === "orientacion") {
+          setFormData({ ...formData, [name]: Array.from(selectedOptions, opt => opt.value) });
+        } else {
+          setFormData({ ...formData, [name]: value });
+        }
+      };
+
+      const handleSubmit = async () => {
+        const piso = { ...formData, compania_id: companiaId, precio: parseFloat(formData.precio), m2: parseInt(formData.m2), habitaciones: formData.habitaciones.map(Number) };
+        try {
+          const response = await fetch(`${API_BASE}/pisos`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify(piso),
+          });
+          const result = await response.json();
+          if (response.ok) {
+            alert(`Piso registrado: ${result.id}`);
+            onRegister();
+          } else {
+            alert("Error al registrar piso: " + result.detail);
+          }
+        } catch (error) {
+          alert("Error al registrar piso: " + error.message);
+        }
+      };
+
+      return (
+        <div className="max-w-4xl mx-auto mt-10 p-6 bg-gray-800 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold mb-4">🏡 Registro de Piso</h2>
+          <div className="grid grid-cols-3 gap-4">
+            <select name="zona" multiple value={formData.zona} onChange={handleChange} className="p-2 rounded bg-white text-black" required>
+              <option value="ALTO">ALTO</option><option value="OLIVOS">OLIVOS</option><option value="LAGUNA">LAGUNA</option>
+              <option value="BATÁN">BATÁN</option><option value="SEPÚLVEDA">SEPÚLVEDA</option><option value="MANZANARES">MANZANARES</option>
+              <option value="PÍO">PÍO</option><option value="PUERTA">PUERTA</option><option value="JESUITAS">JESUITAS</option>
+            </select>
+            <input name="precio" value={formData.precio} onChange={handleChange} placeholder="Precio (€)" className="p-2 rounded bg-white text-black" required />
+            <select name="tipo_vivienda" multiple value={formData.tipo_vivienda} onChange={handleChange} className="p-2 rounded bg-white text-black">
+              <option value="Piso">Piso</option><option value="Casa">Casa</option><option value="Chalet">Chalet</option>
+              <option value="Adosado">Adosado</option><option value="Dúplex">Dúplex</option><option value="Ático">Ático</option><option value="Estudio">Estudio</option>
+            </select>
+            <select name="habitaciones" multiple value={formData.habitaciones} onChange={handleChange} className="p-2 rounded bg-white text-black">
+              {[0,1,2,3,4,5].map(h => <option key={h} value={h}>{h}</option>)}
+            </select>
+            <select name="banos" multiple value={formData.banos} onChange={handleChange} className="p-2 rounded bg-white text-black">
+              <option value="1">1</option><option value="1+1">1+1</option><option value="2">2</option>
+            </select>
+            <select name="estado" value={formData.estado} onChange={handleChange} className="p-2 rounded bg-white text-black">
+              <option value="">Estado</option><option value="Entrar a Vivir">Entrar a Vivir</option><option value="Actualizar">Actualizar</option><option value="A Reformar">A Reformar</option>
+            </select>
+            <select name="ascensor" value={formData.ascensor} onChange={handleChange} className="p-2 rounded bg-white text-black">
+              <option value="">Ascensor</option><option value="SÍ">SÍ</option><option value="HASTA 1º">HASTA 1º</option><option value="HASTA 2º">HASTA 2º</option>
+              <option value="HASTA 3º">HASTA 3º</option><option value="HASTA 4º">HASTA 4º</option><option value="HASTA 5º">HASTA 5º</option>
+            </select>
+            <select name="m2" value={formData.m2} onChange={handleChange} className="p-2 rounded bg-white text-black" required>
+              <option value="">m²</option>{[30,40,50,60,70,80,90,100,110,120,130,150].map(m => <option key={m} value={m}>{m}</option>)}
+            </select>
+            <button type="button" onClick={handleSubmit} className="col-span-3 accent-yellow p-2 rounded">Registrar Piso</button>
+          </div>
+        </div>
+      );
+    };
+
+    const SearchClientes = ({ onLoad }) => {
+      const [pisos, setPisos] = useState([]);
+      const [results, setResults] = useState([]);
+
+      useEffect(() => {
+        fetchPisos();
+      }, []);
+
+      const fetchPisos = async () => {
+        try {
+          const response = await fetch(`${API_BASE}/pisos`, { headers: { Authorization: `Bearer ${token}` } });
+          setPisos(await response.json());
+        } catch (error) {
+          alert("Error al cargar pisos: " + error.message);
+        }
+      };
+
+      const handleSearch = async () => {
+        const pisoId = document.getElementById("pisoSelect").value;
+        if (!pisoId) {
+          alert("Selecciona un piso");
+          return;
+        }
+        try {
+          const response = await fetch(`${API_BASE}/match?piso_id=${pisoId}`, { headers: { Authorization: `Bearer ${token}` } });
+          setResults(await response.json());
+        } catch (error) {
+          alert("Error al buscar clientes: " + error.message);
+        }
+      };
+
+      return (
+        <div className="max-w-4xl mx-auto mt-10 p-6 bg-gray-800 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold mb-4">🔍 Buscar Clientes para un Piso</h2>
+          <select id="pisoSelect" className="w-full p-2 mb-4 rounded bg-white text-black">
+            <option value="">Seleccionar un piso...</option>
+            {pisos.map(piso => <option key={piso.id} value={piso.id}>Piso {piso.id} - {piso.zona} ({piso.precio}€)</option>)}
+          </select>
+          <button onClick={handleSearch} className="accent-yellow p-2 rounded">Buscar</button>
+          <div className="mt-4">
+            <h3 className="text-xl">Clientes Compatibles</h3>
+            <ul className="list-disc pl-5">
+              {results.map(match => <li key={match.cliente_id}>Cliente ID: {match.cliente_id} (Score: {match.score}%)</li>)}
+            </ul>
+          </div>
+        </div>
+      );
+    };
+
+    const SearchPisos = ({ onLoad }) => {
+      const [clientes, setClientes] = useState([]);
+      const [results, setResults] = useState([]);
+
+      useEffect(() => {
+        fetchClientes();
+      }, []);
+
+      const fetchClientes = async () => {
+        try {
+          const response = await fetch(`${API_BASE}/clientes`, { headers: { Authorization: `Bearer ${token}` } });
+          setClientes(await response.json());
+        } catch (error) {
+          alert("Error al cargar clientes: " + error.message);
+        }
+      };
+
+      const handleSearch = async () => {
+        const clienteId = document.getElementById("clienteSelect").value;
+        if (!clienteId) {
+          alert("Selecciona un cliente");
+          return;
+        }
+        try {
+          const response = await fetch(`${API_BASE}/match?cliente_id=${clienteId}`, { headers: { Authorization: `Bearer ${token}` } });
+          setResults(await response.json());
+        } catch (error) {
+          alert("Error al buscar pisos: " + error.message);
+        }
+      };
+
+      return (
+        <div className="max-w-4xl mx-auto mt-10 p-6 bg-gray-800 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold mb-4">🏡 Buscar Pisos para un Cliente</h2>
+          <select id="clienteSelect" className="w-full p-2 mb-4 rounded bg-white text-black">
+            <option value="">Seleccionar un cliente...</option>
+            {clientes.map(cliente => <option key={cliente.id} value={cliente.id}>{cliente.nombre || "Cliente " + cliente.id} - {cliente.zona}</option>)}
+          </select>
+          <button onClick={handleSearch} className="accent-yellow p-2 rounded">Buscar</button>
+          <div className="mt-4">
+            <h3 className="text-xl">Pisos Compatibles</h3>
+            <ul className="list-disc pl-5">
+              {results.map(match => <li key={match.piso_id}>Piso ID: {match.piso_id} (Score: {match.score}%)</li>)}
+            </ul>
+          </div>
+        </div>
+      );
+    };
+
+    const App = () => {
+      const [isLoggedIn, setIsLoggedIn] = useState(!!token);
+
+      const handleLogin = () => {
+        setIsLoggedIn(true);
+      };
+
+      const handleRegister = () => {
+        // Refresh data after registration
+        document.querySelectorAll("select[id$='Select']").forEach(select => {
+          select.dispatchEvent(new Event("change"));
         });
-        const matches = await response.json();
-        let html = "<h3>Pisos compatibles</h3><ul>";
-        matches.forEach(match => {
-          html += `<li>Piso ID: ${match.piso_id} (Score: ${match.score}%)</li>`;
-        });
-        html += "</ul>";
-        document.getElementById("pisosResult").innerHTML = html;
-      } catch (error) {
-        alert("Error al buscar pisos: " + error.message);
-      }
-    }
+      };
+
+      return (
+        <div className="flex">
+          <Sidebar />
+          <div className="ml-64 w-full p-6">
+            {!isLoggedIn ? (
+              <LoginForm onLogin={handleLogin} />
+            ) : (
+              <>
+                <h1 className="text-4xl font-bold mb-6 text-center">🏠 MatchingProps</h1>
+                <ClientForm onRegister={handleRegister} />
+                <PisoForm onRegister={handleRegister} />
+                <SearchClientes onLoad={handleRegister} />
+                <SearchPisos onLoad={handleRegister} />
+              </>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    ReactDOM.render(<App />, document.getElementById("root"));
   </script>
 </body>
 </html>
