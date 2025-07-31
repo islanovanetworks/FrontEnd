@@ -157,10 +157,10 @@
         
         <nav className="space-y-2">
           {[
-            { id: 'clientes', label: '👤 Registrar Cliente', icon: '👤' },
-            { id: 'pisos', label: '🏡 Registrar Piso', icon: '🏡' },
-            { id: 'searchClientes', label: '🔍 Buscar Clientes', icon: '🔍' },
-            { id: 'searchPisos', label: '🏢 Buscar Pisos', icon: '🏢' }
+            { id: 'clientes', label: 'Registrar Cliente', icon: '👤' },
+            { id: 'pisos', label: 'Registrar Piso', icon: '🏡' },
+            { id: 'searchClientes', label: 'Buscar Clientes', icon: '🔍' },
+            { id: 'searchPisos', label: 'Buscar Pisos', icon: '🏢' }
           ].map(item => (
             <button
               key={item.id}
@@ -417,14 +417,16 @@
                     required
                   >
                     <option value="">Seleccionar precio</option>
+                    {/* De 10.000€ a 200.000€ en incrementos de 10.000€ */}
                     {[...Array(20).keys()].map(i => (
                       <option key={i * 10000 + 10000} value={i * 10000 + 10000}>
                         {(i * 10000 + 10000).toLocaleString()}€
                       </option>
                     ))}
+                    {/* De 220.000€ a 500.000€ en incrementos de 20.000€ */}
                     {[...Array(15).keys()].map(i => (
-                      <option key={(i + 20) * 20000} value={(i + 20) * 20000}>
-                        {((i + 20) * 20000).toLocaleString()}€
+                      <option key={220000 + i * 20000} value={220000 + i * 20000}>
+                        {(220000 + i * 20000).toLocaleString()}€
                       </option>
                     ))}
                   </select>
