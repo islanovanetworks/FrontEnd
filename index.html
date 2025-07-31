@@ -1,4 +1,38 @@
-<!DOCTYPE html>
+{/* Información Básica */}
+            <div className="form-section">
+              <h3>Información Básica</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Nombre *</label>
+                  <input
+                    name="nombre"
+                    value={formData.nombre}
+                    onChange={handleChange}
+                    placeholder="Nombre completo"
+                    className="w-full form-input"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono *</label>
+                  <input
+                    name="telefono"
+                    value={formData.telefono}
+                    onChange={handleChange}
+                    placeholder="Número de teléfono"
+                    className="w-full form-input"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Banco</label>
+                  <input
+                    name="banco"
+                    value={formData.banco}
+                    onChange={handleChange}
+                    placeholder="Entida<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -157,10 +191,10 @@
         
         <nav className="space-y-2">
           {[
-            { id: 'clientes', label: 'Registrar Cliente', icon: '👤' },
-            { id: 'pisos', label: 'Registrar Piso', icon: '🏡' },
-            { id: 'searchClientes', label: 'Buscar Clientes', icon: '🔍' },
-            { id: 'searchPisos', label: 'Buscar Pisos', icon: '🏢' }
+            { id: 'clientes', label: '👤 Registrar Cliente', icon: '👤' },
+            { id: 'pisos', label: '🏡 Registrar Piso', icon: '🏡' },
+            { id: 'searchClientes', label: '🔍 Buscar Clientes', icon: '🔍' },
+            { id: 'searchPisos', label: '🏢 Buscar Pisos', icon: '🏢' }
           ].map(item => (
             <button
               key={item.id}
@@ -260,11 +294,11 @@
     const ClientForm = ({ onRegister }) => {
       const [formData, setFormData] = useState({
         nombre: "", telefono: "", zona: [], subzonas: "", entrada: "", precio: "",
-        tipo_vivienda: [], finalidad: [], habitaciones: [], banos: [], estado: "",
+        tipo_vivienda: [], finalidad: [], habitaciones: [], banos: [], estado: [],
         ascensor: "", bajos: "", entreplanta: "", m2: "", altura: "", cercania_metro: "",
         orientacion: [], edificio_semi_nuevo: "", adaptado_movilidad: "", balcon: "",
         patio: "", terraza: "", garaje: "", trastero: "", interior: "", piscina: "",
-        urbanizacion: "", vistas: "", caracteristicas_adicionales: "", banco: "", permuta: ""
+        urbanizacion: "", vistas: "", caracteristicas_adicionales: "", banco: "", permuta: "", kiron: ""
       });
 
       const handleChange = (e) => {
@@ -295,11 +329,11 @@
             alert(`✅ Cliente registrado: ${result.nombre}`);
             setFormData({
               nombre: "", telefono: "", zona: [], subzonas: "", entrada: "", precio: "",
-              tipo_vivienda: [], finalidad: [], habitaciones: [], banos: [], estado: "",
+              tipo_vivienda: [], finalidad: [], habitaciones: [], banos: [], estado: [],
               ascensor: "", bajos: "", entreplanta: "", m2: "", altura: "", cercania_metro: "",
               orientacion: [], edificio_semi_nuevo: "", adaptado_movilidad: "", balcon: "",
               patio: "", terraza: "", garaje: "", trastero: "", interior: "", piscina: "",
-              urbanizacion: "", vistas: "", caracteristicas_adicionales: "", banco: "", permuta: ""
+              urbanizacion: "", vistas: "", caracteristicas_adicionales: "", banco: "", permuta: "", kiron: ""
             });
             onRegister();
           } else {
@@ -321,7 +355,7 @@
             {/* Información Básica */}
             <div className="form-section">
               <h3>Información Básica</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Nombre *</label>
                   <input
@@ -355,6 +389,21 @@
                     placeholder="Entidad bancaria"
                     className="w-full form-input"
                   />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">KÍRON</label>
+                  <select
+                    name="kiron"
+                    value={formData.kiron}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SK">SK</option>
+                    <option value="PK">PK</option>
+                    <option value="NK">NK</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -484,20 +533,13 @@
                   onChange={handleChange}
                 />
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
-                  <select
-                    name="estado"
-                    value={formData.estado}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar estado</option>
-                    <option value="Entrar a Vivir">Entrar a Vivir</option>
-                    <option value="Actualizar">Actualizar</option>
-                    <option value="A Reformar">A Reformar</option>
-                  </select>
-                </div>
+                <MultiSelect
+                  label="Estado"
+                  name="estado"
+                  options={["Entrar a Vivir", "Actualizar", "A Reformar"]}
+                  value={formData.estado}
+                  onChange={handleChange}
+                />
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Metros² *</label>
@@ -531,11 +573,7 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="HASTA 1º">HASTA 1º</option>
-                    <option value="HASTA 2º">HASTA 2º</option>
-                    <option value="HASTA 3º">HASTA 3º</option>
-                    <option value="HASTA 4º">HASTA 4º</option>
-                    <option value="HASTA 5º">HASTA 5º</option>
+                    <option value="NO">NO</option>
                   </select>
                 </div>
                 
@@ -578,14 +616,9 @@
                     className="w-full form-input"
                   >
                     <option value="">Seleccionar</option>
-                    <option value="BAJO">BAJO</option>
-                    <option value="1º">1º</option>
-                    <option value="2º">2º</option>
-                    <option value="3º">3º</option>
-                    <option value="4º">4º</option>
-                    <option value="5º">5º</option>
-                    <option value="6º">6º</option>
-                    <option value="ÁTICO">ÁTICO</option>
+                    <option value="PRIMERAS PLANTAS">PRIMERAS PLANTAS</option>
+                    <option value="PLANTAS INTERMEDIAS">PLANTAS INTERMEDIAS</option>
+                    <option value="ÚLTIMAS PLANTAS">ÚLTIMAS PLANTAS</option>
                   </select>
                 </div>
               </div>
@@ -637,7 +670,6 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
@@ -652,7 +684,6 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
@@ -668,7 +699,6 @@
                     <option value="">Seleccionar</option>
                     <option value="EXTERIOR">EXTERIOR</option>
                     <option value="INTERIOR">INTERIOR</option>
-                    <option value="AMBOS">AMBOS</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
@@ -689,7 +719,6 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
@@ -704,7 +733,6 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
@@ -719,7 +747,6 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
@@ -733,11 +760,7 @@
                     className="w-full form-input"
                   >
                     <option value="">Seleccionar</option>
-                    <option value="DESPEJADAS">DESPEJADAS</option>
-                    <option value="MONTAÑA">MONTAÑA</option>
-                    <option value="MAR">MAR</option>
-                    <option value="CIUDAD">CIUDAD</option>
-                    <option value="PATIO">PATIO</option>
+                    <option value="SÍ">SÍ</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
@@ -758,7 +781,6 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
                     <option value="OPCIONAL">OPCIONAL</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
@@ -774,7 +796,6 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
                     <option value="OPCIONAL">OPCIONAL</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
@@ -790,7 +811,6 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
                     <option value="COMUNITARIA">COMUNITARIA</option>
                     <option value="PRIVADA">PRIVADA</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
@@ -807,7 +827,6 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
@@ -841,7 +860,7 @@
     // Piso Form Component
     const PisoForm = ({ onRegister }) => {
       const [formData, setFormData] = useState({
-        zona: [], precio: "", tipo_vivienda: [], habitaciones: [], banos: [], estado: "",
+        zona: [], precio: "", tipo_vivienda: [], habitaciones: [], banos: [], estado: [],
         ascensor: "", bajos: "", entreplanta: "", m2: "", altura: "", cercania_metro: "",
         orientacion: [], edificio_semi_nuevo: "", adaptado_movilidad: "", balcon: "",
         patio: "", terraza: "", garaje: "", trastero: "", interior: "", piscina: "",
@@ -874,7 +893,7 @@
           if (response.ok) {
             alert(`✅ Piso registrado con ID: ${result.id}`);
             setFormData({
-              zona: [], precio: "", tipo_vivienda: [], habitaciones: [], banos: [], estado: "",
+              zona: [], precio: "", tipo_vivienda: [], habitaciones: [], banos: [], estado: [],
               ascensor: "", bajos: "", entreplanta: "", m2: "", altura: "", cercania_metro: "",
               orientacion: [], edificio_semi_nuevo: "", adaptado_movilidad: "", balcon: "",
               patio: "", terraza: "", garaje: "", trastero: "", interior: "", piscina: "",
@@ -969,20 +988,13 @@
                   onChange={handleChange}
                 />
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
-                  <select
-                    name="estado"
-                    value={formData.estado}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar estado</option>
-                    <option value="Entrar a Vivir">Entrar a Vivir</option>
-                    <option value="Actualizar">Actualizar</option>
-                    <option value="A Reformar">A Reformar</option>
-                  </select>
-                </div>
+                <MultiSelect
+                  label="Estado"
+                  name="estado"
+                  options={["Entrar a Vivir", "Actualizar", "A Reformar"]}
+                  value={formData.estado}
+                  onChange={handleChange}
+                />
               </div>
             </div>
 
@@ -1000,11 +1012,7 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="HASTA 1º">HASTA 1º</option>
-                    <option value="HASTA 2º">HASTA 2º</option>
-                    <option value="HASTA 3º">HASTA 3º</option>
-                    <option value="HASTA 4º">HASTA 4º</option>
-                    <option value="HASTA 5º">HASTA 5º</option>
+                    <option value="NO">NO</option>
                   </select>
                 </div>
                 
@@ -1047,14 +1055,9 @@
                     className="w-full form-input"
                   >
                     <option value="">Seleccionar</option>
-                    <option value="BAJO">BAJO</option>
-                    <option value="1º">1º</option>
-                    <option value="2º">2º</option>
-                    <option value="3º">3º</option>
-                    <option value="4º">4º</option>
-                    <option value="5º">5º</option>
-                    <option value="6º">6º</option>
-                    <option value="ÁTICO">ÁTICO</option>
+                    <option value="PRIMERAS PLANTAS">PRIMERAS PLANTAS</option>
+                    <option value="PLANTAS INTERMEDIAS">PLANTAS INTERMEDIAS</option>
+                    <option value="ÚLTIMAS PLANTAS">ÚLTIMAS PLANTAS</option>
                   </select>
                 </div>
               </div>
@@ -1106,7 +1109,6 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
@@ -1121,7 +1123,6 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
@@ -1137,7 +1138,6 @@
                     <option value="">Seleccionar</option>
                     <option value="EXTERIOR">EXTERIOR</option>
                     <option value="INTERIOR">INTERIOR</option>
-                    <option value="AMBOS">AMBOS</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
@@ -1158,7 +1158,6 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
@@ -1173,7 +1172,6 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
@@ -1188,7 +1186,6 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
@@ -1202,11 +1199,7 @@
                     className="w-full form-input"
                   >
                     <option value="">Seleccionar</option>
-                    <option value="DESPEJADAS">DESPEJADAS</option>
-                    <option value="MONTAÑA">MONTAÑA</option>
-                    <option value="MAR">MAR</option>
-                    <option value="CIUDAD">CIUDAD</option>
-                    <option value="PATIO">PATIO</option>
+                    <option value="SÍ">SÍ</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
@@ -1227,7 +1220,6 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
                     <option value="OPCIONAL">OPCIONAL</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
@@ -1243,7 +1235,6 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
                     <option value="OPCIONAL">OPCIONAL</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
@@ -1259,7 +1250,6 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
                     <option value="COMUNITARIA">COMUNITARIA</option>
                     <option value="PRIVADA">PRIVADA</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
@@ -1272,6 +1262,15 @@
                     name="urbanizacion"
                     value={formData.urbanizacion}
                     onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
+                  </select>
+                </div>
+              </div>
+            </div>onChange={handleChange}
                     className="w-full form-input"
                   >
                     <option value="">Seleccionar</option>
