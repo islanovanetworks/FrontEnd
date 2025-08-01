@@ -432,16 +432,22 @@
                     required
                   >
                     <option value="">Seleccionar precio</option>
-                    {/* De 10.000€ a 200.000€ en incrementos de 10.000€ */}
-                    {[...Array(20).keys()].map(i => (
+                    {/* De 10.000€ a 500.000€ en incrementos de 10.000€ */}
+                    {[...Array(50).keys()].map(i => (
                       <option key={i * 10000 + 10000} value={i * 10000 + 10000}>
                         {(i * 10000 + 10000).toLocaleString()}€
                       </option>
                     ))}
-                    {/* De 220.000€ a 500.000€ en incrementos de 20.000€ */}
-                    {[...Array(15).keys()].map(i => (
-                      <option key={220000 + i * 20000} value={220000 + i * 20000}>
-                        {(220000 + i * 20000).toLocaleString()}€
+                    {/* De 520.000€ a 1.000.000€ en incrementos de 20.000€ */}
+                    {[...Array(25).keys()].map(i => (
+                      <option key={520000 + i * 20000} value={520000 + i * 20000}>
+                        {(520000 + i * 20000).toLocaleString()}€
+                      </option>
+                    ))}
+                    {/* De 1.050.000€ a 2.000.000€ en incrementos de 50.000€ */}
+                    {[...Array(20).keys()].map(i => (
+                      <option key={1050000 + i * 50000} value={1050000 + i * 50000}>
+                        {(1050000 + i * 50000).toLocaleString()}€
                       </option>
                     ))}
                   </select>
@@ -470,7 +476,7 @@
                 <MultiSelect
                   label="Tipo de Vivienda"
                   name="tipo_vivienda"
-                  options={["Piso", "Ático", "Chalet"]}
+                  options={["Piso", "Ático", "Chalet", "Local"]}
                   value={formData.tipo_vivienda}
                   onChange={handleChange}
                 />
@@ -509,18 +515,15 @@
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Metros² *</label>
-                  <select
+                  <input
                     name="m2"
+                    type="number"
                     value={formData.m2}
                     onChange={handleChange}
+                    placeholder="Metros cuadrados"
                     className="w-full form-input"
                     required
-                  >
-                    <option value="">Seleccionar m²</option>
-                    {[30,40,50,60,70,80,90,100,110,120,130,150].map(m => (
-                      <option key={m} value={m}>{m} m²</option>
-                    ))}
-                  </select>
+                  />
                 </div>
               </div>
             </div>
@@ -595,7 +598,7 @@
                 <MultiSelect
                   label="Orientación"
                   name="orientacion"
-                  options={["Norte", "Sur", "Este", "Oeste", "Indiferente"]}
+                  options={["Norte", "Sur", "Este", "Oeste"]}
                   value={formData.orientacion}
                   onChange={handleChange}
                 />
@@ -745,7 +748,6 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="OPCIONAL">OPCIONAL</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
@@ -760,7 +762,6 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="OPCIONAL">OPCIONAL</option>
                     <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
@@ -822,9 +823,9 @@
     // Piso Form Component
     const PisoForm = ({ onRegister }) => {
       const [formData, setFormData] = useState({
-        direccion: "", portal: "", piso: "",
-        zona: "", precio: "", tipo_vivienda: [], habitaciones: [], banos: [], estado: "",
-        ascensor: "", bajos: "", entreplanta: "", m2: "", altura: "", cercania_metro: "",
+        direccion: "", subzonas: "",
+        zona: "", precio: "", tipo_vivienda: [], habitaciones: "", banos: "", estado: "",
+        ascensor: "", bajos: "", entreplanta: "", planta: "", m2: "", altura: "", cercania_metro: "",
         orientacion: [], edificio_semi_nuevo: "", adaptado_movilidad: "", balcon: "",
         patio: "", terraza: "", garaje: "", trastero: "", interior: "", piscina: "",
         urbanizacion: "", vistas: "", caracteristicas_adicionales: ""
@@ -857,9 +858,9 @@
           if (response.ok) {
             alert(`✅ Piso registrado con ID: ${result.id}`);
             setFormData({
-              direccion: "", portal: "", piso: "",
-              zona: "", precio: "", tipo_vivienda: [], habitaciones: [], banos: [], estado: "",
-              ascensor: "", bajos: "", entreplanta: "", m2: "", altura: "", cercania_metro: "",
+              direccion: "", subzonas: "",
+              zona: "", precio: "", tipo_vivienda: [], habitaciones: "", banos: "", estado: "",
+              ascensor: "", bajos: "", entreplanta: "", planta: "", m2: "", altura: "", cercania_metro: "",
               orientacion: [], edificio_semi_nuevo: "", adaptado_movilidad: "", balcon: "",
               patio: "", terraza: "", garaje: "", trastero: "", interior: "", piscina: "",
               urbanizacion: "", vistas: "", caracteristicas_adicionales: ""
@@ -897,28 +898,6 @@
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Portal</label>
-                  <input
-                    name="portal"
-                    value={formData.portal}
-                    onChange={handleChange}
-                    placeholder="Número de portal"
-                    className="w-full form-input"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Piso</label>
-                  <input
-                    name="piso"
-                    value={formData.piso}
-                    onChange={handleChange}
-                    placeholder="Número de piso"
-                    className="w-full form-input"
-                  />
-                </div>
-                
-                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Zona *</label>
                   <select
                     name="zona"
@@ -940,6 +919,16 @@
                   </select>
                 </div>
                 
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Subzonas</label>
+                  <input
+                    name="subzonas"
+                    value={formData.subzonas}
+                    onChange={handleChange}
+                    placeholder="Subzonas específicas"
+                    className="w-full form-input"
+                  />
+                </div>                
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Precio (€) *</label>
                   <input
@@ -983,21 +972,38 @@
                   onChange={handleChange}
                 />
                 
-                <MultiSelect
-                  label="Habitaciones"
-                  name="habitaciones"
-                  options={["0", "1", "2", "3", "4", "5"]}
-                  value={formData.habitaciones}
-                  onChange={handleChange}
-                />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Habitaciones</label>
+                  <select
+                    name="habitaciones"
+                    value={formData.habitaciones}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar habitaciones</option>
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                  </select>
+                </div>
                 
-                <MultiSelect
-                  label="Baños"
-                  name="banos"
-                  options={["1", "1+1", "2"]}
-                  value={formData.banos}
-                  onChange={handleChange}
-                />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Baños</label>
+                  <select
+                    name="banos"
+                    value={formData.banos}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar baños</option>
+                    <option value="1">1</option>
+                    <option value="1+1">1+1</option>
+                    <option value="2">2</option>
+                  </select>
+                </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
@@ -1030,7 +1036,11 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
+                    <option value="Después de 1º">Después de 1º</option>
+                    <option value="Después de 2º">Después de 2º</option>
+                    <option value="Después de 3º">Después de 3º</option>
+                    <option value="Después de 4º">Después de 4º</option>
+                    <option value="Después de 5º">Después de 5º</option>
                   </select>
                 </div>
                 
@@ -1063,6 +1073,24 @@
                 </div>
                 
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Planta</label>
+                  <select
+                    name="planta"
+                    value={formData.planta}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar planta</option>
+                    <option value="-1">-1</option>
+                    <option value="0">0</option>
+                    <option value="Entreplanta">Entreplanta</option>
+                    {[...Array(15).keys()].map(i => (
+                      <option key={i + 1} value={i + 1}>{i + 1}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Altura</label>
                   <select
                     name="altura"
@@ -1076,8 +1104,6 @@
                     <option value="ÚLTIMAS PLANTAS">ÚLTIMAS PLANTAS</option>
                   </select>
                 </div>
-              </div>
-            </div>
 
             {/* Orientación y Transporte */}
             <div className="form-section">
@@ -1154,7 +1180,7 @@
                     <option value="">Seleccionar</option>
                     <option value="EXTERIOR">EXTERIOR</option>
                     <option value="INTERIOR">INTERIOR</option>
-                    <option value="INDIFERENTE">INDIFERENTE</option>
+                    <option value="AMBOS">AMBOS</option>
                   </select>
                 </div>
               </div>
