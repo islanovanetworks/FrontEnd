@@ -303,7 +303,21 @@
             });
             onRegister();
           } else {
-            alert("❌ Error al registrar cliente: " + result.detail);
+            // ✅ MANEJO DE ERRORES MEJORADO
+            console.error("Error response:", result);
+            let errorMessage = "Error desconocido";
+            
+            if (typeof result.detail === 'string') {
+              errorMessage = result.detail;
+            } else if (typeof result.detail === 'object') {
+              errorMessage = JSON.stringify(result.detail, null, 2);
+            } else if (result.message) {
+              errorMessage = result.message;
+            } else {
+              errorMessage = `Error ${response.status}: ${response.statusText}`;
+            }
+            
+            alert("❌ Error al registrar cliente:\n" + errorMessage);
           }
         } catch (error) {
           alert("❌ Error de conexión: " + error.message);
