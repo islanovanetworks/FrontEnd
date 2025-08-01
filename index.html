@@ -542,7 +542,11 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
+                    <option value="Después de 1º">Después de 1º</option>
+                    <option value="Después de 2º">Después de 2º</option>
+                    <option value="Después de 3º">Después de 3º</option>
+                    <option value="Después de 4º">Después de 4º</option>
+                    <option value="Después de 5º">Después de 5º</option>
                   </select>
                 </div>
                 
@@ -843,7 +847,7 @@
           compania_id: companiaId, 
           precio: parseFloat(formData.precio), 
           m2: parseInt(formData.m2), 
-          habitaciones: formData.habitaciones.map(Number),
+          habitaciones: formData.habitaciones ? [formData.habitaciones] : [],
           zona: [formData.zona] // Convert single selection to array for API compatibility
         };
         
@@ -928,7 +932,8 @@
                     placeholder="Subzonas específicas"
                     className="w-full form-input"
                   />
-                </div>                
+                </div>
+                
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Precio (€) *</label>
                   <input
@@ -941,21 +946,20 @@
                     required
                   />
                 </div>
-                
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Metros² *</label>
-                  <select
+                  <input
                     name="m2"
+                    type="number"
                     value={formData.m2}
                     onChange={handleChange}
+                    placeholder="Metros cuadrados"
                     className="w-full form-input"
                     required
-                  >
-                    <option value="">Seleccionar m²</option>
-                    {[30,40,50,60,70,80,90,100,110,120,130,150].map(m => (
-                      <option key={m} value={m}>{m} m²</option>
-                    ))}
-                  </select>
+                  />
                 </div>
               </div>
             </div>
@@ -963,11 +967,11 @@
             {/* Características de la Vivienda */}
             <div className="form-section">
               <h3>Características de la Vivienda</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <MultiSelect
                   label="Tipo de Vivienda"
                   name="tipo_vivienda"
-                  options={["Piso", "Ático", "Chalet"]}
+                  options={["Piso", "Ático", "Chalet", "Local"]}
                   value={formData.tipo_vivienda}
                   onChange={handleChange}
                 />
@@ -1025,7 +1029,7 @@
             {/* Ubicación y Acceso */}
             <div className="form-section">
               <h3>Ubicación y Acceso</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Ascensor</label>
                   <select
@@ -1036,11 +1040,7 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="Después de 1º">Después de 1º</option>
-                    <option value="Después de 2º">Después de 2º</option>
-                    <option value="Después de 3º">Después de 3º</option>
-                    <option value="Después de 4º">Después de 4º</option>
-                    <option value="Después de 5º">Después de 5º</option>
+                    <option value="NO">NO</option>
                   </select>
                 </div>
                 
@@ -1104,6 +1104,8 @@
                     <option value="ÚLTIMAS PLANTAS">ÚLTIMAS PLANTAS</option>
                   </select>
                 </div>
+              </div>
+            </div>
 
             {/* Orientación y Transporte */}
             <div className="form-section">
@@ -1112,7 +1114,7 @@
                 <MultiSelect
                   label="Orientación"
                   name="orientacion"
-                  options={["Norte", "Sur", "Este", "Oeste", "Indiferente"]}
+                  options={["Norte", "Sur", "Este", "Oeste"]}
                   value={formData.orientacion}
                   onChange={handleChange}
                 />
@@ -1262,7 +1264,7 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
                 
@@ -1276,7 +1278,7 @@
                   >
                     <option value="">Seleccionar</option>
                     <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
+                    <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
                 
@@ -1357,6 +1359,146 @@
       };
 
       const handleSearch = async () => {
+        if (!selectedCliente) {
+          alert("Por favor, selecciona un cliente");
+          return;
+        }
+        
+        setLoading(true);
+        try {
+          const response = await fetch(`${API_BASE}/match?cliente_id=${selectedCliente}`, { 
+            headers: { Authorization: `Bearer ${token}` } 
+          });
+          setResults(await response.json());
+        } catch (error) {
+          alert("Error al buscar pisos: " + error.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div className="section-card p-8">
+          <div className="mb-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">🔍 Buscar Clientes</h2>
+            <p className="text-gray-600">Encuentra clientes compatibles para un piso específico</p>
+          </div>
+          
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Seleccionar Piso</label>
+              <select
+                value={selectedPiso}
+                onChange={(e) => setSelectedPiso(e.target.value)}
+                className="w-full form-input"
+              >
+                <option value="">Seleccionar un piso...</option>
+                {pisos.map(piso => (
+                  <option key={piso.id} value={piso.id}>
+                    Piso {piso.id} - {Array.isArray(piso.zona) ? piso.zona.join(', ') : piso.zona} ({piso.precio?.toLocaleString()}€) - {piso.m2}m²
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <button 
+              onClick={handleSearch} 
+              disabled={loading || !selectedCliente}
+              className="btn-primary px-6 py-3 font-semibold disabled:opacity-50"
+            >
+              {loading ? "Buscando..." : "🏢 Buscar Pisos"}
+            </button>
+            
+            {results.length > 0 && (
+              <div className="mt-8">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  Pisos Compatibles ({results.length})
+                </h3>
+                <div className="space-y-3">
+                  {results.map(match => (
+                    <div key={match.piso_id} className="p-4 bg-gray-50 rounded-lg border">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium text-gray-900">
+                          Piso ID: {match.piso_id}
+                        </span>
+                        <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                          {match.score}% compatibilidad
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {results.length === 0 && selectedPiso && !loading && (
+              <div className="text-center py-8 text-gray-500">
+                No se encontraron clientes compatibles para este piso.
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    // Main App Component
+    const App = () => {
+      const [isLoggedIn, setIsLoggedIn] = useState(false);
+      const [activeSection, setActiveSection] = useState('clientes');
+
+      const handleLogin = () => {
+        setIsLoggedIn(true);
+      };
+
+      const handleRegister = () => {
+        // Refresh data after registration if needed
+      };
+
+      const renderActiveSection = () => {
+        switch(activeSection) {
+          case 'clientes':
+            return <ClientForm onRegister={handleRegister} />;
+          case 'pisos':
+            return <PisoForm onRegister={handleRegister} />;
+          case 'searchClientes':
+            return <SearchClientes />;
+          case 'searchPisos':
+            return <SearchPisos />;
+          default:
+            return <ClientForm onRegister={handleRegister} />;
+        }
+      };
+
+      if (!isLoggedIn) {
+        return <LoginForm onLogin={handleLogin} />;
+      }
+
+      return (
+        <div className="flex min-h-screen bg-gray-50">
+          <Sidebar activeSection={activeSection} setActiveSection={setActiveSection} />
+          
+          <div className="flex-1 ml-72">
+            <div className="p-8">
+              <div className="mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  Dashboard
+                </h1>
+                <p className="text-gray-600">
+                  Gestiona clientes y propiedades con inteligencia artificial
+                </p>
+              </div>
+              
+              {renderActiveSection()}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    ReactDOM.render(<App />, document.getElementById("root"));
+  </script>
+</body>
+</html>
         if (!selectedPiso) {
           alert("Por favor, selecciona un piso");
           return;
@@ -1440,165 +1582,165 @@
     };
 
     // Search Pisos Component
-    const SearchPisos = () => {
-      const [clientes, setClientes] = useState([]);
-      const [results, setResults] = useState([]);
-      const [selectedCliente, setSelectedCliente] = useState("");
-      const [loading, setLoading] = useState(false);
-
-      useEffect(() => {
-        fetchClientes();
-      }, []);
-
-      const fetchClientes = async () => {
-        try {
-          const response = await fetch(`${API_BASE}/clientes`, { 
-            headers: { Authorization: `Bearer ${token}` } 
-          });
-          setClientes(await response.json());
-        } catch (error) {
-          alert("Error al cargar clientes: " + error.message);
-        }
-      };
-
-      const handleSearch = async () => {
-        if (!selectedCliente) {
-          alert("Por favor, selecciona un cliente");
-          return;
-        }
-        
-        setLoading(true);
-        try {
-          const response = await fetch(`${API_BASE}/match?cliente_id=${selectedCliente}`, { 
-            headers: { Authorization: `Bearer ${token}` } 
-          });
-          setResults(await response.json());
-        } catch (error) {
-          alert("Error al buscar pisos: " + error.message);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      return (
-        <div className="section-card p-8">
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">🏢 Buscar Pisos</h2>
-            <p className="text-gray-600">Encuentra propiedades compatibles para un cliente específico</p>
-          </div>
-          
-          <div className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Seleccionar Cliente</label>
-              <select
-                value={selectedCliente}
-                onChange={(e) => setSelectedCliente(e.target.value)}
-                className="w-full form-input"
-              >
-                <option value="">Seleccionar un cliente...</option>
-                {clientes.map(cliente => (
-                  <option key={cliente.id} value={cliente.id}>
-                    {cliente.nombre || `Cliente ${cliente.id}`} - {Array.isArray(cliente.zona) ? cliente.zona.join(', ') : cliente.zona} - {cliente.precio?.toLocaleString()}€
-                  </option>
-                ))}
-              </select>
-            </div>
+        const SearchPisos = () => {
+          const [clientes, setClientes] = useState([]);
+          const [results, setResults] = useState([]);
+          const [selectedCliente, setSelectedCliente] = useState("");
+          const [loading, setLoading] = useState(false);
+    
+          useEffect(() => {
+            fetchClientes();
+          }, []);
+    
+          const fetchClientes = async () => {
+            try {
+              const response = await fetch(`${API_BASE}/clientes`, { 
+                headers: { Authorization: `Bearer ${token}` } 
+              });
+              setClientes(await response.json());
+            } catch (error) {
+              alert("Error al cargar clientes: " + error.message);
+            }
+          };
+    
+          const handleSearch = async () => {
+            if (!selectedPiso) {
+              alert("Por favor, selecciona un piso");
+              return;
+            }
             
-            <button 
-              onClick={handleSearch} 
-              disabled={loading || !selectedCliente}
-              className="btn-primary px-6 py-3 font-semibold disabled:opacity-50"
-            >
-              {loading ? "Buscando..." : "🏢 Buscar Pisos"}
-            </button>
-            
-            {results.length > 0 && (
-              <div className="mt-8">
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  Pisos Compatibles ({results.length})
-                </h3>
-                <div className="space-y-3">
-                  {results.map(match => (
-                    <div key={match.piso_id} className="p-4 bg-gray-50 rounded-lg border">
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium text-gray-900">
-                          Piso ID: {match.piso_id}
-                        </span>
-                        <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                          {match.score}% compatibilidad
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {results.length === 0 && selectedCliente && !loading && (
-              <div className="text-center py-8 text-gray-500">
-                No se encontraron pisos compatibles para este cliente.
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    };
-
-    // Main App Component
-    const App = () => {
-      const [isLoggedIn, setIsLoggedIn] = useState(false);
-      const [activeSection, setActiveSection] = useState('clientes');
-
-      const handleLogin = () => {
-        setIsLoggedIn(true);
-      };
-
-      const handleRegister = () => {
-        // Refresh data after registration if needed
-      };
-
-      const renderActiveSection = () => {
-        switch(activeSection) {
-          case 'clientes':
-            return <ClientForm onRegister={handleRegister} />;
-          case 'pisos':
-            return <PisoForm onRegister={handleRegister} />;
-          case 'searchClientes':
-            return <SearchClientes />;
-          case 'searchPisos':
-            return <SearchPisos />;
-          default:
-            return <ClientForm onRegister={handleRegister} />;
-        }
-      };
-
-      if (!isLoggedIn) {
-        return <LoginForm onLogin={handleLogin} />;
-      }
-
-      return (
-        <div className="flex min-h-screen bg-gray-50">
-          <Sidebar activeSection={activeSection} setActiveSection={setActiveSection} />
-          
-          <div className="flex-1 ml-72">
-            <div className="p-8">
-              <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  Dashboard
-                </h1>
-                <p className="text-gray-600">
-                  Gestiona clientes y propiedades con inteligencia artificial
-                </p>
+            setLoading(true);
+            try {
+              const response = await fetch(`${API_BASE}/match?piso_id=${selectedPiso}`, { 
+                headers: { Authorization: `Bearer ${token}` } 
+              });
+              setResults(await response.json());
+            } catch (error) {
+              alert("Error al buscar clientes: " + error.message);
+            } finally {
+              setLoading(false);
+            }
+          };
+    
+          return (
+            <div className="section-card p-8">
+              <div className="mb-6">
+                <h2 className="text-2xl font-semibold text-gray-900 mb-2">🏢 Buscar Pisos</h2>
+                <p className="text-gray-600">Encuentra propiedades compatibles para un cliente específico</p>
               </div>
               
-              {renderActiveSection()}
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Seleccionar Cliente</label>
+                  <select
+                    value={selectedCliente}
+                    onChange={(e) => setSelectedCliente(e.target.value)}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar un cliente...</option>
+                    {clientes.map(cliente => (
+                      <option key={cliente.id} value={cliente.id}>
+                        {cliente.nombre || `Cliente ${cliente.id}`} - {Array.isArray(cliente.zona) ? cliente.zona.join(', ') : cliente.zona} - {cliente.precio?.toLocaleString()}€
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <button 
+                  onClick={handleSearch} 
+                  disabled={loading || !selectedPiso}
+                  className="btn-primary px-6 py-3 font-semibold disabled:opacity-50"
+                >
+                  {loading ? "Buscando..." : "🔍 Buscar Clientes"}
+                </button>
+                
+                {results.length > 0 && (
+                  <div className="mt-8">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                      Pisos Compatibles ({results.length})
+                    </h3>
+                    <div className="space-y-3">
+                      {results.map(match => (
+                        <div key={match.piso_id} className="p-4 bg-gray-50 rounded-lg border">
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium text-gray-900">
+                              Piso ID: {match.piso_id}
+                            </span>
+                            <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                              {match.score}% compatibilidad
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {results.length === 0 && selectedCliente && !loading && (
+                  <div className="text-center py-8 text-gray-500">
+                    No se encontraron pisos compatibles para este cliente.
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </div>
-      );
-    };
-
-    ReactDOM.render(<App />, document.getElementById("root"));
-  </script>
-</body>
-</html>
+          );
+        };
+    
+        // Main App Component
+        const App = () => {
+          const [isLoggedIn, setIsLoggedIn] = useState(false);
+          const [activeSection, setActiveSection] = useState('clientes');
+    
+          const handleLogin = () => {
+            setIsLoggedIn(true);
+          };
+    
+          const handleRegister = () => {
+            // Refresh data after registration if needed
+          };
+    
+          const renderActiveSection = () => {
+            switch(activeSection) {
+              case 'clientes':
+                return <ClientForm onRegister={handleRegister} />;
+              case 'pisos':
+                return <PisoForm onRegister={handleRegister} />;
+              case 'searchClientes':
+                return <SearchClientes />;
+              case 'searchPisos':
+                return <SearchPisos />;
+              default:
+                return <ClientForm onRegister={handleRegister} />;
+            }
+          };
+    
+          if (!isLoggedIn) {
+            return <LoginForm onLogin={handleLogin} />;
+          }
+    
+          return (
+            <div className="flex min-h-screen bg-gray-50">
+              <Sidebar activeSection={activeSection} setActiveSection={setActiveSection} />
+              
+              <div className="flex-1 ml-72">
+                <div className="p-8">
+                  <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                      Dashboard
+                    </h1>
+                    <p className="text-gray-600">
+                      Gestiona clientes y propiedades con inteligencia artificial
+                    </p>
+                  </div>
+                  
+                  {renderActiveSection()}
+                </div>
+              </div>
+            </div>
+          );
+        };
+    
+        ReactDOM.render(<App />, document.getElementById("root"));
+      </script>
+    </body>
+    </html>
