@@ -862,6 +862,7 @@
           precio: parseFloat(formData.precio), 
           m2: parseInt(formData.m2), 
           habitaciones: formData.habitaciones ? [parseInt(formData.habitaciones)] : [],
+          banos: formData.banos ? [formData.banos] : null,
           zona: [formData.zona] // Convert single selection to array for API compatibility
         };
         
