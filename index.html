@@ -861,7 +861,7 @@
           compania_id: companiaId, 
           precio: parseFloat(formData.precio), 
           m2: parseInt(formData.m2), 
-          habitaciones: formData.habitaciones ? [formData.habitaciones] : [],
+          habitaciones: formData.habitaciones ? [parseInt(formData.habitaciones)] : [],
           zona: [formData.zona] // Convert single selection to array for API compatibility
         };
         
@@ -885,7 +885,20 @@
             });
             onRegister();
           } else {
-            alert("❌ Error al registrar piso: " + result.detail);
+            console.error("Error response:", result);
+            let errorMessage = "Error desconocido";
+            
+            if (typeof result.detail === 'string') {
+              errorMessage = result.detail;
+            } else if (typeof result.detail === 'object') {
+              errorMessage = JSON.stringify(result.detail, null, 2);
+            } else if (result.message) {
+              errorMessage = result.message;
+            } else {
+              errorMessage = `Error ${response.status}: ${response.statusText}`;
+            }
+            
+            alert("❌ Error al registrar piso:\n" + errorMessage);
           }
         } catch (error) {
           alert("❌ Error de conexión: " + error.message);
