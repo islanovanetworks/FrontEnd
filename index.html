@@ -592,20 +592,13 @@
                   </select>
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Altura</label>
-                  <select
-                    name="altura"
-                    value={formData.altura}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="PRIMERAS PLANTAS">PRIMERAS PLANTAS</option>
-                    <option value="PLANTAS INTERMEDIAS">PLANTAS INTERMEDIAS</option>
-                    <option value="ÚLTIMAS PLANTAS">ÚLTIMAS PLANTAS</option>
-                  </select>
-                </div>
+                <MultiSelect
+                  label="Altura"
+                  name="altura"
+                  options={["PRIMERAS PLANTAS", "PLANTAS INTERMEDIAS", "ÚLTIMAS PLANTAS"]}
+                  value={formData.altura}
+                  onChange={handleChange}
+                />
               </div>
             </div>
 
