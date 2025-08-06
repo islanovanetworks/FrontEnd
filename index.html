@@ -1372,10 +1372,21 @@
       const fetchPisos = async () => {
         try {
           const response = await fetch(`${API_BASE}/pisos/`, { 
-            headers: { Authorization: `Bearer ${token}` } 
+            method: 'GET',
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            } 
           });
-          setPisos(await response.json());
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          setPisos(data);
         } catch (error) {
+          console.error("Error fetching pisos:", error);
           alert("Error al cargar pisos: " + error.message);
         }
       };
@@ -1389,10 +1400,22 @@
         setLoading(true);
         try {
           const response = await fetch(`${API_BASE}/match/?piso_id=${selectedPiso}`, { 
-            headers: { Authorization: `Bearer ${token}` } 
+            method: 'GET',
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            } 
           });
-          setResults(await response.json());
+          
+          if (!response.ok) {
+            const errorData = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errorData}`);
+          }
+          
+          const data = await response.json();
+          setResults(data);
         } catch (error) {
+          console.error("Error searching clientes:", error);
           alert("Error al buscar clientes: " + error.message);
         } finally {
           setLoading(false);
@@ -1477,10 +1500,21 @@
       const fetchClientes = async () => {
         try {
           const response = await fetch(`${API_BASE}/clientes/`, { 
-            headers: { Authorization: `Bearer ${token}` } 
+            method: 'GET',
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            } 
           });
-          setClientes(await response.json());
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          setClientes(data);
         } catch (error) {
+          console.error("Error fetching clientes:", error);
           alert("Error al cargar clientes: " + error.message);
         }
       };
@@ -1494,10 +1528,22 @@
         setLoading(true);
         try {
           const response = await fetch(`${API_BASE}/match/?cliente_id=${selectedCliente}`, { 
-            headers: { Authorization: `Bearer ${token}` } 
+            method: 'GET',
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            } 
           });
-          setResults(await response.json());
+          
+          if (!response.ok) {
+            const errorData = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errorData}`);
+          }
+          
+          const data = await response.json();
+          setResults(data);
         } catch (error) {
+          console.error("Error searching pisos:", error);
           alert("Error al buscar pisos: " + error.message);
         } finally {
           setLoading(false);
