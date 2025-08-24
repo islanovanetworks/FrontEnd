@@ -260,18 +260,17 @@
     const ClientForm = ({ onRegister }) => {
       const [formData, setFormData] = useState({
         nombre: "", telefono: "", zona: [], subzonas: "", entrada: "", precio: "",
-        tipo_vivienda: [], finalidad: [], habitaciones: [], banos: [], estado: [],
+        tipo_vivienda: [], finalidad: [], habitaciones: [], estado: [],
         ascensor: "", bajos: "", entreplanta: "", m2: "", altura: "", cercania_metro: "",
-        orientacion: [], edificio_semi_nuevo: "", adaptado_movilidad: "", balcon: "",
-        patio: "", terraza: "", garaje: "", trastero: "", interior: "", piscina: "",
-        urbanizacion: "", vistas: "", caracteristicas_adicionales: "", banco: "", permuta: "", kiron: ""
+        orientacion: [], balcon_terraza: "", patio: "", interior: "",
+        caracteristicas_adicionales: "", banco: "", permuta: "", kiron: ""
       });
-
+    
       const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
       };
-
+    
       const handleSubmit = async (e) => {
         e.preventDefault();
         const cliente = { 
@@ -295,15 +294,13 @@
             alert(`✅ Cliente registrado: ${result.nombre}`);
             setFormData({
               nombre: "", telefono: "", zona: [], subzonas: "", entrada: "", precio: "",
-              tipo_vivienda: [], finalidad: [], habitaciones: [], banos: [], estado: [],
+              tipo_vivienda: [], finalidad: [], habitaciones: [], estado: [],
               ascensor: "", bajos: "", entreplanta: "", m2: "", altura: "", cercania_metro: "",
-              orientacion: [], edificio_semi_nuevo: "", adaptado_movilidad: "", balcon: "",
-              patio: "", terraza: "", garaje: "", trastero: "", interior: "", piscina: "",
-              urbanizacion: "", vistas: "", caracteristicas_adicionales: "", banco: "", permuta: "", kiron: ""
+              orientacion: [], balcon_terraza: "", patio: "", interior: "",
+              caracteristicas_adicionales: "", banco: "", permuta: "", kiron: ""
             });
             onRegister();
           } else {
-            // ✅ MANEJO DE ERRORES MEJORADO
             console.error("Error response:", result);
             let errorMessage = "Error desconocido";
             
@@ -323,7 +320,7 @@
           alert("❌ Error de conexión: " + error.message);
         }
       };
-
+    
       return (
         <div className="section-card p-8">
           <div className="mb-6">
@@ -387,7 +384,7 @@
                 </div>
               </div>
             </div>
-
+    
             {/* Ubicación */}
             <div className="form-section">
               <h3>Ubicación</h3>
@@ -413,7 +410,7 @@
                 </div>
               </div>
             </div>
-
+    
             {/* Aspectos Económicos */}
             <div className="form-section">
               <h3>Aspectos Económicos</h3>
@@ -446,19 +443,16 @@
                     required
                   >
                     <option value="">Seleccionar precio</option>
-                    {/* De 10.000€ a 500.000€ en incrementos de 10.000€ */}
                     {[...Array(50).keys()].map(i => (
                       <option key={i * 10000 + 10000} value={i * 10000 + 10000}>
                         {(i * 10000 + 10000).toLocaleString()}€
                       </option>
                     ))}
-                    {/* De 520.000€ a 1.000.000€ en incrementos de 20.000€ */}
                     {[...Array(25).keys()].map(i => (
                       <option key={520000 + i * 20000} value={520000 + i * 20000}>
                         {(520000 + i * 20000).toLocaleString()}€
                       </option>
                     ))}
-                    {/* De 1.050.000€ a 2.000.000€ en incrementos de 50.000€ */}
                     {[...Array(20).keys()].map(i => (
                       <option key={1050000 + i * 50000} value={1050000 + i * 50000}>
                         {(1050000 + i * 50000).toLocaleString()}€
@@ -482,7 +476,7 @@
                 </div>
               </div>
             </div>
-
+    
             {/* Características de la Vivienda */}
             <div className="form-section">
               <h3>Características de la Vivienda</h3>
@@ -512,14 +506,6 @@
                 />
                 
                 <MultiSelect
-                  label="Baños"
-                  name="banos"
-                  options={["1", "1+1", "2"]}
-                  value={formData.banos}
-                  onChange={handleChange}
-                />
-                
-                <MultiSelect
                   label="Estado"
                   name="estado"
                   options={["Entrar a Vivir", "Actualizar", "A Reformar"]}
@@ -541,7 +527,7 @@
                 </div>
               </div>
             </div>
-
+    
             {/* Ubicación y Acceso */}
             <div className="form-section">
               <h3>Ubicación y Acceso</h3>
@@ -601,7 +587,7 @@
                 />
               </div>
             </div>
-
+    
             {/* Orientación y Transporte */}
             <div className="form-section">
               <h3>Orientación y Transporte</h3>
@@ -634,16 +620,16 @@
                 </div>
               </div>
             </div>
-
-            {/* Características del Edificio */}
+    
+            {/* Espacios Exteriores */}
             <div className="form-section">
-              <h3>Características del Edificio</h3>
+              <h3>Espacios Exteriores</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Edificio Semi-nuevo</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Balcón/Terraza</label>
                   <select
-                    name="edificio_semi_nuevo"
-                    value={formData.edificio_semi_nuevo}
+                    name="balcon_terraza"
+                    value={formData.balcon_terraza}
                     onChange={handleChange}
                     className="w-full form-input"
                   >
@@ -654,10 +640,10 @@
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Adaptado Movilidad</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Patio</label>
                   <select
-                    name="adaptado_movilidad"
-                    value={formData.adaptado_movilidad}
+                    name="patio"
+                    value={formData.patio}
                     onChange={handleChange}
                     className="w-full form-input"
                   >
@@ -683,131 +669,7 @@
                 </div>
               </div>
             </div>
-
-            {/* Espacios Exteriores */}
-            <div className="form-section">
-              <h3>Espacios Exteriores</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Balcón</label>
-                  <select
-                    name="balcon"
-                    value={formData.balcon}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SÍ">SÍ</option>
-                    <option value="INDIFERENTE">INDIFERENTE</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Patio</label>
-                  <select
-                    name="patio"
-                    value={formData.patio}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SÍ">SÍ</option>
-                    <option value="INDIFERENTE">INDIFERENTE</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Terraza</label>
-                  <select
-                    name="terraza"
-                    value={formData.terraza}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SÍ">SÍ</option>
-                    <option value="INDIFERENTE">INDIFERENTE</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Vistas</label>
-                  <select
-                    name="vistas"
-                    value={formData.vistas}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SÍ">SÍ</option>
-                    <option value="INDIFERENTE">INDIFERENTE</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Servicios Adicionales */}
-            <div className="form-section">
-              <h3>Servicios Adicionales</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Garaje</label>
-                  <select
-                    name="garaje"
-                    value={formData.garaje}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SÍ">SÍ</option>
-                    <option value="INDIFERENTE">INDIFERENTE</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Trastero</label>
-                  <select
-                    name="trastero"
-                    value={formData.trastero}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SÍ">SÍ</option>
-                    <option value="INDIFERENTE">INDIFERENTE</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Piscina</label>
-                  <select
-                    name="piscina"
-                    value={formData.piscina}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SÍ">SÍ</option>
-                    <option value="INDIFERENTE">INDIFERENTE</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Urbanización</label>
-                  <select
-                    name="urbanizacion"
-                    value={formData.urbanizacion}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SÍ">SÍ</option>
-                    <option value="INDIFERENTE">INDIFERENTE</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
+    
             {/* Características Adicionales */}
             <div className="form-section">
               <h3>Información Adicional</h3>
@@ -835,19 +697,16 @@
     // Piso Form Component
     const PisoForm = ({ onRegister }) => {
       const [formData, setFormData] = useState({
-        direccion: "", subzonas: "",
-        zona: "", precio: "", tipo_vivienda: [], habitaciones: "", banos: "", estado: "",
+        direccion: "", subzonas: "", zona: "", precio: "", tipo_vivienda: [], habitaciones: "", estado: "",
         ascensor: "", bajos: "", entreplanta: "", planta: "", m2: "", altura: "", cercania_metro: "",
-        orientacion: [], edificio_semi_nuevo: "", adaptado_movilidad: "", balcon: "",
-        patio: "", terraza: "", garaje: "", trastero: "", interior: "", piscina: "",
-        urbanizacion: "", vistas: "", caracteristicas_adicionales: ""
+        orientacion: [], balcon_terraza: "", patio: "", interior: "", caracteristicas_adicionales: ""
       });
-
+    
       const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
       };
-
+    
       const handleSubmit = async (e) => {
         e.preventDefault();
         const piso = { 
@@ -856,8 +715,7 @@
           precio: parseFloat(formData.precio), 
           m2: parseInt(formData.m2), 
           habitaciones: formData.habitaciones ? [parseInt(formData.habitaciones)] : [],
-          banos: formData.banos ? [formData.banos] : null,
-          zona: [formData.zona] // Convert single selection to array for API compatibility
+          zona: [formData.zona]
         };
         
         try {
@@ -871,12 +729,9 @@
           if (response.ok) {
             alert(`✅ Piso registrado con ID: ${result.id}`);
             setFormData({
-              direccion: "", subzonas: "",
-              zona: "", precio: "", tipo_vivienda: [], habitaciones: "", banos: "", estado: "",
+              direccion: "", subzonas: "", zona: "", precio: "", tipo_vivienda: [], habitaciones: "", estado: "",
               ascensor: "", bajos: "", entreplanta: "", planta: "", m2: "", altura: "", cercania_metro: "",
-              orientacion: [], edificio_semi_nuevo: "", adaptado_movilidad: "", balcon: "",
-              patio: "", terraza: "", garaje: "", trastero: "", interior: "", piscina: "",
-              urbanizacion: "", vistas: "", caracteristicas_adicionales: ""
+              orientacion: [], balcon_terraza: "", patio: "", interior: "", caracteristicas_adicionales: ""
             });
             onRegister();
           } else {
@@ -899,7 +754,7 @@
           alert("❌ Error de conexión: " + error.message);
         }
       };
-
+    
       return (
         <div className="section-card p-8">
           <div className="mb-6">
@@ -985,11 +840,11 @@
                 </div>
               </div>
             </div>
-
+    
             {/* Características de la Vivienda */}
             <div className="form-section">
               <h3>Características de la Vivienda</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <MultiSelect
                   label="Tipo de Vivienda"
                   name="tipo_vivienda"
@@ -1017,21 +872,6 @@
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Baños</label>
-                  <select
-                    name="banos"
-                    value={formData.banos}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar baños</option>
-                    <option value="1">1</option>
-                    <option value="1+1">1+1</option>
-                    <option value="2">2</option>
-                  </select>
-                </div>
-                
-                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
                   <select
                     name="estado"
@@ -1047,7 +887,7 @@
                 </div>
               </div>
             </div>
-
+    
             {/* Ubicación y Acceso */}
             <div className="form-section">
               <h3>Ubicación y Acceso</h3>
@@ -1128,7 +968,7 @@
                 </div>
               </div>
             </div>
-
+    
             {/* Orientación y Transporte */}
             <div className="form-section">
               <h3>Orientación y Transporte</h3>
@@ -1161,16 +1001,16 @@
                 </div>
               </div>
             </div>
-
-            {/* Características del Edificio */}
+    
+            {/* Espacios Exteriores */}
             <div className="form-section">
-              <h3>Características del Edificio</h3>
+              <h3>Espacios Exteriores</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Edificio Semi-nuevo</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Balcón/Terraza</label>
                   <select
-                    name="edificio_semi_nuevo"
-                    value={formData.edificio_semi_nuevo}
+                    name="balcon_terraza"
+                    value={formData.balcon_terraza}
                     onChange={handleChange}
                     className="w-full form-input"
                   >
@@ -1181,10 +1021,10 @@
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Adaptado Movilidad</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Patio</label>
                   <select
-                    name="adaptado_movilidad"
-                    value={formData.adaptado_movilidad}
+                    name="patio"
+                    value={formData.patio}
                     onChange={handleChange}
                     className="w-full form-input"
                   >
@@ -1210,131 +1050,7 @@
                 </div>
               </div>
             </div>
-
-            {/* Espacios Exteriores */}
-            <div className="form-section">
-              <h3>Espacios Exteriores</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Balcón</label>
-                  <select
-                    name="balcon"
-                    value={formData.balcon}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Patio</label>
-                  <select
-                    name="patio"
-                    value={formData.patio}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Terraza</label>
-                  <select
-                    name="terraza"
-                    value={formData.terraza}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Vistas</label>
-                  <select
-                    name="vistas"
-                    value={formData.vistas}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Servicios Adicionales */}
-            <div className="form-section">
-              <h3>Servicios Adicionales</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Garaje</label>
-                  <select
-                    name="garaje"
-                    value={formData.garaje}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SÍ">SÍ</option>
-                    <option value="INDIFERENTE">INDIFERENTE</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Trastero</label>
-                  <select
-                    name="trastero"
-                    value={formData.trastero}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SÍ">SÍ</option>
-                    <option value="INDIFERENTE">INDIFERENTE</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Piscina</label>
-                  <select
-                    name="piscina"
-                    value={formData.piscina}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Urbanización</label>
-                  <select
-                    name="urbanizacion"
-                    value={formData.urbanizacion}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
+    
             {/* Características Adicionales */}
             <div className="form-section">
               <h3>Información Adicional</h3>
