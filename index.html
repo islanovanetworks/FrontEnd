@@ -1440,7 +1440,7 @@
                 <option value="">Seleccionar un piso...</option>
                 {pisos.map(piso => (
                   <option key={piso.id} value={piso.id}>
-                    Piso {piso.id} - {Array.isArray(piso.zona) ? piso.zona.join(', ') : piso.zona} ({piso.precio?.toLocaleString()}€) - {piso.m2}m²
+                    {piso.direccion || `Piso ${piso.id}`}
                   </option>
                 ))}
               </select>
@@ -1573,7 +1573,7 @@
                 <option value="">Seleccionar un cliente...</option>
                 {clientes.map(cliente => (
                   <option key={cliente.id} value={cliente.id}>
-                    {cliente.nombre || `Cliente ${cliente.id}`} - {Array.isArray(cliente.zona) ? cliente.zona.join(', ') : cliente.zona} - {cliente.precio?.toLocaleString()}€
+                    {cliente.nombre || `Cliente ${cliente.id}`} - {cliente.telefono}
                   </option>
                 ))}
               </select>
