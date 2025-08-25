@@ -1090,18 +1090,19 @@
       );
     };
     // Search Clients Component
+    // Search Clients Component - CÓDIGO ACTUALIZADO
     const SearchClientes = ({ userRole = 'Asesor' }) => {
       const [pisos, setPisos] = useState([]);
       const [results, setResults] = useState([]);
       const [clientes, setClientes] = useState([]);
       const [selectedPiso, setSelectedPiso] = useState("");
       const [loading, setLoading] = useState(false);
-
+      const [sortField, setSortField] = useState("score");
+      const [sortDirection, setSortDirection] = useState("desc");
+    
       useEffect(() => {
         fetchPisos();
-        if (userRole === 'Supervisor') {
-          fetchClientes();
-        }
+        fetchClientes(); // Siempre obtener clientes para mostrar información completa
       }, [userRole]);
       
       const fetchClientes = async () => {
@@ -1122,7 +1123,7 @@
           console.error("Error fetching clientes:", error);
         }
       };
-
+    
       const fetchPisos = async () => {
         try {
           const response = await fetch(`${API_BASE}/pisos/`, { 
@@ -1144,7 +1145,7 @@
           alert("Error al cargar pisos: " + error.message);
         }
       };
-
+    
       const handleSearch = async () => {
         if (!selectedPiso) {
           alert("Por favor, selecciona un piso");
@@ -1175,7 +1176,66 @@
           setLoading(false);
         }
       };
-
+    
+      // Función para ordenar resultados
+      const sortResults = (field) => {
+        const direction = sortField === field && sortDirection === 'asc' ? 'desc' : 'asc';
+        setSortField(field);
+        setSortDirection(direction);
+    
+        const sortedResults = [...results].sort((a, b) => {
+          const clienteA = clientes.find(c => c.id === a.cliente_id);
+          const clienteB = clientes.find(c => c.id === b.cliente_id);
+          
+          let valueA, valueB;
+          
+          if (field === 'score') {
+            valueA = a.score;
+            valueB = b.score;
+          } else if (field === 'nombre') {
+            valueA = clienteA?.nombre || '';
+            valueB = clienteB?.nombre || '';
+          } else if (field === 'telefono') {
+            valueA = clienteA?.telefono || '';
+            valueB = clienteB?.telefono || '';
+          } else if (field === 'precio') {
+            valueA = clienteA?.precio || 0;
+            valueB = clienteB?.precio || 0;
+          } else if (field === 'entrada') {
+            valueA = clienteA?.entrada || 0;
+            valueB = clienteB?.entrada || 0;
+          } else if (field === 'zona') {
+            valueA = clienteA?.zona || '';
+            valueB = clienteB?.zona || '';
+          } else if (field === 'kiron') {
+            valueA = clienteA?.kiron || '';
+            valueB = clienteB?.kiron || '';
+          } else {
+            valueA = clienteA?.[field] || '';
+            valueB = clienteB?.[field] || '';
+          }
+    
+          if (typeof valueA === 'string') {
+            valueA = valueA.toLowerCase();
+            valueB = valueB.toLowerCase();
+          }
+    
+          if (direction === 'asc') {
+            return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
+          } else {
+            return valueA > valueB ? -1 : valueA < valueB ? 1 : 0;
+          }
+        });
+    
+        setResults(sortedResults);
+      };
+    
+      // Función para obtener el icono de ordenamiento
+      const getSortIcon = (field) => {
+        if (sortField !== field) return '↕️';
+        return sortDirection === 'asc' ? '↑' : '↓';
+      };
+    
       return (
         <div className="section-card p-8">
           <div className="mb-6">
@@ -1194,7 +1254,7 @@
                 <option value="">Seleccionar un piso...</option>
                 {pisos.map(piso => (
                   <option key={piso.id} value={piso.id}>
-                    {piso.direccion || `Piso ${piso.id}`}
+                    {piso.direccion || `Piso ${piso.id}`} - {piso.zona} - {piso.precio?.toLocaleString()}€
                   </option>
                 ))}
               </select>
@@ -1213,39 +1273,104 @@
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">
                   Clientes Compatibles ({results.length})
                 </h3>
-                <div className="space-y-3">
-                  {results.map(match => {
-                    const cliente = userRole === 'Supervisor' ? clientes.find(c => c.id === match.cliente_id) : null;
-                    return (
-                      <div key={match.cliente_id} className="p-4 bg-gray-50 rounded-lg border">
-                        <div className="flex justify-between items-center mb-2">
-                          <div>
-                            <span className="font-medium text-gray-900">
-                              {cliente ? `${cliente.nombre} (ID: ${cliente.id})` : `Cliente ID: ${match.cliente_id}`}
-                            </span>
-                            {cliente && (
-                              <div className="text-sm text-gray-600 mt-1">
-                                📞 {cliente.telefono} | 💰 {cliente.precio?.toLocaleString()}€
-                              </div>
-                            )}
-                          </div>
-                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                            match.score >= 90 ? 'bg-green-100 text-green-800' :
-                            match.score >= 80 ? 'bg-blue-100 text-blue-800' :
-                            match.score >= 70 ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-red-100 text-red-800'
-                          }`}>
-                            {match.score}% compatibilidad
-                          </span>
-                        </div>
-                        {userRole === 'Supervisor' && cliente && cliente.asesor_asignado && (
-                          <div className="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                            👤 Asesor: {cliente.asesor_asignado.email}
-                          </div>
+                
+                {/* Tabla con encabezados ordenables */}
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse border border-gray-300">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th 
+                          className="border border-gray-300 px-4 py-2 text-left cursor-pointer hover:bg-gray-200"
+                          onClick={() => sortResults('score')}
+                        >
+                          Compatibilidad {getSortIcon('score')}
+                        </th>
+                        <th 
+                          className="border border-gray-300 px-4 py-2 text-left cursor-pointer hover:bg-gray-200"
+                          onClick={() => sortResults('nombre')}
+                        >
+                          Nombre {getSortIcon('nombre')}
+                        </th>
+                        <th 
+                          className="border border-gray-300 px-4 py-2 text-left cursor-pointer hover:bg-gray-200"
+                          onClick={() => sortResults('telefono')}
+                        >
+                          Teléfono {getSortIcon('telefono')}
+                        </th>
+                        <th 
+                          className="border border-gray-300 px-4 py-2 text-left cursor-pointer hover:bg-gray-200"
+                          onClick={() => sortResults('zona')}
+                        >
+                          Zona {getSortIcon('zona')}
+                        </th>
+                        <th 
+                          className="border border-gray-300 px-4 py-2 text-left cursor-pointer hover:bg-gray-200"
+                          onClick={() => sortResults('precio')}
+                        >
+                          Precio Max {getSortIcon('precio')}
+                        </th>
+                        <th 
+                          className="border border-gray-300 px-4 py-2 text-left cursor-pointer hover:bg-gray-200"
+                          onClick={() => sortResults('entrada')}
+                        >
+                          Entrada {getSortIcon('entrada')}
+                        </th>
+                        <th className="border border-gray-300 px-4 py-2 text-left">Habitaciones</th>
+                        <th className="border border-gray-300 px-4 py-2 text-left">m²</th>
+                        <th className="border border-gray-300 px-4 py-2 text-left">Estado</th>
+                        <th 
+                          className="border border-gray-300 px-4 py-2 text-left cursor-pointer hover:bg-gray-200"
+                          onClick={() => sortResults('kiron')}
+                        >
+                          KÍRON {getSortIcon('kiron')}
+                        </th>
+                        {userRole === 'Supervisor' && (
+                          <th className="border border-gray-300 px-4 py-2 text-left">Asesor</th>
                         )}
-                      </div>
-                    );
-                  })}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {results.map(match => {
+                        const cliente = clientes.find(c => c.id === match.cliente_id);
+                        if (!cliente) return null;
+                        
+                        return (
+                          <tr key={match.cliente_id} className="hover:bg-gray-50">
+                            <td className="border border-gray-300 px-4 py-2">
+                              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                match.score >= 90 ? 'bg-green-100 text-green-800' :
+                                match.score >= 80 ? 'bg-blue-100 text-blue-800' :
+                                match.score >= 70 ? 'bg-yellow-100 text-yellow-800' :
+                                'bg-red-100 text-red-800'
+                              }`}>
+                                {match.score}%
+                              </span>
+                            </td>
+                            <td className="border border-gray-300 px-4 py-2 font-medium">{cliente.nombre}</td>
+                            <td className="border border-gray-300 px-4 py-2">{cliente.telefono}</td>
+                            <td className="border border-gray-300 px-4 py-2">{cliente.zona}</td>
+                            <td className="border border-gray-300 px-4 py-2">{cliente.precio?.toLocaleString()}€</td>
+                            <td className="border border-gray-300 px-4 py-2">{cliente.entrada?.toLocaleString()}€</td>
+                            <td className="border border-gray-300 px-4 py-2">{cliente.habitaciones || 'N/A'}</td>
+                            <td className="border border-gray-300 px-4 py-2">{cliente.m2}m²</td>
+                            <td className="border border-gray-300 px-4 py-2">{cliente.estado || 'N/A'}</td>
+                            <td className="border border-gray-300 px-4 py-2">{cliente.kiron || 'N/A'}</td>
+                            {userRole === 'Supervisor' && (
+                              <td className="border border-gray-300 px-4 py-2">
+                                {cliente.asesor_asignado ? (
+                                  <span className="text-blue-600 text-sm">
+                                    {cliente.asesor_asignado.email}
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400 text-sm">Sin asignar</span>
+                                )}
+                              </td>
+                            )}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}
@@ -1261,16 +1386,19 @@
     };
 
     // Search Pisos Component
+    // Search Pisos Component - CÓDIGO ACTUALIZADO
     const SearchPisos = () => {
       const [clientes, setClientes] = useState([]);
+      const [pisos, setPisos] = useState([]);
       const [results, setResults] = useState([]);
       const [selectedCliente, setSelectedCliente] = useState("");
       const [loading, setLoading] = useState(false);
-
+    
       useEffect(() => {
         fetchClientes();
+        fetchPisos(); // Obtener también los pisos para mostrar información completa
       }, []);
-
+    
       const fetchClientes = async () => {
         try {
           const response = await fetch(`${API_BASE}/clientes/`, { 
@@ -1292,7 +1420,29 @@
           alert("Error al cargar clientes: " + error.message);
         }
       };
-
+    
+      const fetchPisos = async () => {
+        try {
+          const response = await fetch(`${API_BASE}/pisos/`, { 
+            method: 'GET',
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            } 
+          });
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          setPisos(data);
+        } catch (error) {
+          console.error("Error fetching pisos:", error);
+          alert("Error al cargar pisos: " + error.message);
+        }
+      };
+    
       const handleSearch = async () => {
         if (!selectedCliente) {
           alert("Por favor, selecciona un cliente");
@@ -1315,6 +1465,7 @@
           }
           
           const data = await response.json();
+          // Los resultados ya vienen ordenados por score (mayor primero)
           setResults(data);
         } catch (error) {
           console.error("Error searching pisos:", error);
@@ -1323,7 +1474,7 @@
           setLoading(false);
         }
       };
-
+    
       return (
         <div className="section-card p-8">
           <div className="mb-6">
@@ -1342,7 +1493,7 @@
                 <option value="">Seleccionar un cliente...</option>
                 {clientes.map(cliente => (
                   <option key={cliente.id} value={cliente.id}>
-                    {cliente.nombre || `Cliente ${cliente.id}`} - {cliente.telefono}
+                    {cliente.nombre} - {cliente.telefono} - {cliente.precio?.toLocaleString()}€
                   </option>
                 ))}
               </select>
@@ -1359,26 +1510,136 @@
             {results.length > 0 && (
               <div className="mt-8">
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  Pisos Compatibles ({results.length})
+                  Pisos Compatibles ({results.length}) - Ordenados por Compatibilidad
                 </h3>
-                <div className="space-y-3">
-                  {results.map(match => (
-                    <div key={match.piso_id} className="p-4 bg-gray-50 rounded-lg border">
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium text-gray-900">
-                          Piso ID: {match.piso_id}
-                        </span>
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          match.score >= 90 ? 'bg-green-100 text-green-800' :
-                          match.score >= 80 ? 'bg-blue-100 text-blue-800' :
-                          match.score >= 70 ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
-                          {match.score}% compatibilidad
-                        </span>
+                
+                {/* Tabla detallada de pisos */}
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse border border-gray-300">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border border-gray-300 px-4 py-2 text-left">Compatibilidad</th>
+                        <th className="border border-gray-300 px-4 py-2 text-left">Dirección</th>
+                        <th className="border border-gray-300 px-4 py-2 text-left">Zona</th>
+                        <th className="border border-gray-300 px-4 py-2 text-left">Precio</th>
+                        <th className="border border-gray-300 px-4 py-2 text-left">Habitaciones</th>
+                        <th className="border border-gray-300 px-4 py-2 text-left">m²</th>
+                        <th className="border border-gray-300 px-4 py-2 text-left">Estado</th>
+                        <th className="border border-gray-300 px-4 py-2 text-left">Tipo</th>
+                        <th className="border border-gray-300 px-4 py-2 text-left">Ascensor</th>
+                        <th className="border border-gray-300 px-4 py-2 text-left">Altura</th>
+                        <th className="border border-gray-300 px-4 py-2 text-left">Metro</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {results.map((match, index) => {
+                        const piso = pisos.find(p => p.id === match.piso_id);
+                        if (!piso) return null;
+                        
+                        return (
+                          <tr key={match.piso_id} className="hover:bg-gray-50">
+                            <td className="border border-gray-300 px-4 py-2">
+                              <div className="flex items-center space-x-2">
+                                <span className="text-sm font-bold text-gray-600">#{index + 1}</span>
+                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                  match.score >= 90 ? 'bg-green-100 text-green-800' :
+                                  match.score >= 80 ? 'bg-blue-100 text-blue-800' :
+                                  match.score >= 70 ? 'bg-yellow-100 text-yellow-800' :
+                                  'bg-red-100 text-red-800'
+                                }`}>
+                                  {match.score}%
+                                </span>
+                              </div>
+                            </td>
+                            <td className="border border-gray-300 px-4 py-2">
+                              <div className="font-medium">{piso.direccion || `Piso ID: ${piso.id}`}</div>
+                            </td>
+                            <td className="border border-gray-300 px-4 py-2">{piso.zona}</td>
+                            <td className="border border-gray-300 px-4 py-2 font-medium">
+                              {piso.precio?.toLocaleString()}€
+                            </td>
+                            <td className="border border-gray-300 px-4 py-2">{piso.habitaciones || 'N/A'}</td>
+                            <td className="border border-gray-300 px-4 py-2">{piso.m2}m²</td>
+                            <td className="border border-gray-300 px-4 py-2">
+                              <span className={`px-2 py-1 rounded text-xs ${
+                                piso.estado === 'Entrar a Vivir' ? 'bg-green-100 text-green-800' :
+                                piso.estado === 'Actualizar' ? 'bg-yellow-100 text-yellow-800' :
+                                piso.estado === 'A Reformar' ? 'bg-red-100 text-red-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}>
+                                {piso.estado || 'N/A'}
+                              </span>
+                            </td>
+                            <td className="border border-gray-300 px-4 py-2">{piso.tipo_vivienda || 'N/A'}</td>
+                            <td className="border border-gray-300 px-4 py-2">
+                              <span className={`px-2 py-1 rounded text-xs ${
+                                piso.ascensor === 'SÍ' ? 'bg-green-100 text-green-800' :
+                                piso.ascensor === 'NO' ? 'bg-red-100 text-red-800' :
+                                'bg-yellow-100 text-yellow-800'
+                              }`}>
+                                {piso.ascensor || 'N/A'}
+                              </span>
+                            </td>
+                            <td className="border border-gray-300 px-4 py-2">{piso.altura || 'N/A'}</td>
+                            <td className="border border-gray-300 px-4 py-2">{piso.cercania_metro || 'N/A'}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                
+                {/* Información adicional para cada piso */}
+                <div className="mt-6 space-y-4">
+                  <h4 className="text-lg font-semibold text-gray-900">Detalles Adicionales</h4>
+                  {results.slice(0, 5).map((match, index) => {
+                    const piso = pisos.find(p => p.id === match.piso_id);
+                    if (!piso) return null;
+                    
+                    return (
+                      <div key={`detail-${piso.id}`} className="bg-white border border-gray-200 rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-3">
+                          <h5 className="font-semibold text-gray-900">
+                            🏆 #{index + 1} - {piso.direccion || `Piso ID: ${piso.id}`}
+                          </h5>
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            match.score >= 90 ? 'bg-green-100 text-green-800' :
+                            match.score >= 80 ? 'bg-blue-100 text-blue-800' :
+                            match.score >= 70 ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {match.score}% compatibilidad
+                          </span>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <span className="font-medium text-gray-600">Balcón/Terraza:</span>
+                            <div>{piso.balcon_terraza || 'N/A'}</div>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-600">Patio:</span>
+                            <div>{piso.patio || 'N/A'}</div>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-600">Interior:</span>
+                            <div>{piso.interior || 'N/A'}</div>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-600">Bajos:</span>
+                            <div>{piso.bajos || 'N/A'}</div>
+                          </div>
+                        </div>
+                        
+                        {piso.caracteristicas_adicionales && (
+                          <div className="mt-3 pt-3 border-t border-gray-200">
+                            <span className="font-medium text-gray-600">Características adicionales:</span>
+                            <div className="text-gray-700 mt-1">{piso.caracteristicas_adicionales}</div>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
