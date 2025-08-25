@@ -261,8 +261,8 @@
       const [formData, setFormData] = useState({
         nombre: "", telefono: "", zona: [], subzonas: "", entrada: "", precio: "",
         tipo_vivienda: [], finalidad: [], habitaciones: [], estado: [],
-        ascensor: "", bajos: "", entreplanta: "", m2: "", altura: "", cercania_metro: "",
-        orientacion: [], balcon_terraza: "", patio: "", interior: "",
+        ascensor: "", bajos: "", entreplanta: "", m2: "", altura: "", cercania_metro: "", 
+        balcon_terraza: "", patio: "", interior: "",
         caracteristicas_adicionales: "", banco: "", permuta: "", kiron: ""
       });
     
@@ -296,7 +296,7 @@
               nombre: "", telefono: "", zona: [], subzonas: "", entrada: "", precio: "",
               tipo_vivienda: [], finalidad: [], habitaciones: [], estado: [],
               ascensor: "", bajos: "", entreplanta: "", m2: "", altura: "", cercania_metro: "",
-              orientacion: [], balcon_terraza: "", patio: "", interior: "",
+              balcon_terraza: "", patio: "", interior: "",
               caracteristicas_adicionales: "", banco: "", permuta: "", kiron: ""
             });
             onRegister();
@@ -588,19 +588,10 @@
               </div>
             </div>
     
-            {/* Orientación y Transporte */}
+            {/* Transporte */}
             <div className="form-section">
-              <h3>Orientación y Transporte</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <MultiSelect
-                  label="Orientación"
-                  name="orientacion"
-                  options={["Norte", "Sur", "Este", "Oeste"]}
-                  value={formData.orientacion}
-                  onChange={handleChange}
-                  required={false}
-                />
-                
+              <h3>Transporte</h3>
+              <div className="grid grid-cols-1 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Cercanía Metro</label>
                   <select
@@ -699,7 +690,7 @@
       const [formData, setFormData] = useState({
         direccion: "", subzonas: "", zona: "", precio: "", tipo_vivienda: [], habitaciones: "", estado: "",
         ascensor: "", bajos: "", entreplanta: "", planta: "", m2: "", altura: "", cercania_metro: "",
-        orientacion: [], balcon_terraza: "", patio: "", interior: "", caracteristicas_adicionales: ""
+        balcon_terraza: "", patio: "", interior: "", caracteristicas_adicionales: ""
       });
     
       const handleChange = (e) => {
@@ -731,7 +722,7 @@
             setFormData({
               direccion: "", subzonas: "", zona: "", precio: "", tipo_vivienda: [], habitaciones: "", estado: "",
               ascensor: "", bajos: "", entreplanta: "", planta: "", m2: "", altura: "", cercania_metro: "",
-              orientacion: [], balcon_terraza: "", patio: "", interior: "", caracteristicas_adicionales: ""
+              balcon_terraza: "", patio: "", interior: "", caracteristicas_adicionales: ""
             });
             onRegister();
           } else {
@@ -969,19 +960,10 @@
               </div>
             </div>
     
-            {/* Orientación y Transporte */}
+            {/* Transporte */}
             <div className="form-section">
-              <h3>Orientación y Transporte</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <MultiSelect
-                  label="Orientación"
-                  name="orientacion"
-                  options={["Norte", "Sur", "Este", "Oeste"]}
-                  value={formData.orientacion}
-                  onChange={handleChange}
-                  required={false}
-                />
-                
+              <h3>Transporte</h3>
+              <div className="grid grid-cols-1 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Cercanía Metro</label>
                   <select
