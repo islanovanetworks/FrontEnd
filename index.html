@@ -322,7 +322,8 @@
             alert("❌ Error al registrar cliente:\n" + errorMessage);
           }
         } catch (error) {
-          alert("❌ Error de conexión: " + error.message);
+          console.error("Network error:", error);
+          alert("❌ Error de conexión: " + error.message + "\nVerifica que el servidor esté funcionando.");
         }
       };
     
