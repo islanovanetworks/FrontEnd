@@ -266,7 +266,7 @@
       const [formData, setFormData] = useState({
         nombre: "", telefono: "", zona: [], subzonas: "", entrada: "", precio: "",
         tipo_vivienda: [], finalidad: [], habitaciones: [], estado: [],
-        ascensor: "", bajos: "", entreplanta: "", m2: "", altura: "", cercania_metro: "", 
+        ascensor: "", bajos: "", entreplanta: "", m2: "", altura: [], cercania_metro: "", 
         balcon_terraza: "", patio: "", interior: "",
         caracteristicas_adicionales: "", banco: "", permuta: "", kiron: ""
       });
@@ -284,8 +284,29 @@
           entrada: parseFloat(formData.entrada), 
           precio: parseFloat(formData.precio), 
           m2: parseInt(formData.m2), 
-          habitaciones: formData.habitaciones.map(Number) 
+          habitaciones: Array.isArray(formData.habitaciones) ? formData.habitaciones.map(Number) : [],
+          zona: Array.isArray(formData.zona) ? formData.zona : [],
+          tipo_vivienda: Array.isArray(formData.tipo_vivienda) ? formData.tipo_vivienda : [],
+          finalidad: Array.isArray(formData.finalidad) ? formData.finalidad : [],
+          estado: Array.isArray(formData.estado) ? formData.estado : [],
+          altura: Array.isArray(formData.altura) ? formData.altura : []
         };
+        
+        // Validación antes del envío
+        if (!cliente.nombre || !cliente.telefono) {
+          alert("❌ Nombre y teléfono son obligatorios");
+          return;
+        }
+        if (!cliente.zona || cliente.zona.length === 0) {
+          alert("❌ Debe seleccionar al menos una zona");
+          return;
+        }
+        if (!cliente.entrada || !cliente.precio || !cliente.m2) {
+          alert("❌ Entrada, precio y metros cuadrados son obligatorios");
+          return;
+        }
+        
+        console.log("Enviando cliente:", JSON.stringify(cliente, null, 2)); // Debug
         
         try {
           const response = await fetch(`${API_BASE}/clientes/`, {
@@ -300,7 +321,7 @@
             setFormData({
               nombre: "", telefono: "", zona: [], subzonas: "", entrada: "", precio: "",
               tipo_vivienda: [], finalidad: [], habitaciones: [], estado: [],
-              ascensor: "", bajos: "", entreplanta: "", m2: "", altura: "", cercania_metro: "",
+              ascensor: "", bajos: "", entreplanta: "", m2: "", altura: [], cercania_metro: "",
               balcon_terraza: "", patio: "", interior: "",
               caracteristicas_adicionales: "", banco: "", permuta: "", kiron: ""
             });
@@ -323,7 +344,12 @@
           }
         } catch (error) {
           console.error("Network error:", error);
-          alert("❌ Error de conexión: " + error.message + "\nVerifica que el servidor esté funcionando.");
+          console.error("Error details:", {
+            message: error.message,
+            stack: error.stack,
+            clienteData: cliente
+          });
+          alert("❌ Error de conexión: " + error.message + "\nVerifica que el servidor esté funcionando.\nRevisa la consola para más detalles.");
         }
       };
     
@@ -712,7 +738,8 @@
           precio: parseFloat(formData.precio), 
           m2: parseInt(formData.m2), 
           habitaciones: formData.habitaciones ? [parseInt(formData.habitaciones)] : [],
-          zona: [formData.zona]
+          zona: Array.isArray(formData.zona) ? formData.zona : [formData.zona],
+          tipo_vivienda: Array.isArray(formData.tipo_vivienda) ? formData.tipo_vivienda : []
         };
         
         try {
