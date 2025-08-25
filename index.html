@@ -148,20 +148,25 @@
     };
 
     // Sidebar Component
-    const Sidebar = ({ activeSection, setActiveSection }) => (
+    // Sidebar Component
+    const Sidebar = ({ activeSection, setActiveSection, userRole }) => (
       <div className="fixed left-0 top-0 w-72 h-screen bg-white border-r border-gray-200 p-6 z-10">
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900">🏠 MatchingProps</h2>
           <p className="text-sm text-gray-500 mt-1">Plataforma Inmobiliaria Inteligente</p>
+          <div className="mt-2 px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
+            Rol: {userRole}
+          </div>
         </div>
         
         <nav className="space-y-2">
           {[
-            { id: 'clientes', label: 'Registrar Cliente', icon: '👤' },
-            { id: 'pisos', label: 'Registrar Piso', icon: '🏡' },
-            { id: 'searchClientes', label: 'Buscar Clientes', icon: '🔍' },
-            { id: 'searchPisos', label: 'Buscar Pisos', icon: '🏢' }
-          ].map(item => (
+            { id: 'clientes', label: 'Registrar Cliente', icon: '👤', roles: ['Asesor', 'Supervisor'] },
+            { id: 'pisos', label: 'Registrar Piso', icon: '🏡', roles: ['Asesor', 'Supervisor'] },
+            { id: 'searchClientes', label: 'Buscar Clientes', icon: '🔍', roles: ['Asesor', 'Supervisor'] },
+            { id: 'searchPisos', label: 'Buscar Pisos', icon: '🏢', roles: ['Asesor', 'Supervisor'] },
+            { id: 'gestionClientes', label: 'Gestión de Clientes', icon: '👥', roles: ['Supervisor'] }
+          ].filter(item => item.roles.includes(userRole)).map(item => (
             <button
               key={item.id}
               onClick={() => setActiveSection(item.id)}
@@ -1057,15 +1062,38 @@
       );
     };
     // Search Clients Component
-    const SearchClientes = () => {
+    const SearchClientes = ({ userRole = 'Asesor' }) => {
       const [pisos, setPisos] = useState([]);
       const [results, setResults] = useState([]);
+      const [clientes, setClientes] = useState([]);
       const [selectedPiso, setSelectedPiso] = useState("");
       const [loading, setLoading] = useState(false);
 
       useEffect(() => {
         fetchPisos();
-      }, []);
+        if (userRole === 'Supervisor') {
+          fetchClientes();
+        }
+      }, [userRole]);
+      
+      const fetchClientes = async () => {
+        try {
+          const response = await fetch(`${API_BASE}/clientes/`, { 
+            method: 'GET',
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            } 
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            setClientes(data);
+          }
+        } catch (error) {
+          console.error("Error fetching clientes:", error);
+        }
+      };
 
       const fetchPisos = async () => {
         try {
@@ -1158,23 +1186,38 @@
                   Clientes Compatibles ({results.length})
                 </h3>
                 <div className="space-y-3">
-                  {results.map(match => (
-                    <div key={match.cliente_id} className="p-4 bg-gray-50 rounded-lg border">
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium text-gray-900">
-                          Cliente ID: {match.cliente_id}
-                        </span>
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          match.score >= 90 ? 'bg-green-100 text-green-800' :
-                          match.score >= 80 ? 'bg-blue-100 text-blue-800' :
-                          match.score >= 70 ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
-                          {match.score}% compatibilidad
-                        </span>
+                  {results.map(match => {
+                    const cliente = userRole === 'Supervisor' ? clientes.find(c => c.id === match.cliente_id) : null;
+                    return (
+                      <div key={match.cliente_id} className="p-4 bg-gray-50 rounded-lg border">
+                        <div className="flex justify-between items-center mb-2">
+                          <div>
+                            <span className="font-medium text-gray-900">
+                              {cliente ? `${cliente.nombre} (ID: ${cliente.id})` : `Cliente ID: ${match.cliente_id}`}
+                            </span>
+                            {cliente && (
+                              <div className="text-sm text-gray-600 mt-1">
+                                📞 {cliente.telefono} | 💰 {cliente.precio?.toLocaleString()}€
+                              </div>
+                            )}
+                          </div>
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            match.score >= 90 ? 'bg-green-100 text-green-800' :
+                            match.score >= 80 ? 'bg-blue-100 text-blue-800' :
+                            match.score >= 70 ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {match.score}% compatibilidad
+                          </span>
+                        </div>
+                        {userRole === 'Supervisor' && cliente && cliente.asesor_asignado && (
+                          <div className="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                            👤 Asesor: {cliente.asesor_asignado.email}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -1323,11 +1366,166 @@
     };
 
     // Main App Component
+    // Main App Component
+    // Nuevo componente para listar todos los clientes (solo Supervisor)
+    const ClientesList = () => {
+      const [clientes, setClientes] = useState([]);
+      const [asesores, setAsesores] = useState([]);
+      const [loading, setLoading] = useState(true);
+    
+      useEffect(() => {
+        fetchClientes();
+        fetchAsesores();
+      }, []);
+    
+      const fetchClientes = async () => {
+        try {
+          const response = await fetch(`${API_BASE}/clientes/`, { 
+            method: 'GET',
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            } 
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            setClientes(data);
+          }
+        } catch (error) {
+          console.error("Error fetching clientes:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+    
+      const fetchAsesores = async () => {
+        try {
+          const response = await fetch(`${API_BASE}/asesores/`, { 
+            method: 'GET',
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            } 
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            setAsesores(data);
+          }
+        } catch (error) {
+          console.error("Error fetching asesores:", error);
+        }
+      };
+    
+      const handleReasignar = async (clienteId, nuevoAsesorId) => {
+        try {
+          const response = await fetch(`${API_BASE}/asesores/reasignar-cliente`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              cliente_id: clienteId,
+              nuevo_asesor_id: parseInt(nuevoAsesorId)
+            })
+          });
+    
+          if (response.ok) {
+            alert('✅ Cliente reasignado exitosamente');
+            fetchClientes();
+          } else {
+            const error = await response.json();
+            alert('❌ Error: ' + error.detail);
+          }
+        } catch (error) {
+          alert('❌ Error de conexión: ' + error.message);
+        }
+      };
+    
+      if (loading) {
+        return <div className="text-center py-8">Cargando clientes...</div>;
+      }
+    
+      return (
+        <div className="section-card p-8">
+          <div className="mb-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">👥 Gestión de Clientes</h2>
+            <p className="text-gray-600">Todos los clientes de la compañía y sus asesores asignados</p>
+          </div>
+          
+          <div className="space-y-4">
+            {clientes.map(cliente => {
+              const asesor = asesores.find(a => a.id === cliente.asesor_id);
+              return (
+                <div key={cliente.id} className="p-4 bg-white border border-gray-200 rounded-lg">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg text-gray-900">{cliente.nombre}</h3>
+                      <div className="text-sm text-gray-600 mt-1 space-y-1">
+                        <div>📞 {cliente.telefono}</div>
+                        <div>🏠 {cliente.zona} | 💰 {cliente.precio?.toLocaleString()}€</div>
+                        <div>📐 {cliente.m2}m² | 🛏️ {cliente.habitaciones} hab.</div>
+                      </div>
+                    </div>
+                    
+                    <div className="ml-4 text-right">
+                      <div className="mb-2">
+                        <span className="text-sm font-medium text-gray-700">Asesor asignado:</span>
+                        <div className="text-blue-600 font-medium">
+                          {asesor ? asesor.email : 'Sin asignar'}
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <select
+                          className="text-sm border border-gray-300 rounded px-2 py-1"
+                          defaultValue={cliente.asesor_id || ''}
+                          onChange={(e) => {
+                            if (e.target.value && e.target.value !== cliente.asesor_id?.toString()) {
+                              if (confirm('¿Confirmar reasignación del cliente?')) {
+                                handleReasignar(cliente.id, e.target.value);
+                              } else {
+                                e.target.value = cliente.asesor_id || '';
+                              }
+                            }
+                          }}
+                        >
+                          <option value="">Seleccionar asesor...</option>
+                          {asesores.map(asesor => (
+                            <option key={asesor.id} value={asesor.id}>
+                              {asesor.email} ({asesor.clientes_count} clientes)
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            
+            {clientes.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                No hay clientes registrados en esta compañía.
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
     const App = () => {
       const [isLoggedIn, setIsLoggedIn] = useState(false);
       const [activeSection, setActiveSection] = useState('clientes');
-
+      const [userRole, setUserRole] = useState(null);
+    
       const handleLogin = () => {
+        // Extraer rol del token
+        if (token) {
+          const payload = JSON.parse(atob(token.split(".")[1]));
+          setUserRole(payload.rol);
+        }
         setIsLoggedIn(true);
       };
 
@@ -1338,15 +1536,17 @@
       const renderActiveSection = () => {
         switch(activeSection) {
           case 'clientes':
-            return <ClientForm onRegister={handleRegister} />;
+            return <ClientForm onRegister={handleRegister} userRole={userRole} />;
           case 'pisos':
             return <PisoForm onRegister={handleRegister} />;
           case 'searchClientes':
-            return <SearchClientes />;
+            return <SearchClientes userRole={userRole} />;
           case 'searchPisos':
             return <SearchPisos />;
+          case 'gestionClientes':
+            return userRole === 'Supervisor' ? <ClientesList /> : <div className="text-center py-8 text-red-500">Acceso denegado</div>;
           default:
-            return <ClientForm onRegister={handleRegister} />;
+            return <ClientForm onRegister={handleRegister} userRole={userRole} />;
         }
       };
 
@@ -1356,7 +1556,7 @@
 
       return (
         <div className="flex min-h-screen bg-gray-50">
-          <Sidebar activeSection={activeSection} setActiveSection={setActiveSection} />
+          <Sidebar activeSection={activeSection} setActiveSection={setActiveSection} userRole={userRole} />
           
           <div className="flex-1 ml-72">
             <div className="p-8">
