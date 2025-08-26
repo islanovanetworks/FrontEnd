@@ -112,6 +112,7 @@
     let companiaId = null;
 
     // Multi-Select Component
+    // Multi-Select Component
     const MultiSelect = ({ label, name, options, value, onChange, required = false }) => {
       const handleItemClick = (option) => {
         const currentValues = Array.isArray(value) ? value : [];
@@ -147,7 +148,6 @@
       );
     };
 
-    // Sidebar Component
     // Sidebar Component
     const Sidebar = ({ activeSection, setActiveSection, userRole }) => (
       <div className="fixed left-0 top-0 w-72 h-screen bg-white border-r border-gray-200 p-6 z-10">
@@ -717,7 +717,7 @@
       );
     };
 
-    // Piso Form Component
+// Piso Form Component
     const PisoForm = ({ onRegister }) => {
       const [formData, setFormData] = useState({
         direccion: "", zona: "", subzonas: "", precio: "", tipo_vivienda: [], habitaciones: "", estado: "",
@@ -881,6 +881,19 @@
                 </div>
                 
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Metros² *</label>
+                  <input
+                    name="m2"
+                    type="number"
+                    value={formData.m2}
+                    onChange={handleChange}
+                    placeholder="Metros cuadrados"
+                    className="w-full form-input"
+                    required
+                  />
+                </div>
+                
+                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
                   <select
                     name="estado"
@@ -976,6 +989,7 @@
                   </select>
                 </div>
               </div>
+            </div>
     
             {/* Transporte */}
             <div className="form-section">
