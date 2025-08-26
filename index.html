@@ -720,7 +720,7 @@
     // Piso Form Component
     const PisoForm = ({ onRegister }) => {
       const [formData, setFormData] = useState({
-        direccion: "", subzonas: "", zona: "", precio: "", tipo_vivienda: [], habitaciones: "", estado: "",
+        direccion: "", zona: "", subzonas: "", precio: "", tipo_vivienda: [], habitaciones: "", estado: "",
         ascensor: "", bajos: "", entreplanta: "", planta: "", m2: "", altura: "", cercania_metro: "",
         balcon_terraza: "", patio: "", interior: "", caracteristicas_adicionales: ""
       });
@@ -753,7 +753,7 @@
           if (response.ok) {
             alert(`✅ Piso registrado con ID: ${result.id}`);
             setFormData({
-              direccion: "", subzonas: "", zona: "", precio: "", tipo_vivienda: [], habitaciones: "", estado: "",
+              direccion: "", zona: "", subzonas: "", precio: "", tipo_vivienda: [], habitaciones: "", estado: "",
               ascensor: "", bajos: "", entreplanta: "", planta: "", m2: "", altura: "", cercania_metro: "",
               balcon_terraza: "", patio: "", interior: "", caracteristicas_adicionales: ""
             });
@@ -848,22 +848,6 @@
                   />
                 </div>
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Metros² *</label>
-                  <input
-                    name="m2"
-                    type="number"
-                    value={formData.m2}
-                    onChange={handleChange}
-                    placeholder="Metros cuadrados"
-                    className="w-full form-input"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
     
             {/* Características de la Vivienda */}
             <div className="form-section">
@@ -991,7 +975,6 @@
                   </select>
                 </div>
               </div>
-            </div>
     
             {/* Transporte */}
             <div className="form-section">
