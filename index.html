@@ -1292,13 +1292,24 @@
               </select>
             </div>
             
-            <button 
-              onClick={handleSearch} 
-              disabled={loading || !selectedPiso}
-              className="btn-primary px-6 py-3 font-semibold disabled:opacity-50"
-            >
-              {loading ? "Buscando..." : "🔍 Buscar Clientes"}
-            </button>
+            <div className="flex gap-4">
+              <button 
+                onClick={handleSearch} 
+                disabled={loading || !selectedPiso}
+                className="btn-primary px-6 py-3 font-semibold disabled:opacity-50"
+              >
+                {loading ? "Buscando..." : "🔍 Buscar Clientes"}
+              </button>
+              
+              {userRole === 'Supervisor' && (
+                <button 
+                  onClick={downloadMatchesReport}
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                >
+                  📊 Descargar Reporte Excel
+                </button>
+              )}
+            </div>
             
             {results.length > 0 && (
               <div className="mt-8">
@@ -2202,6 +2213,75 @@
           </div>
         </div>
       );
+    };
+
+    // AGREGAR ESTAS FUNCIONES AL FINAL DEL SCRIPT EN index.html, ANTES DE ReactDOM.render
+
+    // Función para convertir JSON a Excel y descargar
+    const downloadExcel = (data, filename) => {
+      // Convertir datos a formato CSV
+      if (!data || data.length === 0) {
+        alert('No hay datos para exportar');
+        return;
+      }
+      
+      // Obtener headers de las columnas
+      const headers = Object.keys(data[0]);
+      
+      // Crear contenido CSV
+      let csvContent = headers.join(',') + '\n';
+      
+      data.forEach(row => {
+        const values = headers.map(header => {
+          let value = row[header] || '';
+          // Escapar comillas y agregar comillas si contiene comas
+          if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+            value = '"' + value.replace(/"/g, '""') + '"';
+          }
+          return value;
+        });
+        csvContent += values.join(',') + '\n';
+      });
+      
+      // Crear blob y descargar
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    };
+    
+    // Función para descargar reporte de matches
+    const downloadMatchesReport = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/match/download-excel`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          const filename = `matches_report_${new Date().toISOString().split('T')[0]}.csv`;
+          downloadExcel(data.datos, filename);
+          alert(`✅ Reporte descargado: ${data.total_registros} registros`);
+        } else {
+          const error = await response.json();
+          alert('❌ Error: ' + error.detail);
+        }
+      } catch (error) {
+        console.error('Error downloading report:', error);
+        alert('❌ Error de conexión al descargar reporte');
+      }
     };
 
     ReactDOM.render(<App />, document.getElementById("root"));
