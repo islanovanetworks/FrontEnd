@@ -1097,6 +1097,9 @@
       const [loading, setLoading] = useState(false);
       const [sortField, setSortField] = useState("score");
       const [sortDirection, setSortDirection] = useState("desc");
+      
+      // Nuevos estados para manejo de estados de cliente
+      const [updatingStates, setUpdatingStates] = useState({});
     
       useEffect(() => {
         fetchPisos();
@@ -1172,6 +1175,46 @@
           alert("Error al buscar clientes: " + error.message);
         } finally {
           setLoading(false);
+        }
+      };
+
+      // Nueva función para actualizar estado de cliente
+      const updateClienteEstado = async (clienteId, estado) => {
+        if (!selectedPiso) return;
+        
+        const key = `${clienteId}-${selectedPiso}`;
+        setUpdatingStates(prev => ({ ...prev, [key]: true }));
+        
+        try {
+          const response = await fetch(`${API_BASE}/match/estado`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              cliente_id: clienteId,
+              piso_id: parseInt(selectedPiso),
+              estado: estado
+            })
+          });
+          
+          if (response.ok) {
+            // Actualizar el estado en results
+            setResults(prev => prev.map(result => 
+              result.cliente_id === clienteId 
+                ? { ...result, estado: estado }
+                : result
+            ));
+          } else {
+            const error = await response.json();
+            alert('❌ Error al actualizar estado: ' + error.detail);
+          }
+        } catch (error) {
+          console.error('Error updating estado:', error);
+          alert('❌ Error de conexión al actualizar estado');
+        } finally {
+          setUpdatingStates(prev => ({ ...prev, [key]: false }));
         }
       };
     
@@ -1268,6 +1311,9 @@
                   <table className="min-w-max border-collapse bg-white">
                     <thead>
                       <tr className="bg-gray-100">
+                        <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">
+                          Estado
+                        </th>
                         <th 
                           className="border border-gray-300 px-3 py-2 text-left cursor-pointer hover:bg-gray-200 whitespace-nowrap text-sm font-medium"
                           onClick={() => sortResults('score')}
@@ -1409,13 +1455,36 @@
                       </tr>
                     </thead>
                     <tbody>
-                      {results.map(match => {
-                        const cliente = clientes.find(c => c.id === match.cliente_id);
-                        if (!cliente) return null;
-                        
-                        return (
-                          <tr key={match.cliente_id} className="hover:bg-gray-50">
-                            <td className="border border-gray-300 px-3 py-2">
+                      {results
+                        .filter(match => match.estado === 'Pendiente' || match.estado === 'No contesta')
+                        .map(match => {
+                          const cliente = clientes.find(c => c.id === match.cliente_id);
+                          if (!cliente) return null;
+                          
+                          const updateKey = `${match.cliente_id}-${selectedPiso}`;
+                          const isUpdating = updatingStates[updateKey];
+                          
+                          return (
+                            <tr key={match.cliente_id} className="hover:bg-gray-50">
+                              <td className="border border-gray-300 px-3 py-2 whitespace-nowrap">
+                                <select
+                                  value={match.estado}
+                                  onChange={(e) => updateClienteEstado(match.cliente_id, e.target.value)}
+                                  disabled={isUpdating}
+                                  className={`text-xs border border-gray-300 rounded px-2 py-1 ${
+                                    match.estado === 'Pendiente' ? 'bg-yellow-50 text-yellow-800' :
+                                    match.estado === 'No contesta' ? 'bg-red-50 text-red-800' :
+                                    'bg-gray-50'
+                                  } ${isUpdating ? 'opacity-50' : ''}`}
+                                >
+                                  <option value="Pendiente">Pendiente</option>
+                                  <option value="Cita Venta Puesta">Cita Venta Puesta</option>
+                                  <option value="Descarta">Descarta</option>
+                                  <option value="No contesta">No contesta</option>
+                                </select>
+                                {isUpdating && <div className="text-xs text-gray-500 mt-1">Actualizando...</div>}
+                              </td>
+                              <td className="border border-gray-300 px-3 py-2">
                               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                                 match.score >= 90 ? 'bg-green-100 text-green-800' :
                                 match.score >= 80 ? 'bg-blue-100 text-blue-800' :
@@ -1472,6 +1541,95 @@
             {results.length === 0 && selectedPiso && !loading && (
               <div className="text-center py-8 text-gray-500">
                 No se encontraron clientes compatibles para este piso.
+              </div>
+            )}
+            {/* Nueva tabla para clientes con Cita Venta Puesta y Descarta */}
+            {results.filter(match => match.estado === 'Cita Venta Puesta' || match.estado === 'Descarta').length > 0 && (
+              <div className="mt-8">
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                  Clientes Gestionados ({results.filter(match => match.estado === 'Cita Venta Puesta' || match.estado === 'Descarta').length})
+                </h4>
+                
+                <div className="overflow-x-auto border border-gray-300 rounded-lg">
+                  <table className="min-w-max border-collapse bg-white">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Estado</th>
+                        <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Compatibilidad</th>
+                        <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Nombre</th>
+                        <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Teléfono</th>
+                        <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Banco</th>
+                        <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">KÍRON</th>
+                        <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Entrada</th>
+                        <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Precio</th>
+                        {userRole === 'Supervisor' && (
+                          <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Asesor</th>
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {results
+                        .filter(match => match.estado === 'Cita Venta Puesta' || match.estado === 'Descarta')
+                        .map(match => {
+                          const cliente = clientes.find(c => c.id === match.cliente_id);
+                          if (!cliente) return null;
+                          
+                          const updateKey = `${match.cliente_id}-${selectedPiso}`;
+                          const isUpdating = updatingStates[updateKey];
+                          
+                          return (
+                            <tr key={match.cliente_id} className="hover:bg-gray-50">
+                              <td className="border border-gray-300 px-3 py-2 whitespace-nowrap">
+                                <select
+                                  value={match.estado}
+                                  onChange={(e) => updateClienteEstado(match.cliente_id, e.target.value)}
+                                  disabled={isUpdating}
+                                  className={`text-xs border border-gray-300 rounded px-2 py-1 ${
+                                    match.estado === 'Cita Venta Puesta' ? 'bg-green-50 text-green-800' :
+                                    match.estado === 'Descarta' ? 'bg-red-50 text-red-800' :
+                                    'bg-gray-50'
+                                  } ${isUpdating ? 'opacity-50' : ''}`}
+                                >
+                                  <option value="Pendiente">Pendiente</option>
+                                  <option value="Cita Venta Puesta">Cita Venta Puesta</option>
+                                  <option value="Descarta">Descarta</option>
+                                  <option value="No contesta">No contesta</option>
+                                </select>
+                                {isUpdating && <div className="text-xs text-gray-500 mt-1">Actualizando...</div>}
+                              </td>
+                              <td className="border border-gray-300 px-3 py-2">
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  match.score >= 90 ? 'bg-green-100 text-green-800' :
+                                  match.score >= 80 ? 'bg-blue-100 text-blue-800' :
+                                  match.score >= 70 ? 'bg-yellow-100 text-yellow-800' :
+                                  'bg-red-100 text-red-800'
+                                }`}>
+                                  {match.score}%
+                                </span>
+                              </td>
+                              <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.nombre}</td>
+                              <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.telefono}</td>
+                              <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.banco || 'N/A'}</td>
+                              <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.kiron || 'N/A'}</td>
+                              <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.entrada?.toLocaleString()}€</td>
+                              <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.precio?.toLocaleString()}€</td>
+                              {userRole === 'Supervisor' && (
+                                <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                                  {cliente.asesor_asignado ? (
+                                    <span className="text-blue-600 text-xs">
+                                      {cliente.asesor_asignado.email}
+                                    </span>
+                                  ) : (
+                                    <span className="text-gray-400 text-xs">Sin asignar</span>
+                                  )}
+                                </td>
+                              )}
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
