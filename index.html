@@ -13,7 +13,7 @@
   <style>
     body { font-family: 'Inter', sans-serif; }
     .gradient-bg {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #273030 0%, #3a4a4a 100%);
     }
     .glass-effect {
       backdrop-filter: blur(10px);
@@ -34,11 +34,11 @@
       font-size: 14px;
     }
     .form-input:focus {
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      border-color: #273030;
+      box-shadow: 0 0 0 3px rgba(39, 48, 48, 0.1);
     }
     .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #273030 0%, #3a4a4a 100%);
       color: white;
       border: none;
       border-radius: 12px;
@@ -46,8 +46,9 @@
       transition: all 0.2s ease;
     }
     .btn-primary:hover {
+      background: linear-gradient(135deg, #1a2020 0%, #2d3d3d 100%);
       transform: translateY(-1px);
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 8px 25px rgba(39, 48, 48, 0.3);
     }
     .sidebar-item {
       border-radius: 10px;
@@ -55,11 +56,11 @@
       font-weight: 500;
     }
     .sidebar-item:hover {
-      background: rgba(102, 126, 234, 0.1);
-      color: #667eea;
+      background: rgba(39, 48, 48, 0.1);
+      color: #273030;
     }
     .sidebar-item.active {
-      background: #667eea;
+      background: #273030;
       color: white;
     }
     .form-section {
@@ -93,12 +94,12 @@
       font-size: 14px;
     }
     .multi-select-item.selected {
-      background: #667eea;
+      background: #273030;
       color: white;
-      border-color: #667eea;
+      border-color: #273030;
     }
     .multi-select-item:hover {
-      border-color: #667eea;
+      border-color: #273030;
     }
     
     /* Estilos para el logo MatchingProps® */
@@ -1345,7 +1346,8 @@
               {userRole === 'Supervisor' && (
                 <button 
                   onClick={downloadMatchesReport}
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                  className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                  style={{background: 'linear-gradient(135deg, #273030 0%, #3a4a4a 100%)'}}
                 >
                   📊 Descargar Reporte Excel
                 </button>
