@@ -1,0 +1,57 @@
+# ================================
+# SECRETS Y CONFIGURACIÓN SENSIBLE
+# ================================
+.env
+.env.local
+.env.production
+.env.development
+config.js
+secrets.json
+
+# ================================
+# NODE.JS Y NPM
+# ================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# ================================
+# BUILDS Y DIST
+# ================================
+dist/
+build/
+out/
+.next/
+
+# ================================
+# LOGS
+# ================================
+*.log
+logs/
+
+# ================================
+# CACHE
+# ================================
+.cache/
+.parcel-cache/
+.eslintcache
+
+# ================================
+# IDEs Y EDITORES
+# ================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ================================
+# TESTING
+# ================================
+coverage/
+.nyc_output/
