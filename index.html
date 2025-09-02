@@ -107,6 +107,24 @@
       border-color: #273030;
     }
     
+    /* ✅ NUEVO: Estilos para penalizaciones en tablas */
+    .penalty-red {
+      background-color: #fee2e2 !important;
+      color: #991b1b !important;
+      font-weight: 600;
+    }
+    
+    .penalty-yellow {
+      background-color: #fef3c7 !important;
+      color: #92400e !important;
+      font-weight: 600;
+    }
+    
+    .penalty-normal {
+      background-color: inherit;
+      color: inherit;
+    }
+    
     /* Estilos para el logo MatchingProps® */
     .logo-main {
       font-family: 'League Spartan', sans-serif;
@@ -1134,6 +1152,34 @@
         </div>
       );
     };
+
+    // ✅ NUEVO: Función auxiliar para manejar penalizaciones
+    const getPenaltyClass = (penalizaciones, fieldName) => {
+      if (!penalizaciones || !penalizaciones[fieldName]) {
+        return 'penalty-normal';
+      }
+      
+      const penalty = penalizaciones[fieldName];
+      if (penalty.color === 'red') {
+        return 'penalty-red';
+      } else if (penalty.color === 'yellow') {
+        return 'penalty-yellow';
+      }
+      
+      return 'penalty-normal';
+    };
+
+    // ✅ NUEVO: Función para obtener valor con estilo aplicado
+    const getStyledCellContent = (value, penalizaciones, fieldName) => {
+      const className = getPenaltyClass(penalizaciones, fieldName);
+      const displayValue = value || 'N/A';
+      
+      return React.createElement('span', { 
+        className: className,
+        style: className !== 'penalty-normal' ? { padding: '4px 8px', borderRadius: '4px' } : {}
+      }, displayValue);
+    };
+
     // Search Clients Component
     // Search Clients Component - CÓDIGO ACTUALIZADO
     const SearchClientes = ({ userRole = 'Asesor' }) => {
@@ -1559,21 +1605,45 @@
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.kiron || 'N/A'}</td>
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.zona}</td>
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.entrada?.toLocaleString()}€</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.precio?.toLocaleString()}€</td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(cliente.precio?.toLocaleString() + '€', match.penalizaciones, 'precio')}
+                            </td>
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.permuta || 'N/A'}</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.tipo_vivienda || 'N/A'}</td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(cliente.tipo_vivienda, match.penalizaciones, 'tipo_vivienda')}
+                            </td>
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.finalidad || 'N/A'}</td>
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.habitaciones || 'N/A'}</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.estado || 'N/A'}</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.m2}m²</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.ascensor || 'N/A'}</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.bajos || 'N/A'}</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.entreplanta || 'N/A'}</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.altura || 'N/A'}</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.cercania_metro || 'N/A'}</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.balcon_terraza || 'N/A'}</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.patio || 'N/A'}</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.interior || 'N/A'}</td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(cliente.estado, match.penalizaciones, 'estado')}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(cliente.m2 + 'm²', match.penalizaciones, 'm2')}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(cliente.ascensor, match.penalizaciones, 'ascensor')}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(cliente.bajos, match.penalizaciones, 'bajos')}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(cliente.entreplanta, match.penalizaciones, 'entreplanta')}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(cliente.altura, match.penalizaciones, 'altura')}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(cliente.cercania_metro, match.penalizaciones, 'cercania_metro')}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(cliente.balcon_terraza, match.penalizaciones, 'balcon_terraza')}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(cliente.patio, match.penalizaciones, 'patio')}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(cliente.interior, match.penalizaciones, 'interior')}
+                            </td>
                             <td className="border border-gray-300 px-3 py-2 max-w-xs text-sm overflow-hidden text-ellipsis">
                               {cliente.caracteristicas_adicionales || 'N/A'}
                             </td>
@@ -2015,21 +2085,43 @@
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{piso.zona}</td>
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{piso.subzonas || 'N/A'}</td>
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
-                              {piso.precio?.toLocaleString()}€
+                              {getStyledCellContent(piso.precio?.toLocaleString() + '€', match.penalizaciones, 'precio')}
                             </td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{piso.m2}m²</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{piso.tipo_vivienda || 'N/A'}</td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(piso.m2 + 'm²', match.penalizaciones, 'm2')}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(piso.tipo_vivienda, match.penalizaciones, 'tipo_vivienda')}
+                            </td>
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{piso.habitaciones || 'N/A'}</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{piso.estado || 'N/A'}</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{piso.ascensor || 'N/A'}</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{piso.bajos || 'N/A'}</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{piso.entreplanta || 'N/A'}</td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(piso.estado, match.penalizaciones, 'estado')}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(piso.ascensor, match.penalizaciones, 'ascensor')}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(piso.bajos, match.penalizaciones, 'bajos')}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(piso.entreplanta, match.penalizaciones, 'entreplanta')}
+                            </td>
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{piso.planta || 'N/A'}</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{piso.altura || 'N/A'}</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{piso.cercania_metro || 'N/A'}</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{piso.balcon_terraza || 'N/A'}</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{piso.patio || 'N/A'}</td>
-                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{piso.interior || 'N/A'}</td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(piso.altura, match.penalizaciones, 'altura')}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(piso.cercania_metro, match.penalizaciones, 'cercania_metro')}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(piso.balcon_terraza, match.penalizaciones, 'balcon_terraza')}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(piso.patio, match.penalizaciones, 'patio')}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {getStyledCellContent(piso.interior, match.penalizaciones, 'interior')}
+                            </td>
                             <td className="border border-gray-300 px-3 py-2 max-w-xs text-sm overflow-hidden text-ellipsis">
                               {piso.caracteristicas_adicionales || 'N/A'}
                             </td>
