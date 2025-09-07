@@ -172,7 +172,22 @@
   <script type="text/babel">
     const { useState, useEffect } = React;
 
-    const API_BASE = "https://matchingprops.onrender.com";
+    // ✅ Multi-environment API detection
+    const API_BASE = (() => {
+      const hostname = window.location.hostname;
+      
+      // Test environment detection
+      if (hostname.includes('test') || hostname.includes('flame')) {
+        return "https://matchingprops-backend-test.onrender.com"; // ← URL de tu backend test
+      }
+      
+      // Production environment (mantener URL actual)
+      return "https://matchingprops.onrender.com"; // ← Tu URL de backend producción actual
+    })();
+    
+    // ✅ Environment indicator for debugging
+    console.log(`🌍 Environment: ${API_BASE.includes('test') ? 'TEST' : 'PRODUCTION'}`);
+    console.log(`📡 API Base: ${API_BASE}`);
     let token = null;
     let companiaId = null;
 
