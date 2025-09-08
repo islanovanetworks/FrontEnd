@@ -229,6 +229,7 @@
     };
 
     // Sidebar Component
+    // Sidebar Component
     const Sidebar = ({ activeSection, setActiveSection, userRole }) => (
       <div className="fixed left-0 top-0 w-72 h-screen bg-white border-r border-gray-200 p-6 z-10">
         <div className="mb-8">
@@ -245,7 +246,8 @@
             { id: 'pisos', label: 'Registrar Piso', icon: '🏡', roles: ['Asesor', 'Supervisor'] },
             { id: 'searchClientes', label: 'Buscar Clientes', icon: '🔍', roles: ['Asesor', 'Supervisor'] },
             { id: 'searchPisos', label: 'Buscar Pisos', icon: '🏢', roles: ['Asesor', 'Supervisor'] },
-            { id: 'gestionClientes', label: 'Gestión de Clientes', icon: '👥', roles: ['Supervisor'] }
+            { id: 'gestionClientes', label: 'Gestión de Clientes', icon: '👥', roles: ['Asesor', 'Supervisor'] },
+            { id: 'gestionPisos', label: 'Gestión de Pisos', icon: '🏗️', roles: ['Supervisor'] }
           ].filter(item => item.roles.includes(userRole)).map(item => (
             <button
               key={item.id}
@@ -2158,6 +2160,807 @@
         </div>
       );
     };
+    // ✅ COMPONENTE DE GESTIÓN DE CLIENTES - CORREGIDO
+    const ClientesManagement = ({ userRole }) => {
+      const [clientes, setClientes] = useState([]);
+      const [asesores, setAsesores] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [editingCliente, setEditingCliente] = useState(null);
+      const [showEditModal, setShowEditModal] = useState(false);
+    
+      useEffect(() => {
+        fetchClientes();
+        if (userRole === 'Supervisor') {
+          fetchAsesores();
+        }
+      }, [userRole]);
+    
+      const fetchClientes = async () => {
+        try {
+          const response = await fetch(`${API_BASE}/clientes/all`, { 
+            method: 'GET',
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            } 
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            setClientes(data);
+          }
+        } catch (error) {
+          console.error("Error fetching clientes:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+    
+      const fetchAsesores = async () => {
+        try {
+          const response = await fetch(`${API_BASE}/asesores/`, { 
+            method: 'GET',
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            } 
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            setAsesores(data);
+          }
+        } catch (error) {
+          console.error("Error fetching asesores:", error);
+        }
+      };
+    
+      const handleEdit = (cliente) => {
+        setEditingCliente({
+          ...cliente,
+          zona: cliente.zona ? cliente.zona.split(',') : [],
+          tipo_vivienda: cliente.tipo_vivienda ? cliente.tipo_vivienda.split(',') : [],
+          finalidad: cliente.finalidad ? cliente.finalidad.split(',') : [],
+          habitaciones: cliente.habitaciones ? cliente.habitaciones.split(',') : [],
+          estado: cliente.estado ? cliente.estado.split(',') : [],
+          altura: cliente.altura ? cliente.altura.split(',') : []
+        });
+        setShowEditModal(true);
+      };
+    
+      const handleUpdate = async (updatedCliente) => {
+        try {
+          const response = await fetch(`${API_BASE}/clientes/${updatedCliente.id}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              ...updatedCliente,
+              entrada: parseFloat(updatedCliente.entrada),
+              precio: parseFloat(updatedCliente.precio),
+              m2: parseInt(updatedCliente.m2),
+              habitaciones: Array.isArray(updatedCliente.habitaciones) ? updatedCliente.habitaciones.map(Number) : [],
+              compania_id: companiaId
+            })
+          });
+    
+          if (response.ok) {
+            alert('✅ Cliente actualizado exitosamente');
+            setShowEditModal(false);
+            setEditingCliente(null);
+            fetchClientes();
+          } else {
+            const error = await response.json();
+            alert('❌ Error: ' + error.detail);
+          }
+        } catch (error) {
+          alert('❌ Error de conexión: ' + error.message);
+        }
+      };
+    
+      const handleDelete = async (clienteId, clienteNombre) => {
+        if (confirm(`¿Estás seguro de eliminar el cliente "${clienteNombre}"?\n\nEsta acción no se puede deshacer.`)) {
+          try {
+            const response = await fetch(`${API_BASE}/clientes/${clienteId}`, {
+              method: 'DELETE',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            });
+    
+            if (response.ok) {
+              alert('✅ Cliente eliminado exitosamente');
+              fetchClientes();
+            } else {
+              const error = await response.json();
+              alert('❌ Error: ' + error.detail);
+            }
+          } catch (error) {
+            alert('❌ Error de conexión: ' + error.message);
+          }
+        }
+      };
+    
+      const handleReasignar = async (clienteId, nuevoAsesorId) => {
+        try {
+          const response = await fetch(`${API_BASE}/asesores/reasignar-cliente`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              cliente_id: clienteId,
+              nuevo_asesor_id: parseInt(nuevoAsesorId)
+            })
+          });
+    
+          if (response.ok) {
+            alert('✅ Cliente reasignado exitosamente');
+            fetchClientes();
+          } else {
+            const error = await response.json();
+            alert('❌ Error: ' + error.detail);
+          }
+        } catch (error) {
+          alert('❌ Error de conexión: ' + error.message);
+        }
+      };
+    
+      if (loading) {
+        return <div className="text-center py-8">Cargando clientes...</div>;
+      }
+    
+      return (
+        <div className="section-card p-8">
+          <div className="mb-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+              👥 Gestión de Clientes {userRole === 'Supervisor' ? '(Todos)' : '(Mis Clientes)'}
+            </h2>
+            <p className="text-gray-600">
+              {userRole === 'Supervisor' 
+                ? 'Gestiona todos los clientes de la compañía' 
+                : 'Gestiona tus clientes asignados'
+              }
+            </p>
+          </div>
+          
+          <div className="space-y-4">
+            {clientes.map(cliente => (
+              <div key={cliente.id} className="p-4 bg-white border border-gray-200 rounded-lg">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg text-gray-900">{cliente.nombre}</h3>
+                    <div className="text-sm text-gray-600 mt-1 space-y-1">
+                      <div>📞 {cliente.telefono}</div>
+                      <div>🏠 {cliente.zona} | 💰 {cliente.precio?.toLocaleString()}€</div>
+                      <div>📐 {cliente.m2}m² | 🛏️ {cliente.habitaciones} hab.</div>
+                      <div>🏦 {cliente.banco || 'Sin banco'} | 🔑 {cliente.kiron || 'Sin KÍRON'}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="ml-4 text-right space-y-2">
+                    {userRole === 'Supervisor' && (
+                      <div className="mb-2">
+                        <span className="text-sm font-medium text-gray-700">Asesor:</span>
+                        <div className="text-blue-600 font-medium text-sm">
+                          {cliente.asesor_asignado ? cliente.asesor_asignado.email : 'Sin asignar'}
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="flex flex-col space-y-2">
+                      <button
+                        onClick={() => handleEdit(cliente)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors"
+                      >
+                        ✏️ Editar
+                      </button>
+                      
+                      <button
+                        onClick={() => handleDelete(cliente.id, cliente.nombre)}
+                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition-colors"
+                      >
+                        🗑️ Eliminar
+                      </button>
+                      
+                      {userRole === 'Supervisor' && (
+                        <select
+                          className="text-xs border border-gray-300 rounded px-2 py-1"
+                          defaultValue={cliente.asesor_id || ''}
+                          onChange={(e) => {
+                            if (e.target.value && e.target.value !== cliente.asesor_id?.toString()) {
+                              if (confirm('¿Confirmar reasignación del cliente?')) {
+                                handleReasignar(cliente.id, e.target.value);
+                              } else {
+                                e.target.value = cliente.asesor_id || '';
+                              }
+                            }
+                          }}
+                        >
+                          <option value="">Reasignar...</option>
+                          {asesores.map(asesor => (
+                            <option key={asesor.id} value={asesor.id}>
+                              {asesor.email} ({asesor.clientes_count})
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {clientes.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                No hay clientes registrados.
+              </div>
+            )}
+          </div>
+    
+          {/* Modal de Edición */}
+          {showEditModal && editingCliente && (
+            <ClienteEditModal
+              cliente={editingCliente}
+              onSave={handleUpdate}
+              onCancel={() => {
+                setShowEditModal(false);
+                setEditingCliente(null);
+              }}
+            />
+          )}
+        </div>
+      );
+    };
+    
+    // ✅ COMPONENTE DE GESTIÓN DE PISOS - COMPLETO Y CORREGIDO
+    const PisosManagement = () => {
+      const [pisos, setPisos] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [editingPiso, setEditingPiso] = useState(null);
+      const [showEditModal, setShowEditModal] = useState(false);
+    
+      useEffect(() => {
+        fetchPisos();
+      }, []);
+    
+      const fetchPisos = async () => {
+        try {
+          const response = await fetch(`${API_BASE}/pisos/all`, { 
+            method: 'GET',
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            } 
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            setPisos(data);
+          }
+        } catch (error) {
+          console.error("Error fetching pisos:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+    
+      const handleEdit = (piso) => {
+        setEditingPiso({
+          ...piso,
+          zona: piso.zona ? [piso.zona] : [],
+          tipo_vivienda: piso.tipo_vivienda ? piso.tipo_vivienda.split(',') : []
+        });
+        setShowEditModal(true);
+      };
+    
+      const handleUpdate = async (updatedPiso) => {
+        try {
+          const response = await fetch(`${API_BASE}/pisos/${updatedPiso.id}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              ...updatedPiso,
+              precio: parseFloat(updatedPiso.precio),
+              m2: parseInt(updatedPiso.m2),
+              habitaciones: updatedPiso.habitaciones ? [parseInt(updatedPiso.habitaciones)] : [],
+              compania_id: companiaId
+            })
+          });
+    
+          if (response.ok) {
+            alert('✅ Piso actualizado exitosamente');
+            setShowEditModal(false);
+            setEditingPiso(null);
+            fetchPisos();
+          } else {
+            const error = await response.json();
+            alert('❌ Error: ' + error.detail);
+          }
+        } catch (error) {
+          alert('❌ Error de conexión: ' + error.message);
+        }
+      };
+    
+      const handleDelete = async (pisoId, pisoInfo) => {
+        if (confirm(`¿Estás seguro de eliminar el piso "${pisoInfo}"?\n\nEsta acción no se puede deshacer.`)) {
+          try {
+            const response = await fetch(`${API_BASE}/pisos/${pisoId}`, {
+              method: 'DELETE',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            });
+    
+            if (response.ok) {
+              alert('✅ Piso eliminado exitosamente');
+              fetchPisos();
+            } else {
+              const error = await response.json();
+              alert('❌ Error: ' + error.detail);
+            }
+          } catch (error) {
+            alert('❌ Error de conexión: ' + error.message);
+          }
+        }
+      };
+    
+      if (loading) {
+        return <div className="text-center py-8">Cargando pisos...</div>;
+      }
+    
+      return (
+        <div className="section-card p-8">
+          <div className="mb-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">🏗️ Gestión de Pisos</h2>
+            <p className="text-gray-600">Gestiona todas las propiedades de la compañía</p>
+          </div>
+          
+          <div className="space-y-4">
+            {pisos.map(piso => (
+              <div key={piso.id} className="p-4 bg-white border border-gray-200 rounded-lg">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg text-gray-900">
+                      {piso.direccion || `Piso ID: ${piso.id}`}
+                    </h3>
+                    <div className="text-sm text-gray-600 mt-1 space-y-1">
+                      <div>🏠 {piso.zona} | 💰 {piso.precio?.toLocaleString()}€</div>
+                      <div>📐 {piso.m2}m² | 🛏️ {piso.habitaciones || 'N/A'} hab.</div>
+                      <div>🏢 {piso.tipo_vivienda || 'N/A'} | 🔧 {piso.estado || 'N/A'}</div>
+                      <div>🚇 {piso.cercania_metro || 'N/A'} | 🏗️ Planta {piso.planta || 'N/A'}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="ml-4 text-right space-y-2">
+                    <div className="flex flex-col space-y-2">
+                      <button
+                        onClick={() => handleEdit(piso)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors"
+                      >
+                        ✏️ Editar
+                      </button>
+                      
+                      <button
+                        onClick={() => handleDelete(piso.id, piso.direccion || `Piso ID: ${piso.id}`)}
+                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition-colors"
+                      >
+                        🗑️ Eliminar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {pisos.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                No hay pisos registrados.
+              </div>
+            )}
+          </div>
+    
+          {/* Modal de Edición de Pisos */}
+          {showEditModal && editingPiso && (
+            <PisoEditModal
+              piso={editingPiso}
+              onSave={handleUpdate}
+              onCancel={() => {
+                setShowEditModal(false);
+                setEditingPiso(null);
+              }}
+            />
+          )}
+        </div>
+      );
+    };
+    
+    // ✅ MODAL DE EDICIÓN DE CLIENTE
+    const ClienteEditModal = ({ cliente, onSave, onCancel }) => {
+      const [formData, setFormData] = useState(cliente);
+    
+      const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+      };
+    
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        onSave(formData);
+      };
+    
+      return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-4xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-semibold mb-4">✏️ Editar Cliente: {cliente.nombre}</h3>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Información Básica */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+                  <input
+                    name="nombre"
+                    value={formData.nombre}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono *</label>
+                  <input
+                    name="telefono"
+                    value={formData.telefono}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Banco</label>
+                  <input
+                    name="banco"
+                    value={formData.banco || ''}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">KÍRON</label>
+                  <select
+                    name="kiron"
+                    value={formData.kiron || ''}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SK">SK</option>
+                    <option value="PK">PK</option>
+                    <option value="NK">NK</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Entrada (€) *</label>
+                  <input
+                    name="entrada"
+                    type="number"
+                    value={formData.entrada}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Precio (€) *</label>
+                  <input
+                    name="precio"
+                    type="number"
+                    value={formData.precio}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Metros² *</label>
+                  <input
+                    name="m2"
+                    type="number"
+                    value={formData.m2}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ascensor</label>
+                  <select
+                    name="ascensor"
+                    value={formData.ascensor || ''}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="Después de 1º">Después de 1º</option>
+                    <option value="Después de 2º">Después de 2º</option>
+                    <option value="Después de 3º">Después de 3º</option>
+                    <option value="Después de 4º">Después de 4º</option>
+                    <option value="Después de 5º">Después de 5º</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Permuta</label>
+                  <select
+                    name="permuta"
+                    value={formData.permuta || ''}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+              </div>
+    
+              {/* MultiSelect para Zona */}
+              <MultiSelect
+                label="Zona *"
+                name="zona"
+                options={["ALTO", "OLIVOS", "LAGUNA", "BATÁN", "SEPÚLVEDA", "MANZANARES", "PÍO", "PUERTA", "JESUITAS"]}
+                value={formData.zona}
+                onChange={handleChange}
+                required={true}
+              />
+    
+              {/* Características Adicionales */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Características Adicionales</label>
+                <textarea
+                  name="caracteristicas_adicionales"
+                  value={formData.caracteristicas_adicionales || ''}
+                  onChange={handleChange}
+                  rows="3"
+                  className="w-full form-input"
+                />
+              </div>
+              
+              <div className="flex justify-end space-x-4 pt-4">
+                <button
+                  type="button"
+                  onClick={onCancel}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 btn-primary"
+                >
+                  ✅ Guardar Cambios
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      );
+    };
+    
+    // ✅ MODAL DE EDICIÓN DE PISO
+    const PisoEditModal = ({ piso, onSave, onCancel }) => {
+      const [formData, setFormData] = useState(piso);
+    
+      const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+      };
+    
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        onSave(formData);
+      };
+    
+      return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-4xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-semibold mb-4">
+              ✏️ Editar Piso: {piso.direccion || `ID ${piso.id}`}
+            </h3>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Información Básica */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                  <input
+                    name="direccion"
+                    value={formData.direccion || ''}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Zona *</label>
+                  <select
+                    name="zona"
+                    value={formData.zona || ''}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                    required
+                  >
+                    <option value="">Seleccionar zona</option>
+                    <option value="ALTO">ALTO</option>
+                    <option value="OLIVOS">OLIVOS</option>
+                    <option value="LAGUNA">LAGUNA</option>
+                    <option value="BATÁN">BATÁN</option>
+                    <option value="SEPÚLVEDA">SEPÚLVEDA</option>
+                    <option value="MANZANARES">MANZANARES</option>
+                    <option value="PÍO">PÍO</option>
+                    <option value="PUERTA">PUERTA</option>
+                    <option value="JESUITAS">JESUITAS</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Subzonas</label>
+                  <input
+                    name="subzonas"
+                    value={formData.subzonas || ''}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Precio (€) *</label>
+                  <input
+                    name="precio"
+                    type="number"
+                    value={formData.precio}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Metros² *</label>
+                  <input
+                    name="m2"
+                    type="number"
+                    value={formData.m2}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Habitaciones</label>
+                  <select
+                    name="habitaciones"
+                    value={formData.habitaciones || ''}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                  <select
+                    name="estado"
+                    value={formData.estado || ''}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="Entrar a Vivir">Entrar a Vivir</option>
+                    <option value="Actualizar">Actualizar</option>
+                    <option value="A Reformar">A Reformar</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ascensor</label>
+                  <select
+                    name="ascensor"
+                    value={formData.ascensor || ''}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="SÍ">SÍ</option>
+                    <option value="NO">NO</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Planta</label>
+                  <select
+                    name="planta"
+                    value={formData.planta || ''}
+                    onChange={handleChange}
+                    className="w-full form-input"
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="-1">-1</option>
+                    <option value="0">0</option>
+                    <option value="Entreplanta">Entreplanta</option>
+                    {[...Array(15).keys()].map(i => (
+                      <option key={i + 1} value={i + 1}>{i + 1}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+    
+              {/* MultiSelect para Tipo de Vivienda */}
+              <MultiSelect
+                label="Tipo de Vivienda"
+                name="tipo_vivienda"
+                options={["Piso", "Ático", "Chalet", "Local"]}
+                value={formData.tipo_vivienda}
+                onChange={handleChange}
+              />
+    
+              {/* Características Adicionales */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Características Adicionales</label>
+                <textarea
+                  name="caracteristicas_adicionales"
+                  value={formData.caracteristicas_adicionales || ''}
+                  onChange={handleChange}
+                  rows="3"
+                  className="w-full form-input"
+                />
+              </div>
+              
+              <div className="flex justify-end space-x-4 pt-4">
+                <button
+                  type="button"
+                  onClick={onCancel}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 btn-primary"
+                >
+                  ✅ Guardar Cambios
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      );
+    };
 
     // Main App Component
     // Main App Component
@@ -2338,7 +3141,9 @@
           case 'searchPisos':
             return <SearchPisos />;
           case 'gestionClientes':
-            return userRole === 'Supervisor' ? <ClientesList /> : <div className="text-center py-8 text-red-500">Acceso denegado</div>;
+            return <ClientesManagement userRole={userRole} />;
+          case 'gestionPisos':
+            return userRole === 'Supervisor' ? <PisosManagement /> : <div className="text-center py-8 text-red-500">Acceso denegado - Solo Supervisores</div>;
           default:
             return <ClientForm onRegister={handleRegister} userRole={userRole} />;
         }
