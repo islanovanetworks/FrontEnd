@@ -233,8 +233,15 @@
     const Sidebar = ({ activeSection, setActiveSection, userRole }) => (
       <div className="fixed left-0 top-0 w-72 h-screen bg-white border-r border-gray-200 p-6 z-10">
         <div className="mb-8">
+          {/* 
+          ============================================
+          BRANDING TEMPORALMENTE OCULTO
+          Descomentar las siguientes líneas cuando termine el período de prueba
+          ============================================
           <h2 className="logo-sidebar">matchingprops</h2>
           <p className="text-sm text-gray-500 mt-1">Plataforma Inmobiliaria Inteligente</p>
+          ============================================
+          */}
           <div className="mt-2 px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
             Rol: {userRole}
           </div>
@@ -298,10 +305,17 @@
       return (
         <div className="min-h-screen gradient-bg flex items-center justify-center p-6">
           <div className="w-full max-w-md">
-            <div className="text-center mb-8">
-              <h1 className="logo-main mb-2">matchingprops</h1>
-              <p className="text-white/80">Plataforma Inmobiliaria Inteligente</p>
-            </div>
+            {/* 
+        ============================================
+        BRANDING TEMPORALMENTE OCULTO
+        Descomentar las siguientes líneas cuando termine el período de prueba
+        ============================================
+        <div className="text-center mb-8">
+          <h1 className="logo-main mb-2">matchingprops</h1>
+          <p className="text-white/80">Plataforma Inmobiliaria Inteligente</p>
+        </div>
+        ============================================
+        */}
             
             <div className="glass-effect rounded-2xl p-8">
               <h2 className="text-2xl font-semibold text-white mb-6 text-center">Iniciar Sesión</h2>
