@@ -1364,6 +1364,9 @@
           } else if (['precio', 'entrada'].includes(field)) {
             valueA = clienteA?.[field] || 0;
             valueB = clienteB?.[field] || 0;
+          } else if (field === 'asesor') {
+            valueA = clienteA?.asesor_asignado?.email || '';
+            valueB = clienteB?.asesor_asignado?.email || '';
           } else {
             // Para todos los demás campos de texto
             valueA = clienteA?.[field] || '';
@@ -1467,6 +1470,12 @@
                           onClick={() => sortResults('telefono')}
                         >
                           Teléfono {getSortIcon('telefono')}
+                        </th>
+                        <th 
+                          className="border border-gray-300 px-3 py-2 text-left cursor-pointer hover:bg-gray-200 whitespace-nowrap text-sm font-medium"
+                          onClick={() => sortResults('asesor')}
+                        >
+                          Asesor Asignado {getSortIcon('asesor')}
                         </th>
                         <th 
                           className="border border-gray-300 px-3 py-2 text-left cursor-pointer hover:bg-gray-200 whitespace-nowrap text-sm font-medium"
@@ -1632,6 +1641,15 @@
                             </td>
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.nombre}</td>
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.telefono}</td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {cliente.asesor_asignado ? (
+                                <span className="text-blue-600 text-xs">
+                                  {cliente.asesor_asignado.email}
+                                </span>
+                              ) : (
+                                <span className="text-gray-400 text-xs">Sin asignar</span>
+                              )}
+                            </td>
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.banco || 'N/A'}</td>
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.kiron || 'N/A'}</td>
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.zona}</td>
@@ -1678,17 +1696,6 @@
                             <td className="border border-gray-300 px-3 py-2 max-w-xs text-sm overflow-hidden text-ellipsis">
                               {cliente.caracteristicas_adicionales || 'N/A'}
                             </td>
-                            {userRole === 'Supervisor' && (
-                              <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
-                                {cliente.asesor_asignado ? (
-                                  <span className="text-blue-600 text-xs">
-                                    {cliente.asesor_asignado.email}
-                                  </span>
-                                ) : (
-                                  <span className="text-gray-400 text-xs">Sin asignar</span>
-                                )}
-                              </td>
-                            )}
                           </tr>
                         );
                       })}
@@ -1720,11 +1727,9 @@
                         <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Teléfono</th>
                         <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Banco</th>
                         <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">KÍRON</th>
+                        <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Asesor Asignado</th>
                         <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Entrada</th>
                         <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Precio</th>
-                        {userRole === 'Supervisor' && (
-                          <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Asesor</th>
-                        )}
                       </tr>
                     </thead>
                     <tbody>
@@ -1771,19 +1776,17 @@
                               <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.telefono}</td>
                               <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.banco || 'N/A'}</td>
                               <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.kiron || 'N/A'}</td>
+                              <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                                {cliente.asesor_asignado ? (
+                                  <span className="text-blue-600 text-xs">
+                                    {cliente.asesor_asignado.email}
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400 text-xs">Sin asignar</span>
+                                )}
+                              </td>
                               <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.entrada?.toLocaleString()}€</td>
                               <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.precio?.toLocaleString()}€</td>
-                              {userRole === 'Supervisor' && (
-                                <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
-                                  {cliente.asesor_asignado ? (
-                                    <span className="text-blue-600 text-xs">
-                                      {cliente.asesor_asignado.email}
-                                    </span>
-                                  ) : (
-                                    <span className="text-gray-400 text-xs">Sin asignar</span>
-                                  )}
-                                </td>
-                              )}
                             </tr>
                           );
                         })}
