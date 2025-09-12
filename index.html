@@ -2175,12 +2175,20 @@
       );
     };
     // ✅ COMPONENTE DE GESTIÓN DE CLIENTES - CORREGIDO
+    // ✅ COMPONENTE DE GESTIÓN DE CLIENTES - CORREGIDO
     const ClientesManagement = ({ userRole }) => {
       const [clientes, setClientes] = useState([]);
       const [asesores, setAsesores] = useState([]);
       const [loading, setLoading] = useState(true);
       const [editingCliente, setEditingCliente] = useState(null);
       const [showEditModal, setShowEditModal] = useState(false);
+      // ✅ NUEVO: Estado para el buscador
+      const [searchPhone, setSearchPhone] = useState('');
+    
+      // ✅ NUEVO: Función para filtrar clientes por teléfono
+      const filteredClientes = clientes.filter(cliente => 
+        cliente.telefono.toLowerCase().includes(searchPhone.toLowerCase())
+      );
     
       useEffect(() => {
         fetchClientes();
@@ -2331,19 +2339,49 @@
       return (
         <div className="section-card p-8">
           <div className="mb-6">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-              👥 Gestión de Clientes {userRole === 'Supervisor' ? '(Todos)' : '(Mis Clientes)'}
-            </h2>
-            <p className="text-gray-600">
-              {userRole === 'Supervisor' 
-                ? 'Gestiona todos los clientes de la compañía' 
-                : 'Gestiona tus clientes asignados'
-              }
-            </p>
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+                  👥 Gestión de Clientes {userRole === 'Supervisor' ? '(Todos)' : '(Mis Clientes)'}
+                </h2>
+                <p className="text-gray-600">
+                  {userRole === 'Supervisor' 
+                    ? 'Gestiona todos los clientes de la compañía' 
+                    : 'Gestiona tus clientes asignados'
+                  }
+                </p>
+              </div>
+              
+              {/* ✅ NUEVO: Buscador por teléfono */}
+              <div className="flex items-center space-x-2">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="🔍 Buscar por teléfono..."
+                    value={searchPhone}
+                    onChange={(e) => setSearchPhone(e.target.value)}
+                    className="form-input w-64 pl-4 pr-4 py-2 text-sm border-2 border-gray-200 rounded-lg focus:border-blue-500"
+                  />
+                  {searchPhone && (
+                    <button
+                      onClick={() => setSearchPhone('')}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+                {searchPhone && (
+                  <span className="text-sm text-gray-500">
+                    {filteredClientes.length} resultado{filteredClientes.length !== 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
           
           <div className="space-y-4">
-            {clientes.map(cliente => (
+            {filteredClientes.map(cliente => (
               <div key={cliente.id} className="p-4 bg-white border border-gray-200 rounded-lg">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
@@ -2409,7 +2447,13 @@
               </div>
             ))}
             
-            {clientes.length === 0 && (
+            {filteredClientes.length === 0 && searchPhone && (
+              <div className="text-center py-8 text-gray-500">
+                No se encontraron clientes con el teléfono "{searchPhone}".
+              </div>
+            )}
+            
+            {clientes.length === 0 && !searchPhone && (
               <div className="text-center py-8 text-gray-500">
                 No hay clientes registrados.
               </div>
