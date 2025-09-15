@@ -83,6 +83,14 @@
       padding-bottom: 8px;
       border-bottom: 2px solid #e5e7eb;
     }
+    .form-section h4 {
+      color: #374151;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #d1d5db;
+    }
     .multi-select-container {
       display: flex;
       flex-wrap: wrap;
@@ -233,8 +241,15 @@
     const Sidebar = ({ activeSection, setActiveSection, userRole }) => (
       <div className="fixed left-0 top-0 w-72 h-screen bg-white border-r border-gray-200 p-6 z-10">
         <div className="mb-8">
+          {/* 
+          ============================================
+          BRANDING TEMPORALMENTE OCULTO
+          Descomentar las siguientes líneas cuando termine el período de prueba
+          ============================================
           <h2 className="logo-sidebar">matchingprops</h2>
           <p className="text-sm text-gray-500 mt-1">Plataforma Inmobiliaria Inteligente</p>
+          ============================================
+          */}
           <div className="mt-2 px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
             Rol: {userRole}
           </div>
@@ -298,10 +313,17 @@
       return (
         <div className="min-h-screen gradient-bg flex items-center justify-center p-6">
           <div className="w-full max-w-md">
-            <div className="text-center mb-8">
-              <h1 className="logo-main mb-2">matchingprops</h1>
-              <p className="text-white/80">Plataforma Inmobiliaria Inteligente</p>
-            </div>
+            {/* 
+        ============================================
+        BRANDING TEMPORALMENTE OCULTO
+        Descomentar las siguientes líneas cuando termine el período de prueba
+        ============================================
+        <div className="text-center mb-8">
+          <h1 className="logo-main mb-2">matchingprops</h1>
+          <p className="text-white/80">Plataforma Inmobiliaria Inteligente</p>
+        </div>
+        ============================================
+        */}
             
             <div className="glass-effect rounded-2xl p-8">
               <h2 className="text-2xl font-semibold text-white mb-6 text-center">Iniciar Sesión</h2>
@@ -720,7 +742,6 @@
                     <option value="10-15 MIN">10-15 MIN</option>
                     <option value="15-20 MIN">15-20 MIN</option>
                     <option value="+20 MIN">+20 MIN</option>
-                    <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
               </div>
@@ -1091,7 +1112,6 @@
                     <option value="10-15 MIN">10-15 MIN</option>
                     <option value="15-20 MIN">15-20 MIN</option>
                     <option value="+20 MIN">+20 MIN</option>
-                    <option value="INDIFERENTE">INDIFERENTE</option>
                   </select>
                 </div>
               </div>
@@ -1350,6 +1370,9 @@
           } else if (['precio', 'entrada'].includes(field)) {
             valueA = clienteA?.[field] || 0;
             valueB = clienteB?.[field] || 0;
+          } else if (field === 'asesor') {
+            valueA = clienteA?.asesor_asignado?.email || '';
+            valueB = clienteB?.asesor_asignado?.email || '';
           } else {
             // Para todos los demás campos de texto
             valueA = clienteA?.[field] || '';
@@ -1425,7 +1448,7 @@
             {results.length > 0 && (
               <div className="mt-8">
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  Clientes Compatibles ({results.length}) - Ordenados por Compatibilidad
+                  Clientes Compatibles Pendientes ({results.filter(match => match.estado === 'Pendiente' || match.estado === 'No contesta').length}) - Ordenados por Compatibilidad
                 </h3>
                 
                 {/* Tabla con scroll horizontal y todas las columnas */}
@@ -1453,6 +1476,12 @@
                           onClick={() => sortResults('telefono')}
                         >
                           Teléfono {getSortIcon('telefono')}
+                        </th>
+                        <th 
+                          className="border border-gray-300 px-3 py-2 text-left cursor-pointer hover:bg-gray-200 whitespace-nowrap text-sm font-medium"
+                          onClick={() => sortResults('asesor')}
+                        >
+                          Asesor Asignado {getSortIcon('asesor')}
                         </th>
                         <th 
                           className="border border-gray-300 px-3 py-2 text-left cursor-pointer hover:bg-gray-200 whitespace-nowrap text-sm font-medium"
@@ -1571,9 +1600,6 @@
                         <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">
                           Características Adicionales
                         </th>
-                        {userRole === 'Supervisor' && (
-                          <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Asesor</th>
-                        )}
                       </tr>
                     </thead>
                     <tbody>
@@ -1618,6 +1644,15 @@
                             </td>
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.nombre}</td>
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.telefono}</td>
+                            <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                              {cliente.asesor_asignado ? (
+                                <span className="text-blue-600 text-xs">
+                                  {cliente.asesor_asignado.email}
+                                </span>
+                              ) : (
+                                <span className="text-gray-400 text-xs">Sin asignar</span>
+                              )}
+                            </td>
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.banco || 'N/A'}</td>
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.kiron || 'N/A'}</td>
                             <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.zona}</td>
@@ -1664,17 +1699,6 @@
                             <td className="border border-gray-300 px-3 py-2 max-w-xs text-sm overflow-hidden text-ellipsis">
                               {cliente.caracteristicas_adicionales || 'N/A'}
                             </td>
-                            {userRole === 'Supervisor' && (
-                              <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
-                                {cliente.asesor_asignado ? (
-                                  <span className="text-blue-600 text-xs">
-                                    {cliente.asesor_asignado.email}
-                                  </span>
-                                ) : (
-                                  <span className="text-gray-400 text-xs">Sin asignar</span>
-                                )}
-                              </td>
-                            )}
                           </tr>
                         );
                       })}
@@ -1706,11 +1730,9 @@
                         <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Teléfono</th>
                         <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Banco</th>
                         <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">KÍRON</th>
+                        <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Asesor Asignado</th>
                         <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Entrada</th>
                         <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Precio</th>
-                        {userRole === 'Supervisor' && (
-                          <th className="border border-gray-300 px-3 py-2 text-left whitespace-nowrap text-sm font-medium">Asesor</th>
-                        )}
                       </tr>
                     </thead>
                     <tbody>
@@ -1757,19 +1779,17 @@
                               <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.telefono}</td>
                               <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.banco || 'N/A'}</td>
                               <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.kiron || 'N/A'}</td>
+                              <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
+                                {cliente.asesor_asignado ? (
+                                  <span className="text-blue-600 text-xs">
+                                    {cliente.asesor_asignado.email}
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-400 text-xs">Sin asignar</span>
+                                )}
+                              </td>
                               <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.entrada?.toLocaleString()}€</td>
                               <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">{cliente.precio?.toLocaleString()}€</td>
-                              {userRole === 'Supervisor' && (
-                                <td className="border border-gray-300 px-3 py-2 whitespace-nowrap text-sm">
-                                  {cliente.asesor_asignado ? (
-                                    <span className="text-blue-600 text-xs">
-                                      {cliente.asesor_asignado.email}
-                                    </span>
-                                  ) : (
-                                    <span className="text-gray-400 text-xs">Sin asignar</span>
-                                  )}
-                                </td>
-                              )}
                             </tr>
                           );
                         })}
@@ -2161,12 +2181,20 @@
       );
     };
     // ✅ COMPONENTE DE GESTIÓN DE CLIENTES - CORREGIDO
+    // ✅ COMPONENTE DE GESTIÓN DE CLIENTES - CORREGIDO
     const ClientesManagement = ({ userRole }) => {
       const [clientes, setClientes] = useState([]);
       const [asesores, setAsesores] = useState([]);
       const [loading, setLoading] = useState(true);
       const [editingCliente, setEditingCliente] = useState(null);
       const [showEditModal, setShowEditModal] = useState(false);
+      // ✅ NUEVO: Estado para el buscador
+      const [searchPhone, setSearchPhone] = useState('');
+    
+      // ✅ NUEVO: Función para filtrar clientes por teléfono
+      const filteredClientes = clientes.filter(cliente => 
+        cliente.telefono.toLowerCase().includes(searchPhone.toLowerCase())
+      );
     
       useEffect(() => {
         fetchClientes();
@@ -2317,19 +2345,49 @@
       return (
         <div className="section-card p-8">
           <div className="mb-6">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-              👥 Gestión de Clientes {userRole === 'Supervisor' ? '(Todos)' : '(Mis Clientes)'}
-            </h2>
-            <p className="text-gray-600">
-              {userRole === 'Supervisor' 
-                ? 'Gestiona todos los clientes de la compañía' 
-                : 'Gestiona tus clientes asignados'
-              }
-            </p>
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+                  👥 Gestión de Clientes {userRole === 'Supervisor' ? '(Todos)' : '(Mis Clientes)'}
+                </h2>
+                <p className="text-gray-600">
+                  {userRole === 'Supervisor' 
+                    ? 'Gestiona todos los clientes de la compañía' 
+                    : 'Gestiona tus clientes asignados'
+                  }
+                </p>
+              </div>
+              
+              {/* ✅ NUEVO: Buscador por teléfono */}
+              <div className="flex items-center space-x-2">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="🔍 Buscar por teléfono..."
+                    value={searchPhone}
+                    onChange={(e) => setSearchPhone(e.target.value)}
+                    className="form-input w-64 pl-4 pr-4 py-2 text-sm border-2 border-gray-200 rounded-lg focus:border-blue-500"
+                  />
+                  {searchPhone && (
+                    <button
+                      onClick={() => setSearchPhone('')}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+                {searchPhone && (
+                  <span className="text-sm text-gray-500">
+                    {filteredClientes.length} resultado{filteredClientes.length !== 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
           
           <div className="space-y-4">
-            {clientes.map(cliente => (
+            {filteredClientes.map(cliente => (
               <div key={cliente.id} className="p-4 bg-white border border-gray-200 rounded-lg">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
@@ -2395,7 +2453,13 @@
               </div>
             ))}
             
-            {clientes.length === 0 && (
+            {filteredClientes.length === 0 && searchPhone && (
+              <div className="text-center py-8 text-gray-500">
+                No se encontraron clientes con el teléfono "{searchPhone}".
+              </div>
+            )}
+            
+            {clientes.length === 0 && !searchPhone && (
               <div className="text-center py-8 text-gray-500">
                 No hay clientes registrados.
               </div>
@@ -2584,6 +2648,7 @@
     };
     
     // ✅ MODAL DE EDICIÓN DE CLIENTE
+    // ✅ MODAL DE EDICIÓN DE CLIENTE - COMPLETO CON TODOS LOS PARÁMETROS
     const ClienteEditModal = ({ cliente, onSave, onCancel }) => {
       const [formData, setFormData] = useState(cliente);
     
@@ -2599,161 +2664,342 @@
     
       return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg p-6 max-w-6xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-semibold mb-4">✏️ Editar Cliente: {cliente.nombre}</h3>
             
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* Información Básica */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
-                  <input
-                    name="nombre"
-                    value={formData.nombre}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono *</label>
-                  <input
-                    name="telefono"
-                    value={formData.telefono}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Banco</label>
-                  <input
-                    name="banco"
-                    value={formData.banco || ''}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">KÍRON</label>
-                  <select
-                    name="kiron"
-                    value={formData.kiron || ''}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SK">SK</option>
-                    <option value="PK">PK</option>
-                    <option value="NK">NK</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Entrada (€) *</label>
-                  <input
-                    name="entrada"
-                    type="number"
-                    value={formData.entrada}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Precio (€) *</label>
-                  <input
-                    name="precio"
-                    type="number"
-                    value={formData.precio}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Metros² *</label>
-                  <input
-                    name="m2"
-                    type="number"
-                    value={formData.m2}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ascensor</label>
-                  <select
-                    name="ascensor"
-                    value={formData.ascensor || ''}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SÍ">SÍ</option>
-                    <option value="Después de 1º">Después de 1º</option>
-                    <option value="Después de 2º">Después de 2º</option>
-                    <option value="Después de 3º">Después de 3º</option>
-                    <option value="Después de 4º">Después de 4º</option>
-                    <option value="Después de 5º">Después de 5º</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Permuta</label>
-                  <select
-                    name="permuta"
-                    value={formData.permuta || ''}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
-                  </select>
+              <div className="form-section">
+                <h4 className="text-lg font-medium text-gray-900 mb-3">Información Básica</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+                    <input
+                      name="nombre"
+                      value={formData.nombre}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono *</label>
+                    <input
+                      name="telefono"
+                      value={formData.telefono}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Banco</label>
+                    <input
+                      name="banco"
+                      value={formData.banco || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">KÍRON</label>
+                    <select
+                      name="kiron"
+                      value={formData.kiron || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="SK">SK</option>
+                      <option value="PK">PK</option>
+                      <option value="NK">NK</option>
+                    </select>
+                  </div>
                 </div>
               </div>
     
-              {/* MultiSelect para Zona */}
-              <MultiSelect
-                label="Zona *"
-                name="zona"
-                options={["ALTO", "OLIVOS", "LAGUNA", "BATÁN", "SEPÚLVEDA", "MANZANARES", "PÍO", "PUERTA", "JESUITAS"]}
-                value={formData.zona}
-                onChange={handleChange}
-                required={true}
-              />
+              {/* Ubicación */}
+              <div className="form-section">
+                <h4 className="text-lg font-medium text-gray-900 mb-3">Ubicación</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <MultiSelect
+                    label="Zona *"
+                    name="zona"
+                    options={["ALTO", "OLIVOS", "LAGUNA", "BATÁN", "SEPÚLVEDA", "MANZANARES", "PÍO", "PUERTA", "JESUITAS"]}
+                    value={formData.zona}
+                    onChange={handleChange}
+                    required={true}
+                  />
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Subzonas</label>
+                    <input
+                      name="subzonas"
+                      value={formData.subzonas || ''}
+                      onChange={handleChange}
+                      placeholder="Subzonas específicas"
+                      className="w-full form-input"
+                    />
+                  </div>
+                </div>
+              </div>
     
-              {/* Características Adicionales */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Características Adicionales</label>
-                <textarea
-                  name="caracteristicas_adicionales"
-                  value={formData.caracteristicas_adicionales || ''}
-                  onChange={handleChange}
-                  rows="3"
-                  className="w-full form-input"
-                />
+              {/* Aspectos Económicos */}
+              <div className="form-section">
+                <h4 className="text-lg font-medium text-gray-900 mb-3">Aspectos Económicos</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Entrada (€) *</label>
+                    <input
+                      name="entrada"
+                      type="number"
+                      value={formData.entrada}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Precio (€) *</label>
+                    <input
+                      name="precio"
+                      type="number"
+                      value={formData.precio}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Permuta</label>
+                    <select
+                      name="permuta"
+                      value={formData.permuta || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="SÍ">SÍ</option>
+                      <option value="NO">NO</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+    
+              {/* Características de la Vivienda */}
+              <div className="form-section">
+                <h4 className="text-lg font-medium text-gray-900 mb-3">Características de la Vivienda</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <MultiSelect
+                    label="Tipo de Vivienda"
+                    name="tipo_vivienda"
+                    options={["Piso", "Ático", "Chalet", "Local"]}
+                    value={formData.tipo_vivienda}
+                    onChange={handleChange}
+                  />
+                  
+                  <MultiSelect
+                    label="Finalidad"
+                    name="finalidad"
+                    options={["Primera Vivienda", "Inversión"]}
+                    value={formData.finalidad}
+                    onChange={handleChange}
+                  />
+                  
+                  <MultiSelect
+                    label="Habitaciones"
+                    name="habitaciones"
+                    options={["0", "1", "2", "3", "4", "5"]}
+                    value={formData.habitaciones}
+                    onChange={handleChange}
+                  />
+                  
+                  <MultiSelect
+                    label="Estado"
+                    name="estado"
+                    options={["Entrar a Vivir", "Actualizar", "A Reformar"]}
+                    value={formData.estado}
+                    onChange={handleChange}
+                  />
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Metros² *</label>
+                    <input
+                      name="m2"
+                      type="number"
+                      value={formData.m2}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+    
+              {/* Ubicación y Acceso */}
+              <div className="form-section">
+                <h4 className="text-lg font-medium text-gray-900 mb-3">Ubicación y Acceso</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Ascensor</label>
+                    <select
+                      name="ascensor"
+                      value={formData.ascensor || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="SÍ">SÍ</option>
+                      <option value="Después de 1º">Después de 1º</option>
+                      <option value="Después de 2º">Después de 2º</option>
+                      <option value="Después de 3º">Después de 3º</option>
+                      <option value="Después de 4º">Después de 4º</option>
+                      <option value="Después de 5º">Después de 5º</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Bajos</label>
+                    <select
+                      name="bajos"
+                      value={formData.bajos || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="SÍ">SÍ</option>
+                      <option value="NO">NO</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Entreplanta</label>
+                    <select
+                      name="entreplanta"
+                      value={formData.entreplanta || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="SÍ">SÍ</option>
+                      <option value="NO">NO</option>
+                    </select>
+                  </div>
+                  
+                  <MultiSelect
+                    label="Altura"
+                    name="altura"
+                    options={["PRIMERAS PLANTAS", "PLANTAS INTERMEDIAS", "ÚLTIMAS PLANTAS"]}
+                    value={formData.altura}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+    
+              {/* Transporte */}
+              <div className="form-section">
+                <h4 className="text-lg font-medium text-gray-900 mb-3">Transporte</h4>
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Cercanía Metro</label>
+                    <select
+                      name="cercania_metro"
+                      value={formData.cercania_metro || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="0-5 MIN">0-5 MIN</option>
+                      <option value="5-10 MIN">5-10 MIN</option>
+                      <option value="10-15 MIN">10-15 MIN</option>
+                      <option value="15-20 MIN">15-20 MIN</option>
+                      <option value="+20 MIN">+20 MIN</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+    
+              {/* Espacios Exteriores */}
+              <div className="form-section">
+                <h4 className="text-lg font-medium text-gray-900 mb-3">Espacios Exteriores</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Balcón/Terraza</label>
+                    <select
+                      name="balcon_terraza"
+                      value={formData.balcon_terraza || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="SÍ">SÍ</option>
+                      <option value="INDIFERENTE">INDIFERENTE</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Patio</label>
+                    <select
+                      name="patio"
+                      value={formData.patio || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="SÍ">SÍ</option>
+                      <option value="INDIFERENTE">INDIFERENTE</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Interior</label>
+                    <select
+                      name="interior"
+                      value={formData.interior || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="EXTERIOR">EXTERIOR</option>
+                      <option value="INTERIOR">INTERIOR</option>
+                      <option value="INDIFERENTE">INDIFERENTE</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+    
+              {/* Información Adicional */}
+              <div className="form-section">
+                <h4 className="text-lg font-medium text-gray-900 mb-3">Información Adicional</h4>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Características Adicionales</label>
+                  <textarea
+                    name="caracteristicas_adicionales"
+                    value={formData.caracteristicas_adicionales || ''}
+                    onChange={handleChange}
+                    placeholder="Detalles adicionales sobre las preferencias del cliente..."
+                    rows="4"
+                    className="w-full form-input"
+                  />
+                </div>
               </div>
               
-              <div className="flex justify-end space-x-4 pt-4">
+              <div className="flex justify-end space-x-4 pt-4 border-t border-gray-200">
                 <button
                   type="button"
                   onClick={onCancel}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
+                  className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 btn-primary"
+                  className="px-6 py-2 btn-primary"
                 >
                   ✅ Guardar Cambios
                 </button>
@@ -2765,6 +3011,7 @@
     };
     
     // ✅ MODAL DE EDICIÓN DE PISO
+    // ✅ MODAL DE EDICIÓN DE PISO - COMPLETO CON TODOS LOS PARÁMETROS
     const PisoEditModal = ({ piso, onSave, onCancel }) => {
       const [formData, setFormData] = useState(piso);
     
@@ -2780,178 +3027,315 @@
     
       return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg p-6 max-w-6xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-semibold mb-4">
               ✏️ Editar Piso: {piso.direccion || `ID ${piso.id}`}
             </h3>
             
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* Información Básica */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
-                  <input
-                    name="direccion"
-                    value={formData.direccion || ''}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Zona *</label>
-                  <select
-                    name="zona"
-                    value={formData.zona || ''}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                    required
-                  >
-                    <option value="">Seleccionar zona</option>
-                    <option value="ALTO">ALTO</option>
-                    <option value="OLIVOS">OLIVOS</option>
-                    <option value="LAGUNA">LAGUNA</option>
-                    <option value="BATÁN">BATÁN</option>
-                    <option value="SEPÚLVEDA">SEPÚLVEDA</option>
-                    <option value="MANZANARES">MANZANARES</option>
-                    <option value="PÍO">PÍO</option>
-                    <option value="PUERTA">PUERTA</option>
-                    <option value="JESUITAS">JESUITAS</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Subzonas</label>
-                  <input
-                    name="subzonas"
-                    value={formData.subzonas || ''}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Precio (€) *</label>
-                  <input
-                    name="precio"
-                    type="number"
-                    value={formData.precio}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Metros² *</label>
-                  <input
-                    name="m2"
-                    type="number"
-                    value={formData.m2}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Habitaciones</label>
-                  <select
-                    name="habitaciones"
-                    value={formData.habitaciones || ''}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="0">0</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                  <select
-                    name="estado"
-                    value={formData.estado || ''}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="Entrar a Vivir">Entrar a Vivir</option>
-                    <option value="Actualizar">Actualizar</option>
-                    <option value="A Reformar">A Reformar</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ascensor</label>
-                  <select
-                    name="ascensor"
-                    value={formData.ascensor || ''}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="SÍ">SÍ</option>
-                    <option value="NO">NO</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Planta</label>
-                  <select
-                    name="planta"
-                    value={formData.planta || ''}
-                    onChange={handleChange}
-                    className="w-full form-input"
-                  >
-                    <option value="">Seleccionar</option>
-                    <option value="-1">-1</option>
-                    <option value="0">0</option>
-                    <option value="Entreplanta">Entreplanta</option>
-                    {[...Array(15).keys()].map(i => (
-                      <option key={i + 1} value={i + 1}>{i + 1}</option>
-                    ))}
-                  </select>
+              <div className="form-section">
+                <h4 className="text-lg font-medium text-gray-900 mb-3">Información Básica</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                    <input
+                      name="direccion"
+                      value={formData.direccion || ''}
+                      onChange={handleChange}
+                      placeholder="Dirección completa"
+                      className="w-full form-input"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Zona *</label>
+                    <select
+                      name="zona"
+                      value={formData.zona || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                      required
+                    >
+                      <option value="">Seleccionar zona</option>
+                      <option value="ALTO">ALTO</option>
+                      <option value="OLIVOS">OLIVOS</option>
+                      <option value="LAGUNA">LAGUNA</option>
+                      <option value="BATÁN">BATÁN</option>
+                      <option value="SEPÚLVEDA">SEPÚLVEDA</option>
+                      <option value="MANZANARES">MANZANARES</option>
+                      <option value="PÍO">PÍO</option>
+                      <option value="PUERTA">PUERTA</option>
+                      <option value="JESUITAS">JESUITAS</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Subzonas</label>
+                    <input
+                      name="subzonas"
+                      value={formData.subzonas || ''}
+                      onChange={handleChange}
+                      placeholder="Subzonas específicas"
+                      className="w-full form-input"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Precio (€) *</label>
+                    <input
+                      name="precio"
+                      type="number"
+                      value={formData.precio}
+                      onChange={handleChange}
+                      placeholder="Precio en euros"
+                      className="w-full form-input"
+                      required
+                    />
+                  </div>
                 </div>
               </div>
     
-              {/* MultiSelect para Tipo de Vivienda */}
-              <MultiSelect
-                label="Tipo de Vivienda"
-                name="tipo_vivienda"
-                options={["Piso", "Ático", "Chalet", "Local"]}
-                value={formData.tipo_vivienda}
-                onChange={handleChange}
-              />
+              {/* Características de la Vivienda */}
+              <div className="form-section">
+                <h4 className="text-lg font-medium text-gray-900 mb-3">Características de la Vivienda</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <MultiSelect
+                    label="Tipo de Vivienda"
+                    name="tipo_vivienda"
+                    options={["Piso", "Ático", "Chalet", "Local"]}
+                    value={formData.tipo_vivienda}
+                    onChange={handleChange}
+                  />
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Habitaciones</label>
+                    <select
+                      name="habitaciones"
+                      value={formData.habitaciones || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar habitaciones</option>
+                      <option value="0">0</option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Metros² *</label>
+                    <input
+                      name="m2"
+                      type="number"
+                      value={formData.m2}
+                      onChange={handleChange}
+                      placeholder="Metros cuadrados"
+                      className="w-full form-input"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                    <select
+                      name="estado"
+                      value={formData.estado || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar estado</option>
+                      <option value="Entrar a Vivir">Entrar a Vivir</option>
+                      <option value="Actualizar">Actualizar</option>
+                      <option value="A Reformar">A Reformar</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
     
-              {/* Características Adicionales */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Características Adicionales</label>
-                <textarea
-                  name="caracteristicas_adicionales"
-                  value={formData.caracteristicas_adicionales || ''}
-                  onChange={handleChange}
-                  rows="3"
-                  className="w-full form-input"
-                />
+              {/* Ubicación y Acceso */}
+              <div className="form-section">
+                <h4 className="text-lg font-medium text-gray-900 mb-3">Ubicación y Acceso</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Ascensor</label>
+                    <select
+                      name="ascensor"
+                      value={formData.ascensor || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="SÍ">SÍ</option>
+                      <option value="NO">NO</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Bajos</label>
+                    <select
+                      name="bajos"
+                      value={formData.bajos || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="SÍ">SÍ</option>
+                      <option value="NO">NO</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Entreplanta</label>
+                    <select
+                      name="entreplanta"
+                      value={formData.entreplanta || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="SÍ">SÍ</option>
+                      <option value="NO">NO</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Planta</label>
+                    <select
+                      name="planta"
+                      value={formData.planta || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar planta</option>
+                      <option value="-1">-1</option>
+                      <option value="0">0</option>
+                      <option value="Entreplanta">Entreplanta</option>
+                      {[...Array(15).keys()].map(i => (
+                        <option key={i + 1} value={i + 1}>{i + 1}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Altura</label>
+                    <select
+                      name="altura"
+                      value={formData.altura || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="PRIMERAS PLANTAS">PRIMERAS PLANTAS</option>
+                      <option value="PLANTAS INTERMEDIAS">PLANTAS INTERMEDIAS</option>
+                      <option value="ÚLTIMAS PLANTAS">ÚLTIMAS PLANTAS</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+    
+              {/* Transporte */}
+              <div className="form-section">
+                <h4 className="text-lg font-medium text-gray-900 mb-3">Transporte</h4>
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Cercanía Metro</label>
+                    <select
+                      name="cercania_metro"
+                      value={formData.cercania_metro || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="0-5 MIN">0-5 MIN</option>
+                      <option value="5-10 MIN">5-10 MIN</option>
+                      <option value="10-15 MIN">10-15 MIN</option>
+                      <option value="15-20 MIN">15-20 MIN</option>
+                      <option value="+20 MIN">+20 MIN</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+    
+              {/* Espacios Exteriores */}
+              <div className="form-section">
+                <h4 className="text-lg font-medium text-gray-900 mb-3">Espacios Exteriores</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Balcón/Terraza</label>
+                    <select
+                      name="balcon_terraza"
+                      value={formData.balcon_terraza || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="SÍ">SÍ</option>
+                      <option value="NO">NO</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Patio</label>
+                    <select
+                      name="patio"
+                      value={formData.patio || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="SÍ">SÍ</option>
+                      <option value="NO">NO</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Interior</label>
+                    <select
+                      name="interior"
+                      value={formData.interior || ''}
+                      onChange={handleChange}
+                      className="w-full form-input"
+                    >
+                      <option value="">Seleccionar</option>
+                      <option value="EXTERIOR">EXTERIOR</option>
+                      <option value="INTERIOR">INTERIOR</option>
+                      <option value="AMBOS">AMBOS</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+    
+              {/* Información Adicional */}
+              <div className="form-section">
+                <h4 className="text-lg font-medium text-gray-900 mb-3">Información Adicional</h4>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Características Adicionales</label>
+                  <textarea
+                    name="caracteristicas_adicionales"
+                    value={formData.caracteristicas_adicionales || ''}
+                    onChange={handleChange}
+                    placeholder="Detalles adicionales sobre la propiedad..."
+                    rows="4"
+                    className="w-full form-input"
+                  />
+                </div>
               </div>
               
-              <div className="flex justify-end space-x-4 pt-4">
+              <div className="flex justify-end space-x-4 pt-4 border-t border-gray-200">
                 <button
                   type="button"
                   onClick={onCancel}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
+                  className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 btn-primary"
+                  className="px-6 py-2 btn-primary"
                 >
                   ✅ Guardar Cambios
                 </button>
