@@ -1448,7 +1448,7 @@
             {results.length > 0 && (
               <div className="mt-8">
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  Clientes Compatibles ({results.length}) - Ordenados por Compatibilidad
+                  Clientes Compatibles Pendientes ({results.filter(match => match.estado === 'Pendiente' || match.estado === 'No contesta').length}) - Ordenados por Compatibilidad
                 </h3>
                 
                 {/* Tabla con scroll horizontal y todas las columnas */}
