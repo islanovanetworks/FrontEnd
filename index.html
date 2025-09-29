@@ -180,17 +180,23 @@
   <script type="text/babel">
     const { useState, useEffect } = React;
 
+    // Declarar hostname fuera del IIFE
+    const hostname = window.location.hostname;
+
     // ✅ Multi-environment API detection
     const API_BASE = (() => {
-      const hostname = window.location.hostname;
-      
-      // Test environment detection
-      if (hostname.includes('test') || hostname.includes('flame')) {
-        return "https://matchingprops-backend-test.onrender.com"; // ← URL de tu backend test
+      // Development/Test environment detection
+      // Detecta automáticamente si estás en entorno de test
+      if (hostname.includes('testfrontend-umber.vercel.app') ||  // ← TU NUEVO VERCEL TEST
+          hostname.includes('testfrontend-lf66') ||              // ← Preview deployments
+          hostname.includes('front-end-dra8') ||                  // ← Mantener por compatibilidad
+          hostname.includes('localhost') ||
+          hostname.includes('127.0.0.1')) {
+        return "https://matchingprops-backend-test.onrender.com";
       }
       
-      // Production environment (mantener URL actual)
-      return "https://matchingprops.onrender.com"; // ← Tu URL de backend producción actual
+      // Production environment
+      return "https://matchingprops.onrender.com";
     })();
     
     // ✅ Environment indicator for debugging
