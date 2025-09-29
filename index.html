@@ -180,10 +180,11 @@
   <script type="text/babel">
     const { useState, useEffect } = React;
 
-    // ✅ Multi-environment API detection
+    // Declarar hostname FUERA para que sea accesible en todo el script
+    const hostname = window.location.hostname;
+
+    // Multi-environment API detection
     const API_BASE = (() => {
-      const hostname = window.location.hostname;
-      
       // Test/Development environment detection
       if (hostname.includes('testingfront-end-vndu') ||
           hostname.includes('front-end-dra8') ||
@@ -196,12 +197,24 @@
       return "https://matchingprops.onrender.com";
     })();
     
-    // ✅ Environment indicator for debugging
+    // Environment indicator for debugging
     const ENV_NAME = API_BASE.includes('test') ? 'TEST/DEV' : 'PRODUCTION';
     console.log(`🌍 Environment: ${ENV_NAME}`);
     console.log(`📡 API Base: ${API_BASE}`);
-    console.log(`🖥️ Frontend Host: ${window.location.hostname}`);
+    console.log(`🖥️ Frontend Host: ${hostname}`);
     console.log(`🔗 Full Backend URL: ${API_BASE}`);
+    
+    // VERIFICACIÓN CRÍTICA - Alertar si hay inconsistencia
+    if ((hostname.includes('testingfront-end-vndu') || hostname.includes('front-end-dra8')) && !API_BASE.includes('test')) {
+      console.error('⚠️ WARNING: Frontend is TEST but Backend is PRODUCTION!');
+      console.error('⚠️ This will cause authentication errors!');
+      alert('⚠️ ERROR DE CONFIGURACIÓN: Frontend TEST apunta a Backend PRODUCTION');
+    }
+    if (hostname.includes('front-end-ygjn') && API_BASE.includes('test')) {
+      console.error('⚠️ WARNING: Frontend is PRODUCTION but Backend is TEST!');
+      console.error('⚠️ This will cause authentication errors!');
+      alert('⚠️ ERROR DE CONFIGURACIÓN: Frontend PRODUCTION apunta a Backend TEST');
+    }
     
     let token = null;
     let companiaId = null;
