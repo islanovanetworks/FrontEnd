@@ -540,12 +540,13 @@
               <h3>Ubicación</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <MultiSelect
-                  label="Zona"
+                  label="Zona *"
                   name="zona"
-                  options={["ALTO", "OLIVOS", "LAGUNA", "BATÁN", "SEPÚLVEDA", "MANZANARES", "PÍO", "PUERTA", "JESUITAS"]}
+                  options={zonasDisponibles.length > 0 ? zonasDisponibles : ["ALTO", "OLIVOS", "LAGUNA", "BATÁN", "SEPÚLVEDA", "MANZANARES", "PÍO", "PUERTA", "JESUITAS"]}
                   value={formData.zona}
                   onChange={handleChange}
                   required={true}
+                  disabled={loadingZonas}
                 />
                 
                 <div>
@@ -928,18 +929,32 @@
                     onChange={handleChange}
                     className="w-full form-input"
                     required
+                    disabled={loadingZonas}
                   >
-                    <option value="">Seleccionar zona</option>
-                    <option value="ALTO">ALTO</option>
-                    <option value="OLIVOS">OLIVOS</option>
-                    <option value="LAGUNA">LAGUNA</option>
-                    <option value="BATÁN">BATÁN</option>
-                    <option value="SEPÚLVEDA">SEPÚLVEDA</option>
-                    <option value="MANZANARES">MANZANARES</option>
-                    <option value="PÍO">PÍO</option>
-                    <option value="PUERTA">PUERTA</option>
-                    <option value="JESUITAS">JESUITAS</option>
+                    <option value="">
+                      {loadingZonas ? 'Cargando zonas...' : 'Seleccionar zona'}
+                    </option>
+                    {zonasDisponibles.length > 0 ? (
+                      zonasDisponibles.map(zona => (
+                        <option key={zona} value={zona}>{zona}</option>
+                      ))
+                    ) : (
+                      <>
+                        <option value="ALTO">ALTO</option>
+                        <option value="OLIVOS">OLIVOS</option>
+                        <option value="LAGUNA">LAGUNA</option>
+                        <option value="BATÁN">BATÁN</option>
+                        <option value="SEPÚLVEDA">SEPÚLVEDA</option>
+                        <option value="MANZANARES">MANZANARES</option>
+                        <option value="PÍO">PÍO</option>
+                        <option value="PUERTA">PUERTA</option>
+                        <option value="JESUITAS">JESUITAS</option>
+                      </>
+                    )}
                   </select>
+                  {loadingZonas && (
+                    <p className="text-xs text-gray-500 mt-1">⏳ Cargando zonas de tu compañía...</p>
+                  )}
                 </div>
                 
                 <div>
@@ -2813,13 +2828,14 @@
                 <h4 className="text-lg font-medium text-gray-900 mb-3">Ubicación</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <MultiSelect
-                    label="Zona *"
-                    name="zona"
-                    options={["ALTO", "OLIVOS", "LAGUNA", "BATÁN", "SEPÚLVEDA", "MANZANARES", "PÍO", "PUERTA", "JESUITAS"]}
-                    value={formData.zona}
-                    onChange={handleChange}
-                    required={true}
-                  />
+                  label="Zona *"
+                  name="zona"
+                  options={zonasDisponibles.length > 0 ? zonasDisponibles : ["ALTO", "OLIVOS", "LAGUNA", "BATÁN", "SEPÚLVEDA", "MANZANARES", "PÍO", "PUERTA", "JESUITAS"]}
+                  value={formData.zona}
+                  onChange={handleChange}
+                  required={true}
+                  disabled={loadingZonas}
+                />
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Subzonas</label>
@@ -3143,18 +3159,32 @@
                       onChange={handleChange}
                       className="w-full form-input"
                       required
+                      disabled={loadingZonas}
                     >
-                      <option value="">Seleccionar zona</option>
-                      <option value="ALTO">ALTO</option>
-                      <option value="OLIVOS">OLIVOS</option>
-                      <option value="LAGUNA">LAGUNA</option>
-                      <option value="BATÁN">BATÁN</option>
-                      <option value="SEPÚLVEDA">SEPÚLVEDA</option>
-                      <option value="MANZANARES">MANZANARES</option>
-                      <option value="PÍO">PÍO</option>
-                      <option value="PUERTA">PUERTA</option>
-                      <option value="JESUITAS">JESUITAS</option>
+                      <option value="">
+                        {loadingZonas ? 'Cargando zonas...' : 'Seleccionar zona'}
+                      </option>
+                      {zonasDisponibles.length > 0 ? (
+                        zonasDisponibles.map(zona => (
+                          <option key={zona} value={zona}>{zona}</option>
+                        ))
+                      ) : (
+                        <>
+                          <option value="ALTO">ALTO</option>
+                          <option value="OLIVOS">OLIVOS</option>
+                          <option value="LAGUNA">LAGUNA</option>
+                          <option value="BATÁN">BATÁN</option>
+                          <option value="SEPÚLVEDA">SEPÚLVEDA</option>
+                          <option value="MANZANARES">MANZANARES</option>
+                          <option value="PÍO">PÍO</option>
+                          <option value="PUERTA">PUERTA</option>
+                          <option value="JESUITAS">JESUITAS</option>
+                        </>
+                      )}
                     </select>
+                    {loadingZonas && (
+                      <p className="text-xs text-gray-500 mt-1">⏳ Cargando zonas de tu compañía...</p>
+                    )}
                   </div>
                   
                   <div>
@@ -3629,6 +3659,8 @@
       const [activeSection, setActiveSection] = useState('clientes');
       const [userRole, setUserRole] = useState(null);
       const [showTrialExpiredModal, setShowTrialExpiredModal] = useState(false);
+      const [zonasDisponibles, setZonasDisponibles] = useState([]);  // NUEVO: Estado para zonas dinámicas
+      const [loadingZonas, setLoadingZonas] = useState(false);  // NUEVO: Estado de carga de zonas
     
       const handleLogin = () => {
         // Extraer rol del token
@@ -3637,6 +3669,9 @@
           setUserRole(payload.rol);
         }
         setIsLoggedIn(true);
+
+        // NUEVO: Cargar zonas después del login
+        loadZonasDisponibles();
         
         // Mostrar modal si la prueba ha caducado
         if (!window.trialActive) {
@@ -3644,9 +3679,53 @@
         }
       };
 
+      // NUEVA FUNCIÓN: Cargar zonas de la compañía del usuario
+      const loadZonasDisponibles = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          setZonasDisponibles(["ALTO", "OLIVOS", "LAGUNA", "BATÁN", "SEPÚLVEDA", "MANZANARES", "PÍO", "PUERTA", "JESUITAS"]);
+          return;
+        }
+        
+        setLoadingZonas(true);
+        try {
+          const response = await fetch(`${API_URL}/companias/zonas/`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+          });
+          
+          if (response.ok) {
+            const zonasData = await response.json();
+            const zonasNombres = zonasData.map(z => z.zona);
+            setZonasDisponibles(zonasNombres);
+            console.log('✅ Zonas cargadas:', zonasNombres);
+          } else {
+            console.warn('⚠️ No se pudieron cargar zonas, usando zonas por defecto');
+            // Fallback a zonas por defecto si falla la carga
+            setZonasDisponibles(["ALTO", "OLIVOS", "LAGUNA", "BATÁN", "SEPÚLVEDA", "MANZANARES", "PÍO", "PUERTA", "JESUITAS"]);
+          }
+        } catch (error) {
+          console.error('❌ Error cargando zonas:', error);
+          // Fallback a zonas por defecto si falla la carga
+          setZonasDisponibles(["ALTO", "OLIVOS", "LAGUNA", "BATÁN", "SEPÚLVEDA", "MANZANARES", "PÍO", "PUERTA", "JESUITAS"]);
+        } finally {
+          setLoadingZonas(false);
+        }
+      };
+
       const handleRegister = () => {
         // Refresh data after registration if needed
       };
+
+      // NUEVO: useEffect para cargar zonas al iniciar la app si ya hay sesión
+      useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token && isLoggedIn) {
+          loadZonasDisponibles();
+        }
+      }, [isLoggedIn]);
 
       const renderActiveSection = () => {
         switch(activeSection) {
