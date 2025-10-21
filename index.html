@@ -305,6 +305,14 @@
             token = data.access_token;
             const payload = JSON.parse(atob(data.access_token.split(".")[1]));
             companiaId = payload.compania_id;
+            
+            // Verificar estado de la prueba gratuita
+            const trialResponse = await fetch(`${API_BASE}/companias/${companiaId}/trial-status`);
+            const trialData = await trialResponse.json();
+            
+            // Guardar estado del trial
+            window.trialActive = trialData.trial_active;
+            
             onLogin();
           } else {
             alert("Credenciales incorrectas. Por favor, inténtalo de nuevo.");
@@ -1285,6 +1293,12 @@
       };
     
       const handleSearch = async () => {
+        // Verificar si la prueba está activa
+        if (!window.trialActive) {
+          alert("⚠️ Su prueba gratuita ha caducado. No puede realizar búsquedas de matching.\n\nPóngase en contacto con el administrador para más información.");
+          return;
+        }
+        
         if (!selectedPiso) {
           alert("Por favor, selecciona un piso");
           return;
@@ -3588,10 +3602,33 @@
         </div>
       );
     };
+    // Modal de Prueba Caducada
+    const TrialExpiredModal = ({ onClose }) => (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-xl">
+          <div className="text-center">
+            <div className="text-5xl mb-4">⚠️</div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Prueba Gratuita Caducada
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Ha caducado su prueba gratuita. Póngase en contacto con el administrador para más información.
+            </p>
+            <button
+              onClick={onClose}
+              className="btn-primary px-6 py-3 font-semibold w-full"
+            >
+              Aceptar
+            </button>
+          </div>
+        </div>
+      </div>
+    );
     const App = () => {
       const [isLoggedIn, setIsLoggedIn] = useState(false);
       const [activeSection, setActiveSection] = useState('clientes');
       const [userRole, setUserRole] = useState(null);
+      const [showTrialExpiredModal, setShowTrialExpiredModal] = useState(false);
     
       const handleLogin = () => {
         // Extraer rol del token
@@ -3600,6 +3637,11 @@
           setUserRole(payload.rol);
         }
         setIsLoggedIn(true);
+        
+        // Mostrar modal si la prueba ha caducado
+        if (!window.trialActive) {
+          setShowTrialExpiredModal(true);
+        }
       };
 
       const handleRegister = () => {
@@ -3647,6 +3689,11 @@
               {renderActiveSection()}
             </div>
           </div>
+          
+          {/* Modal de prueba caducada */}
+          {showTrialExpiredModal && (
+            <TrialExpiredModal onClose={() => setShowTrialExpiredModal(false)} />
+          )}
         </div>
       );
     };
