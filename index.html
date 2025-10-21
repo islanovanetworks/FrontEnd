@@ -207,8 +207,11 @@
 
     // Multi-Select Component
     // Multi-Select Component
-    const MultiSelect = ({ label, name, options, value, onChange, required = false }) => {
+    // Multi-Select Component
+    const MultiSelect = ({ label, name, options, value, onChange, required = false, disabled = false }) => {
       const handleItemClick = (option) => {
+        if (disabled) return; // No permitir selección si está deshabilitado
+        
         const currentValues = Array.isArray(value) ? value : [];
         const isSelected = currentValues.includes(option);
         
@@ -227,16 +230,22 @@
           <label className="block text-sm font-medium text-gray-700 mb-2">
             {label} {required && '*'}
           </label>
-          <div className="multi-select-container">
-            {options.map(option => (
-              <div
-                key={option}
-                className={`multi-select-item ${Array.isArray(value) && value.includes(option) ? 'selected' : ''}`}
-                onClick={() => handleItemClick(option)}
-              >
-                {option}
+          <div className={`multi-select-container ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            {options.length === 0 ? (
+              <div className="text-sm text-gray-500 p-2">
+                No hay opciones disponibles
               </div>
-            ))}
+            ) : (
+              options.map(option => (
+                <div
+                  key={option}
+                  className={`multi-select-item ${Array.isArray(value) && value.includes(option) ? 'selected' : ''} ${disabled ? 'cursor-not-allowed' : ''}`}
+                  onClick={() => handleItemClick(option)}
+                >
+                  {option}
+                </div>
+              ))
+            )}
           </div>
         </div>
       );
@@ -536,18 +545,25 @@
             </div>
     
             {/* Ubicación */}
+            {/* Ubicación */}
             <div className="form-section">
               <h3>Ubicación</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <MultiSelect
-                  label="Zona *"
+                  label="Zona"
                   name="zona"
-                  options={zonasDisponibles.length > 0 ? zonasDisponibles : ["ALTO", "OLIVOS", "LAGUNA", "BATÁN", "SEPÚLVEDA", "MANZANARES", "PÍO", "PUERTA", "JESUITAS"]}
+                  options={zonasDisponibles}
                   value={formData.zona}
                   onChange={handleChange}
                   required={true}
-                  disabled={loadingZonas}
+                  disabled={loadingZonas || zonasDisponibles.length === 0}
                 />
+                {loadingZonas && (
+                  <p className="text-xs text-gray-500 mt-1">⏳ Cargando zonas de tu compañía...</p>
+                )}
+                {!loadingZonas && zonasDisponibles.length === 0 && (
+                  <p className="text-xs text-red-600 mt-1">⚠️ No hay zonas configuradas para tu compañía. Contacta al administrador.</p>
+                )}
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Subzonas</label>
@@ -929,31 +945,20 @@
                     onChange={handleChange}
                     className="w-full form-input"
                     required
-                    disabled={loadingZonas}
+                    disabled={loadingZonas || zonasDisponibles.length === 0}
                   >
                     <option value="">
-                      {loadingZonas ? 'Cargando zonas...' : 'Seleccionar zona'}
+                      {loadingZonas ? 'Cargando zonas...' : (zonasDisponibles.length === 0 ? 'No hay zonas configuradas' : 'Seleccionar zona')}
                     </option>
-                    {zonasDisponibles.length > 0 ? (
-                      zonasDisponibles.map(zona => (
-                        <option key={zona} value={zona}>{zona}</option>
-                      ))
-                    ) : (
-                      <>
-                        <option value="ALTO">ALTO</option>
-                        <option value="OLIVOS">OLIVOS</option>
-                        <option value="LAGUNA">LAGUNA</option>
-                        <option value="BATÁN">BATÁN</option>
-                        <option value="SEPÚLVEDA">SEPÚLVEDA</option>
-                        <option value="MANZANARES">MANZANARES</option>
-                        <option value="PÍO">PÍO</option>
-                        <option value="PUERTA">PUERTA</option>
-                        <option value="JESUITAS">JESUITAS</option>
-                      </>
-                    )}
+                    {zonasDisponibles.map(zona => (
+                      <option key={zona} value={zona}>{zona}</option>
+                    ))}
                   </select>
                   {loadingZonas && (
                     <p className="text-xs text-gray-500 mt-1">⏳ Cargando zonas de tu compañía...</p>
+                  )}
+                  {!loadingZonas && zonasDisponibles.length === 0 && (
+                    <p className="text-xs text-red-600 mt-1">⚠️ No hay zonas configuradas para tu compañía. Contacta al administrador.</p>
                   )}
                 </div>
                 
@@ -2824,18 +2829,19 @@
               </div>
     
               {/* Ubicación */}
+              {/* Ubicación */}
               <div className="form-section">
                 <h4 className="text-lg font-medium text-gray-900 mb-3">Ubicación</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <MultiSelect
-                  label="Zona *"
-                  name="zona"
-                  options={zonasDisponibles.length > 0 ? zonasDisponibles : ["ALTO", "OLIVOS", "LAGUNA", "BATÁN", "SEPÚLVEDA", "MANZANARES", "PÍO", "PUERTA", "JESUITAS"]}
-                  value={formData.zona}
-                  onChange={handleChange}
-                  required={true}
-                  disabled={loadingZonas}
-                />
+                    label="Zona *"
+                    name="zona"
+                    options={zonasDisponibles}
+                    value={formData.zona}
+                    onChange={handleChange}
+                    required={true}
+                    disabled={loadingZonas || zonasDisponibles.length === 0}
+                  />
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Subzonas</label>
@@ -3159,31 +3165,20 @@
                       onChange={handleChange}
                       className="w-full form-input"
                       required
-                      disabled={loadingZonas}
+                      disabled={loadingZonas || zonasDisponibles.length === 0}
                     >
                       <option value="">
-                        {loadingZonas ? 'Cargando zonas...' : 'Seleccionar zona'}
+                        {loadingZonas ? 'Cargando zonas...' : (zonasDisponibles.length === 0 ? 'No hay zonas configuradas' : 'Seleccionar zona')}
                       </option>
-                      {zonasDisponibles.length > 0 ? (
-                        zonasDisponibles.map(zona => (
-                          <option key={zona} value={zona}>{zona}</option>
-                        ))
-                      ) : (
-                        <>
-                          <option value="ALTO">ALTO</option>
-                          <option value="OLIVOS">OLIVOS</option>
-                          <option value="LAGUNA">LAGUNA</option>
-                          <option value="BATÁN">BATÁN</option>
-                          <option value="SEPÚLVEDA">SEPÚLVEDA</option>
-                          <option value="MANZANARES">MANZANARES</option>
-                          <option value="PÍO">PÍO</option>
-                          <option value="PUERTA">PUERTA</option>
-                          <option value="JESUITAS">JESUITAS</option>
-                        </>
-                      )}
+                      {zonasDisponibles.map(zona => (
+                        <option key={zona} value={zona}>{zona}</option>
+                      ))}
                     </select>
                     {loadingZonas && (
-                      <p className="text-xs text-gray-500 mt-1">⏳ Cargando zonas de tu compañía...</p>
+                      <p className="text-xs text-gray-500 mt-1">⏳ Cargando zonas...</p>
+                    )}
+                    {!loadingZonas && zonasDisponibles.length === 0 && (
+                      <p className="text-xs text-red-600 mt-1">⚠️ No hay zonas configuradas.</p>
                     )}
                   </div>
                   
@@ -3663,6 +3658,9 @@
       const [loadingZonas, setLoadingZonas] = useState(false);  // NUEVO: Estado de carga de zonas
     
       const handleLogin = () => {
+        // Guardar token en localStorage
+        localStorage.setItem('token', token);
+        
         // Extraer rol del token
         if (token) {
           const payload = JSON.parse(atob(token.split(".")[1]));
@@ -3680,16 +3678,17 @@
       };
 
       // NUEVA FUNCIÓN: Cargar zonas de la compañía del usuario
+      // NUEVA FUNCIÓN: Cargar zonas de la compañía del usuario
       const loadZonasDisponibles = async () => {
-        const token = localStorage.getItem('token');
         if (!token) {
-          setZonasDisponibles(["ALTO", "OLIVOS", "LAGUNA", "BATÁN", "SEPÚLVEDA", "MANZANARES", "PÍO", "PUERTA", "JESUITAS"]);
+          setZonasDisponibles([]);
+          console.warn('⚠️ No hay token, no se pueden cargar zonas');
           return;
         }
         
         setLoadingZonas(true);
         try {
-          const response = await fetch(`${API_URL}/companias/zonas/`, {
+          const response = await fetch(`${API_BASE}/companias/zonas/`, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json'
@@ -3700,16 +3699,22 @@
             const zonasData = await response.json();
             const zonasNombres = zonasData.map(z => z.zona);
             setZonasDisponibles(zonasNombres);
-            console.log('✅ Zonas cargadas:', zonasNombres);
+            console.log('✅ Zonas cargadas para tu compañía:', zonasNombres);
+            
+            // Si no hay zonas, alertar al usuario
+            if (zonasNombres.length === 0) {
+              console.error('⚠️ ADVERTENCIA: Esta compañía no tiene zonas configuradas. Por favor, registra zonas usando el endpoint POST /companias/zonas/');
+              alert('⚠️ Esta compañía no tiene zonas configuradas. Contacta al administrador para registrar las zonas.');
+            }
           } else {
-            console.warn('⚠️ No se pudieron cargar zonas, usando zonas por defecto');
-            // Fallback a zonas por defecto si falla la carga
-            setZonasDisponibles(["ALTO", "OLIVOS", "LAGUNA", "BATÁN", "SEPÚLVEDA", "MANZANARES", "PÍO", "PUERTA", "JESUITAS"]);
+            console.error('❌ Error al cargar zonas:', response.status);
+            setZonasDisponibles([]);
+            alert('❌ Error al cargar las zonas de tu compañía. Por favor, recarga la página o contacta al administrador.');
           }
         } catch (error) {
           console.error('❌ Error cargando zonas:', error);
-          // Fallback a zonas por defecto si falla la carga
-          setZonasDisponibles(["ALTO", "OLIVOS", "LAGUNA", "BATÁN", "SEPÚLVEDA", "MANZANARES", "PÍO", "PUERTA", "JESUITAS"]);
+          setZonasDisponibles([]);
+          alert('❌ Error de conexión al cargar las zonas. Por favor, verifica tu conexión e intenta de nuevo.');
         } finally {
           setLoadingZonas(false);
         }
@@ -3718,14 +3723,6 @@
       const handleRegister = () => {
         // Refresh data after registration if needed
       };
-
-      // NUEVO: useEffect para cargar zonas al iniciar la app si ya hay sesión
-      useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token && isLoggedIn) {
-          loadZonasDisponibles();
-        }
-      }, [isLoggedIn]);
 
       const renderActiveSection = () => {
         switch(activeSection) {
