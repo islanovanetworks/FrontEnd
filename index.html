@@ -2224,7 +2224,7 @@
     };
     // ✅ COMPONENTE DE GESTIÓN DE CLIENTES - CORREGIDO
     // ✅ COMPONENTE DE GESTIÓN DE CLIENTES - CORREGIDO
-    const ClientesManagement = ({ userRole }) => {
+    const ClientesManagement = ({ userRole, zonasDisponibles = [], loadingZonas = false }) => {
       const [clientes, setClientes] = useState([]);
       const [asesores, setAsesores] = useState([]);
       const [loading, setLoading] = useState(true);
@@ -2517,6 +2517,8 @@
                 setShowEditModal(false);
                 setEditingCliente(null);
               }}
+              zonasDisponibles={zonasDisponibles}
+              loadingZonas={loadingZonas}
             />
           )}
         </div>
@@ -2761,7 +2763,7 @@
     
     // ✅ MODAL DE EDICIÓN DE CLIENTE
     // ✅ MODAL DE EDICIÓN DE CLIENTE - COMPLETO CON TODOS LOS PARÁMETROS
-    const ClienteEditModal = ({ cliente, onSave, onCancel }) => {
+    const ClienteEditModal = ({ cliente, onSave, onCancel, zonasDisponibles = [], loadingZonas = false }) => {
       const [formData, setFormData] = useState(cliente);
     
       const handleChange = (e) => {
@@ -3740,7 +3742,7 @@
           case 'searchPisos':
             return <SearchPisos />;
           case 'gestionClientes':
-            return <ClientesManagement userRole={userRole} />;
+            return <ClientesManagement userRole={userRole} zonasDisponibles={zonasDisponibles} loadingZonas={loadingZonas} />;
           case 'gestionPisos':
             return userRole === 'Supervisor' ? <PisosManagement zonasDisponibles={zonasDisponibles} loadingZonas={loadingZonas} /> : <div className="text-center py-8 text-red-500">Acceso denegado - Solo Supervisores</div>;
           default:
