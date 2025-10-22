@@ -389,7 +389,7 @@
     };
 
     // Client Form Component
-    const ClientForm = ({ onRegister }) => {
+    const ClientForm = ({ onRegister, zonasDisponibles = [], loadingZonas = false }) => {
       const [formData, setFormData] = useState({
         nombre: "", telefono: "", zona: [], subzonas: "", entrada: "", precio: "",
         tipo_vivienda: [], finalidad: [], habitaciones: [], estado: [],
@@ -851,8 +851,8 @@
       );
     };
 
-// Piso Form Component
-    const PisoForm = ({ onRegister }) => {
+    // Piso Form Component
+    const PisoForm = ({ onRegister, zonasDisponibles = [], loadingZonas = false }) => {
       const [formData, setFormData] = useState({
         direccion: "", zona: "", subzonas: "", precio: "", tipo_vivienda: [], habitaciones: "", estado: "",
         ascensor: "", bajos: "", entreplanta: "", planta: "", m2: "", altura: "", cercania_metro: "",
@@ -2524,7 +2524,9 @@
     };
     
     // ✅ COMPONENTE DE GESTIÓN DE PISOS - COMPLETO Y CORREGIDO
-    const PisosManagement = () => {
+    // ✅ COMPONENTE DE GESTIÓN DE PISOS - COMPLETO Y CORREGIDO
+    // ✅ COMPONENTE DE GESTIÓN DE PISOS - COMPLETO Y CORREGIDO
+    const PisosManagement = ({ zonasDisponibles = [], loadingZonas = false }) => {
       const [pisos, setPisos] = useState([]);
       const [loading, setLoading] = useState(true);
       const [editingPiso, setEditingPiso] = useState(null);
@@ -2740,6 +2742,7 @@
           </div>
     
           {/* Modal de Edición de Pisos */}
+          {/* Modal de Edición */}
           {showEditModal && editingPiso && (
             <PisoEditModal
               piso={editingPiso}
@@ -2748,6 +2751,8 @@
                 setShowEditModal(false);
                 setEditingPiso(null);
               }}
+              zonasDisponibles={zonasDisponibles}
+              loadingZonas={loadingZonas}
             />
           )}
         </div>
@@ -3119,9 +3124,9 @@
       );
     };
     
-    // ✅ MODAL DE EDICIÓN DE PISO
+
     // ✅ MODAL DE EDICIÓN DE PISO - COMPLETO CON TODOS LOS PARÁMETROS
-    const PisoEditModal = ({ piso, onSave, onCancel }) => {
+    const PisoEditModal = ({ piso, onSave, onCancel, zonasDisponibles = [], loadingZonas = false }) => {
       const [formData, setFormData] = useState(piso);
     
       const handleChange = (e) => {
@@ -3727,9 +3732,9 @@
       const renderActiveSection = () => {
         switch(activeSection) {
           case 'clientes':
-            return <ClientForm onRegister={handleRegister} userRole={userRole} />;
+            return <ClientForm onRegister={handleRegister} userRole={userRole} zonasDisponibles={zonasDisponibles} loadingZonas={loadingZonas} />;
           case 'pisos':
-            return <PisoForm onRegister={handleRegister} />;
+            return <PisoForm onRegister={handleRegister} zonasDisponibles={zonasDisponibles} loadingZonas={loadingZonas} />;
           case 'searchClientes':
             return <SearchClientes userRole={userRole} />;
           case 'searchPisos':
@@ -3737,9 +3742,9 @@
           case 'gestionClientes':
             return <ClientesManagement userRole={userRole} />;
           case 'gestionPisos':
-            return userRole === 'Supervisor' ? <PisosManagement /> : <div className="text-center py-8 text-red-500">Acceso denegado - Solo Supervisores</div>;
+            return userRole === 'Supervisor' ? <PisosManagement zonasDisponibles={zonasDisponibles} loadingZonas={loadingZonas} /> : <div className="text-center py-8 text-red-500">Acceso denegado - Solo Supervisores</div>;
           default:
-            return <ClientForm onRegister={handleRegister} userRole={userRole} />;
+            return <ClientForm onRegister={handleRegister} userRole={userRole} zonasDisponibles={zonasDisponibles} loadingZonas={loadingZonas} />;
         }
       };
 
