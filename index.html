@@ -277,7 +277,8 @@
             { id: 'searchClientes', label: 'Buscar Clientes', icon: '🔍', roles: ['Asesor', 'Supervisor'] },
             { id: 'searchPisos', label: 'Buscar Pisos', icon: '🏢', roles: ['Asesor', 'Supervisor'] },
             { id: 'gestionClientes', label: 'Gestión de Clientes', icon: '👥', roles: ['Asesor', 'Supervisor'] },
-            { id: 'gestionPisos', label: 'Gestión de Pisos', icon: '🏗️', roles: ['Supervisor'] }
+            { id: 'gestionPisos', label: 'Gestión de Pisos', icon: '🏗️', roles: ['Supervisor'] },
+            { id: 'dashboardAsesores', label: 'Panel de Asesores', icon: '📊', roles: ['Supervisor'] }
           ].filter(item => item.roles.includes(userRole)).map(item => (
             <button
               key={item.id}
@@ -3656,6 +3657,238 @@
         </div>
       </div>
     );
+    // Dashboard de Asesores Component (Solo Supervisores)
+    const DashboardAsesores = () => {
+      const [dashboardData, setDashboardData] = useState(null);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState(null);
+
+      useEffect(() => {
+        fetchDashboardData();
+      }, []);
+
+      const fetchDashboardData = async () => {
+        setLoading(true);
+        setError(null);
+        
+        try {
+          const response = await fetch(`${API_BASE}/match/supervisor-dashboard`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            setDashboardData(data);
+          } else {
+            const errorData = await response.json();
+            setError(errorData.detail || 'Error al cargar el dashboard');
+          }
+        } catch (err) {
+          setError('Error de conexión. Por favor, intenta de nuevo.');
+          console.error('Error fetching dashboard:', err);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      if (loading) {
+        return (
+          <div className="section-card p-8">
+            <div className="text-center py-12">
+              <div className="text-2xl mb-4">⏳</div>
+              <p className="text-gray-600">Cargando dashboard...</p>
+            </div>
+          </div>
+        );
+      }
+
+      if (error) {
+        return (
+          <div className="section-card p-8">
+            <div className="text-center py-12">
+              <div className="text-4xl mb-4">❌</div>
+              <p className="text-red-600 font-semibold mb-4">{error}</p>
+              <button 
+                onClick={fetchDashboardData}
+                className="btn-primary px-6 py-3"
+              >
+                Reintentar
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="section-card p-8">
+          <div className="mb-6 flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+                📊 Panel de Supervisión de Asesores
+              </h2>
+              <p className="text-gray-600">
+                Monitorea el estado de los clientes asignados a cada asesor
+              </p>
+            </div>
+            <button 
+              onClick={fetchDashboardData}
+              className="btn-primary px-4 py-2 text-sm"
+            >
+              🔄 Actualizar
+            </button>
+          </div>
+
+          {dashboardData && dashboardData.asesores.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-4xl mb-4">📭</div>
+              <p className="text-gray-600">No hay asesores con clientes asignados en esta compañía.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {/* Resumen General */}
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">📈 Resumen General</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-blue-600">
+                      {dashboardData.asesores.reduce((sum, a) => sum + a.total_clientes, 0)}
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">Total Clientes</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-orange-600">
+                      {dashboardData.asesores.reduce((sum, a) => sum + a.pendiente, 0)}
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">Pendientes</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-green-600">
+                      {dashboardData.asesores.reduce((sum, a) => sum + a.cita_venta_puesta, 0)}
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">Citas Puestas</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-gray-600">
+                      {dashboardData.total_asesores}
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">Asesores Activos</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tabla de Asesores */}
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-200">
+                      <th className="text-left p-4 text-sm font-semibold text-gray-700">Asesor</th>
+                      <th className="text-left p-4 text-sm font-semibold text-gray-700">Rol</th>
+                      <th className="text-center p-4 text-sm font-semibold text-gray-700">Total</th>
+                      <th className="text-center p-4 text-sm font-semibold text-orange-700">Pendiente</th>
+                      <th className="text-center p-4 text-sm font-semibold text-green-700">Cita Puesta</th>
+                      <th className="text-center p-4 text-sm font-semibold text-red-700">Descarta</th>
+                      <th className="text-center p-4 text-sm font-semibold text-gray-700">No Contesta</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dashboardData.asesores.map((asesor, index) => (
+                      <tr 
+                        key={asesor.asesor_email} 
+                        className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${
+                          asesor.pendiente > 5 ? 'bg-orange-50' : ''
+                        }`}
+                      >
+                        <td className="p-4">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-semibold">
+                              {asesor.asesor_nombre.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <div className="font-medium text-gray-900">{asesor.asesor_nombre}</div>
+                              <div className="text-xs text-gray-500">{asesor.asesor_email}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                            asesor.asesor_rol === 'Supervisor' 
+                              ? 'bg-purple-100 text-purple-700' 
+                              : 'bg-blue-100 text-blue-700'
+                          }`}>
+                            {asesor.asesor_rol}
+                          </span>
+                        </td>
+                        <td className="p-4 text-center">
+                          <span className="font-semibold text-gray-900">{asesor.total_clientes}</span>
+                        </td>
+                        <td className="p-4 text-center">
+                          <span className={`inline-block px-3 py-1 rounded-full font-semibold ${
+                            asesor.pendiente > 5 
+                              ? 'bg-orange-100 text-orange-700' 
+                              : 'bg-gray-100 text-gray-700'
+                          }`}>
+                            {asesor.pendiente}
+                          </span>
+                        </td>
+                        <td className="p-4 text-center">
+                          <span className="inline-block px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold">
+                            {asesor.cita_venta_puesta}
+                          </span>
+                        </td>
+                        <td className="p-4 text-center">
+                          <span className="inline-block px-3 py-1 rounded-full bg-red-100 text-red-700 font-semibold">
+                            {asesor.descarta}
+                          </span>
+                        </td>
+                        <td className="p-4 text-center">
+                          <span className="inline-block px-3 py-1 rounded-full bg-gray-100 text-gray-700 font-semibold">
+                            {asesor.no_contesta}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Leyenda */}
+              <div className="bg-gray-50 rounded-lg p-4 mt-6">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">📌 Indicadores</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 rounded-full bg-orange-100 border border-orange-300"></div>
+                    <span className="text-gray-600">Pendiente: Cliente sin llamar</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 rounded-full bg-green-100 border border-green-300"></div>
+                    <span className="text-gray-600">Cita Puesta: Cliente agendado</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 rounded-full bg-red-100 border border-red-300"></div>
+                    <span className="text-gray-600">Descarta: Cliente no interesado</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 rounded-full bg-gray-100 border border-gray-300"></div>
+                    <span className="text-gray-600">No Contesta: Cliente no localizado</span>
+                  </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-gray-200">
+                  <p className="text-xs text-gray-500">
+                    💡 <strong>Tip:</strong> Los asesores con más de 5 clientes pendientes aparecen destacados en naranja
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // Main App Component
     const App = () => {
       const [isLoggedIn, setIsLoggedIn] = useState(false);
       const [activeSection, setActiveSection] = useState('clientes');
@@ -3745,6 +3978,8 @@
             return <ClientesManagement userRole={userRole} zonasDisponibles={zonasDisponibles} loadingZonas={loadingZonas} />;
           case 'gestionPisos':
             return userRole === 'Supervisor' ? <PisosManagement zonasDisponibles={zonasDisponibles} loadingZonas={loadingZonas} /> : <div className="text-center py-8 text-red-500">Acceso denegado - Solo Supervisores</div>;
+          case 'dashboardAsesores':
+            return userRole === 'Supervisor' ? <DashboardAsesores /> : <div className="text-center py-8 text-red-500">Acceso denegado - Solo Supervisores</div>;
           default:
             return <ClientForm onRegister={handleRegister} userRole={userRole} zonasDisponibles={zonasDisponibles} loadingZonas={loadingZonas} />;
         }
