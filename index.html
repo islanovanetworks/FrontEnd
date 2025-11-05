@@ -2580,15 +2580,29 @@
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              ...updatedPiso,
+              direccion: updatedPiso.direccion || null,
+              zona: Array.isArray(updatedPiso.zona) ? updatedPiso.zona : [updatedPiso.zona],
+              subzonas: updatedPiso.subzonas || null,
               precio: parseFloat(updatedPiso.precio),
-              m2: parseInt(updatedPiso.m2),
+              tipo_vivienda: Array.isArray(updatedPiso.tipo_vivienda) ? updatedPiso.tipo_vivienda : (updatedPiso.tipo_vivienda ? [updatedPiso.tipo_vivienda] : []),
               habitaciones: updatedPiso.habitaciones ? [parseInt(updatedPiso.habitaciones)] : [],
+              estado: updatedPiso.estado || null,
+              ascensor: updatedPiso.ascensor || null,
+              bajos: updatedPiso.bajos || null,
+              entreplanta: updatedPiso.entreplanta || null,
+              planta: updatedPiso.planta || null,
+              m2: parseInt(updatedPiso.m2),
+              altura: updatedPiso.altura || null,
+              cercania_metro: updatedPiso.cercania_metro || null,
+              balcon_terraza: updatedPiso.balcon_terraza || null,
+              patio: updatedPiso.patio || null,
+              interior: updatedPiso.interior || null,
+              caracteristicas_adicionales: updatedPiso.caracteristicas_adicionales || null,
               paralizado: updatedPiso.paralizado || "NO",
               compania_id: companiaId
             })
           });
-    
+      
           if (response.ok) {
             alert('✅ Piso actualizado exitosamente');
             setShowEditModal(false);
