@@ -2564,8 +2564,9 @@
       const handleEdit = (piso) => {
         setEditingPiso({
           ...piso,
-          zona: piso.zona ? [piso.zona] : [],
+          zona: piso.zona || '',
           tipo_vivienda: piso.tipo_vivienda ? piso.tipo_vivienda.split(',') : [],
+          habitaciones: piso.habitaciones || '',
           paralizado: piso.paralizado || "NO"
         });
         setShowEditModal(true);
@@ -2573,22 +2574,40 @@
     
       const handleUpdate = async (updatedPiso) => {
         try {
+          const payload = {
+            direccion: updatedPiso.direccion || null,
+            zona: updatedPiso.zona ? [updatedPiso.zona] : [],
+            subzonas: updatedPiso.subzonas || null,
+            precio: parseFloat(updatedPiso.precio),
+            tipo_vivienda: Array.isArray(updatedPiso.tipo_vivienda) ? updatedPiso.tipo_vivienda : (updatedPiso.tipo_vivienda ? [updatedPiso.tipo_vivienda] : []),
+            habitaciones: updatedPiso.habitaciones ? [parseInt(updatedPiso.habitaciones)] : [],
+            estado: updatedPiso.estado || null,
+            ascensor: updatedPiso.ascensor || null,
+            bajos: updatedPiso.bajos || null,
+            entreplanta: updatedPiso.entreplanta || null,
+            planta: updatedPiso.planta || null,
+            m2: parseInt(updatedPiso.m2),
+            altura: updatedPiso.altura || null,
+            cercania_metro: updatedPiso.cercania_metro || null,
+            balcon_terraza: updatedPiso.balcon_terraza || null,
+            patio: updatedPiso.patio || null,
+            interior: updatedPiso.interior || null,
+            caracteristicas_adicionales: updatedPiso.caracteristicas_adicionales || null,
+            paralizado: updatedPiso.paralizado || "NO",
+            compania_id: companiaId
+          };
+      
+          console.log('📤 Enviando payload a backend:', payload);
+      
           const response = await fetch(`${API_BASE}/pisos/${updatedPiso.id}`, {
             method: 'PUT',
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-              ...updatedPiso,
-              precio: parseFloat(updatedPiso.precio),
-              m2: parseInt(updatedPiso.m2),
-              habitaciones: updatedPiso.habitaciones ? [parseInt(updatedPiso.habitaciones)] : [],
-              paralizado: updatedPiso.paralizado || "NO",
-              compania_id: companiaId
-            })
+            body: JSON.stringify(payload)
           });
-    
+      
           if (response.ok) {
             alert('✅ Piso actualizado exitosamente');
             setShowEditModal(false);
@@ -2596,34 +2615,12 @@
             fetchPisos();
           } else {
             const error = await response.json();
+            console.error('❌ Error del backend:', error);
             alert('❌ Error: ' + error.detail);
           }
         } catch (error) {
+          console.error('❌ Error de conexión:', error);
           alert('❌ Error de conexión: ' + error.message);
-        }
-      };
-    
-      const handleDelete = async (pisoId, pisoInfo) => {
-        if (confirm(`¿Estás seguro de eliminar el piso "${pisoInfo}"?\n\nEsta acción no se puede deshacer.`)) {
-          try {
-            const response = await fetch(`${API_BASE}/pisos/${pisoId}`, {
-              method: 'DELETE',
-              headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-              }
-            });
-    
-            if (response.ok) {
-              alert('✅ Piso eliminado exitosamente');
-              fetchPisos();
-            } else {
-              const error = await response.json();
-              alert('❌ Error: ' + error.detail);
-            }
-          } catch (error) {
-            alert('❌ Error de conexión: ' + error.message);
-          }
         }
       };
 
