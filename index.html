@@ -2564,8 +2564,9 @@
       const handleEdit = (piso) => {
         setEditingPiso({
           ...piso,
-          zona: piso.zona ? [piso.zona] : [],
+          zona: piso.zona || '',
           tipo_vivienda: piso.tipo_vivienda ? piso.tipo_vivienda.split(',') : [],
+          habitaciones: piso.habitaciones || '',
           paralizado: piso.paralizado || "NO"
         });
         setShowEditModal(true);
@@ -2581,10 +2582,10 @@
             },
             body: JSON.stringify({
               direccion: updatedPiso.direccion || null,
-              zona: Array.isArray(updatedPiso.zona) ? updatedPiso.zona : [updatedPiso.zona],
+              zona: updatedPiso.zona ? [updatedPiso.zona] : [],
               subzonas: updatedPiso.subzonas || null,
               precio: parseFloat(updatedPiso.precio),
-              tipo_vivienda: Array.isArray(updatedPiso.tipo_vivienda) ? updatedPiso.tipo_vivienda : (updatedPiso.tipo_vivienda ? [updatedPiso.tipo_vivienda] : []),
+              tipo_vivienda: Array.isArray(updatedPiso.tipo_vivienda) ? updatedPiso.tipo_vivienda : [],
               habitaciones: updatedPiso.habitaciones ? [parseInt(updatedPiso.habitaciones)] : [],
               estado: updatedPiso.estado || null,
               ascensor: updatedPiso.ascensor || null,
@@ -2614,30 +2615,6 @@
           }
         } catch (error) {
           alert('❌ Error de conexión: ' + error.message);
-        }
-      };
-    
-      const handleDelete = async (pisoId, pisoInfo) => {
-        if (confirm(`¿Estás seguro de eliminar el piso "${pisoInfo}"?\n\nEsta acción no se puede deshacer.`)) {
-          try {
-            const response = await fetch(`${API_BASE}/pisos/${pisoId}`, {
-              method: 'DELETE',
-              headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-              }
-            });
-    
-            if (response.ok) {
-              alert('✅ Piso eliminado exitosamente');
-              fetchPisos();
-            } else {
-              const error = await response.json();
-              alert('❌ Error: ' + error.detail);
-            }
-          } catch (error) {
-            alert('❌ Error de conexión: ' + error.message);
-          }
         }
       };
 
